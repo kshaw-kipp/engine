@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cardinals' Reading Engine — KIPP Paterson</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// KIPP Reading Hub v2 — Improved Prototype
+// Incorporating: Sophie/Ryan feedback + AR competitive analysis
+// Key changes: Book lookup, comprehension checks, words read,
+//   genre tracking, fixed fluency passages, better dashboards
+
+const BOOK_DATABASE = [
+  { id: 1, title: "Percy Jackson: The Lightning Thief", author: "Rick Riordan", pages: 377, wordsPerPage: 250, genre: "fiction", level: "5-7" },
+  { id: 2, title: "Brown Girl Dreaming", author: "Jacqueline Woodson", pages: 336, wordsPerPage: 120, genre: "fiction", level: "5-7" },
+  { id: 3, title: "The Crossover", author: "Kwame Alexander", pages: 237, wordsPerPage: 100, genre: "fiction", level: "5-7" },
+  { id: 4, title: "Diary of a Wimpy Kid", author: "Jeff Kinney", pages: 217, wordsPerPage: 150, genre: "fiction", level: "3-5" },
+  { id: 5, title: "Monster", author: "Walter Dean Myers", pages: 281, wordsPerPage: 200, genre: "fiction", level: "7-8" },
+  { id: 6, title: "Esperanza Rising", author: "Pam Muñoz Ryan", pages: 262, wordsPerPage: 230, genre: "fiction", level: "5-7" },
+  { id: 7, title: "Ghost", author: "Jason Reynolds", pages: 181, wordsPerPage: 220, genre: "fiction", level: "5-7" },
+  { id: 8, title: "New Kid", author: "Jerry Craft", pages: 256, wordsPerPage: 80, genre: "fiction", level: "5-7" },
+  { id: 9, title: "I Am Malala (Young Readers)", author: "Malala Yousafzai", pages: 240, wordsPerPage: 240, genre: "nonfiction", level: "6-8" },
+  { id: 10, title: "Hidden Figures (Young Readers)", author: "Margot Lee Shetterly", pages: 240, wordsPerPage: 235, genre: "nonfiction", level: "5-7" },
+  { id: 11, title: "Who Was Martin Luther King, Jr.?", author: "Bonnie Bader", pages: 112, wordsPerPage: 200, genre: "nonfiction", level: "3-5" },
+  { id: 12, title: "Wings of Fire: The Dragonet Prophecy", author: "Tui T. Sutherland", pages: 336, wordsPerPage: 250, genre: "fiction", level: "4-6" },
+  { id: 13, title: "Holes", author: "Louis Sachar", pages: 233, wordsPerPage: 230, genre: "fiction", level: "5-7" },
+  { id: 14, title: "The Wild Robot", author: "Peter Brown", pages: 278, wordsPerPage: 180, genre: "fiction", level: "4-6" },
+  { id: 15, title: "Front Desk", author: "Kelly Yang", pages: 284, wordsPerPage: 220, genre: "fiction", level: "4-6" },
+  { id: 16, title: "Refugee", author: "Alan Gratz", pages: 338, wordsPerPage: 240, genre: "fiction", level: "5-7" },
+  { id: 17, title: "Number the Stars", author: "Lois Lowry", pages: 137, wordsPerPage: 230, genre: "fiction", level: "5-6" },
+  { id: 18, title: "Because of Winn-Dixie", author: "Kate DiCamillo", pages: 182, wordsPerPage: 210, genre: "fiction", level: "3-5" },
+  { id: 19, title: "National Geographic: Extreme Animals", author: "National Geographic", pages: 64, wordsPerPage: 180, genre: "nonfiction", level: "3-5" },
+  { id: 20, title: "The 57 Bus", author: "Dashka Slater", pages: 310, wordsPerPage: 240, genre: "nonfiction", level: "7-8" },
+];
+
+const COMPREHENSION_PROMPTS = [
+  "Who is the main character and what problem are they facing?",
+  "What was the most surprising thing that happened in what you read?",
+  "How did the setting (where/when the story takes place) affect what happened?",
+  "Pick one character — what do they want more than anything?",
+  "What do you think will happen next, and why?",
+  "What's one thing you learned that you didn't know before?",
+  "How does this part connect to something earlier in the book?",
+  "If you could talk to one character, what would you ask them?",
+];
+
+const FLUENCY_PASSAGES = {
+  5: {
+    title: "The Discovery",
+    text: "Maria walked along the rocky shore, her sneakers crunching on the shells and pebbles beneath her feet. The morning sun painted everything in shades of gold and orange. She had been coming to this beach every summer since she was five years old, but today felt different. A flash of light caught her eye near the tide pools. She knelt down carefully, pushing aside strands of seaweed. There, nestled between two smooth rocks, was a glass bottle with something inside. Her heart raced as she picked it up and held it to the light. Inside was a rolled-up piece of paper, yellowed with age. She pulled out the cork and gently shook the paper free. The handwriting was small and careful. It read: To whoever finds this message, I hope you believe in adventure. Follow the path where the lighthouse stands. Maria looked up at the old lighthouse on the cliff above her. She had always wondered what was inside. Now she had a reason to find out.",
+    wordCount: 170,
+  },
+  6: {
+    title: "Mission to Mars",
+    text: "Commander Chen checked the oxygen levels one more time before making the announcement. Everything had to be perfect for what came next. Through the small window of the spacecraft, she could see the red surface of Mars growing larger with each passing minute. They had been traveling for seven months, and the crew of six was both exhausted and thrilled. This would be the first human landing on Mars in history. Back on Earth, millions of people were watching the live feed, holding their breath. Chen pressed the intercom button. Ladies and gentlemen, we are beginning our descent. In approximately forty-five minutes, we will touch down on Martian soil for the first time. The ship trembled slightly as it entered the thin atmosphere. Dr. Patel, the geologist, gripped his armrest and smiled. He had spent his entire career studying Mars through telescopes and satellite images. Now he would walk on it, scoop up its ancient dust with his own hands, and search for signs of life that scientists had debated for centuries.",
+    wordCount: 175,
+  },
+  7: {
+    title: "The Turning Point",
+    text: "The gymnasium fell silent as Jordan stepped up to the free throw line. This was the moment everyone had been waiting for. The score was tied with four seconds remaining on the clock, and the championship hung in the balance. Jordan bounced the basketball twice, a habit formed over countless hours of practice in the driveway back home. The crowd of three hundred students, teachers, and parents seemed to lean forward as one. Coach Williams stood on the sideline, arms crossed, her expression unreadable. She had recruited Jordan from the track team just eight months ago, seeing potential that nobody else had noticed. Jordan had resisted at first, arguing that basketball was not the right fit. But Coach Williams had been patient and persistent, showing up every day with the same quiet confidence. Now here they were. Jordan took a deep breath, bent the knees slightly, and released the ball in a smooth arc toward the basket. The ball spun through the air, and for a brief moment, time seemed to stop completely. The net barely moved as the ball passed through it cleanly.",
+    wordCount: 185,
+  },
+  8: {
+    title: "Digital Divide",
+    text: "When the power went out across the entire city of Riverside on a Tuesday afternoon in November, fourteen-year-old Aisha discovered something remarkable about her neighborhood. Without screens to stare at and earbuds to hide behind, people actually started talking to each other. Mrs. Okafor from next door brought out candles and a deck of cards. The Martinez family across the street set up a grill and started cooking everything from their freezer before it could spoil. Within an hour, nearly twenty people had gathered in the courtyard between their apartment buildings, sharing food and stories by candlelight. Aisha had lived in this building for three years and never spoken to half of these people. Now she was learning that Mr. Thompson on the fourth floor had been a jazz musician, that the quiet woman from apartment six was writing a novel, and that the twins from the second floor could do magic tricks that left everyone gasping. It took a blackout to reveal what had been missing all along. The power came back at midnight, but the connections they made that evening lasted much longer than anyone expected.",
+    wordCount: 190,
+  },
+};
+
+const BENCHMARKS = {
+  5: { BOY: { g: 139, yL: 103, yH: 138, oL: 81, oH: 102 }, MOY: { g: 149, yL: 122, yH: 148, oL: 108, oH: 121 }, EOY: { g: 157, yL: 137, yH: 156, oL: 124, oH: 136 } },
+  6: { BOY: { g: 151, yL: 123, yH: 150, oL: 99, oH: 122 }, MOY: { g: 157, yL: 133, yH: 156, oL: 117, oH: 132 }, EOY: { g: 160, yL: 141, yH: 159, oL: 125, oH: 140 } },
+  7: { BOY: { g: 152, yL: 126, yH: 151, oL: 101, oH: 125 }, MOY: { g: 161, yL: 136, yH: 160, oL: 121, oH: 135 }, EOY: { g: 164, yL: 141, yH: 163, oL: 127, oH: 140 } },
+  8: { BOY: { g: 142, yL: 125, yH: 141, oL: 110, oH: 124 }, MOY: { g: 156, yL: 131, yH: 155, oL: 116, oH: 130 }, EOY: { g: 159, yL: 135, yH: 158, oL: 121, oH: 134 } },
+};
+
+function bmColor(grade, period, wpm) {
+  const b = BENCHMARKS[grade]?.[period];
+  if (!b) return "#94a3b8";
+  if (wpm >= b.g) return "#22c55e";
+  if (wpm >= b.yL && wpm <= b.yH) return "#eab308";
+  if (wpm >= b.oL && wpm <= b.oH) return "#f97316";
+  return "#ef4444";
+}
+function bmLabel(color) {
+  if (color === "#22c55e") return "Above Benchmark";
+  if (color === "#eab308") return "Approaching Benchmark";
+  if (color === "#f97316") return "Below Benchmark";
+  if (color === "#ef4444") return "Well Below Benchmark";
+  return "";
+}
+
+const STUDENTS = [
+  { id: 1, name: "Jaylen M.", grade: 6, homeroom: "Harvard", school: "Middle" },
+  { id: 2, name: "Amara W.", grade: 6, homeroom: "UCLA", school: "Middle" },
+  { id: 3, name: "Carlos R.", grade: 7, homeroom: "Spelman", school: "Middle" },
+  { id: 4, name: "Destiny J.", grade: 5, homeroom: "Rutgers", school: "Middle" },
+  { id: 5, name: "Marcus T.", grade: 8, homeroom: "Montclair", school: "Middle" },
+  { id: 6, name: "Sofia P.", grade: 6, homeroom: "Seton Hall", school: "Middle" },
+  { id: 7, name: "Aiden K.", grade: 7, homeroom: "Montclair", school: "Middle" },
+  { id: 8, name: "Luna V.", grade: 5, homeroom: "U of Texas", school: "Middle" },
+];
+
+const TEACHERS = [
+  { id: 900001, name: "Ana Segovia", isTeacher: true, role: "HR & ELA", hrHomeroom: "Penn State", elaHomerooms: ["FDU", "NJIT", "Penn State"], grades: [3], school: "Elementary", grade: 3 },
+  { id: 900002, name: "Ayonna Howard", isTeacher: true, role: "HR", hrHomeroom: "Rutgers", elaHomerooms: [], grades: [5], school: "Middle", grade: 5 },
+  { id: 900003, name: "Chris Underwood", isTeacher: true, role: "HR & ELA", hrHomeroom: "Montclair", elaHomerooms: ["Montclair", "Spelman"], grades: [7], school: "Middle", grade: 7 },
+  { id: 900004, name: "Claudia Romani", isTeacher: true, role: "HR & ELA", hrHomeroom: "Morehouse", elaHomerooms: ["Morehouse"], grades: [2], school: "Elementary", grade: 2 },
+  { id: 900005, name: "Craig Satz", isTeacher: true, role: "HR", hrHomeroom: "Spelman", elaHomerooms: [], grades: [7], school: "Middle", grade: 7 },
+  { id: 900006, name: "Heylin Perez", isTeacher: true, role: "HR & ELA", hrHomeroom: "Ramapo", elaHomerooms: ["Ramapo"], grades: [2], school: "Elementary", grade: 2 },
+  { id: 900007, name: "Jair Jacome", isTeacher: true, role: "HR", hrHomeroom: "Seton Hall", elaHomerooms: [], grades: [6], school: "Middle", grade: 6 },
+  { id: 900008, name: "Julissa Espino", isTeacher: true, role: "HR", hrHomeroom: "UCLA", elaHomerooms: [], grades: [6], school: "Middle", grade: 6 },
+  { id: 900009, name: "Kassandra Serrano Flores", isTeacher: true, role: "HR & ELA", hrHomeroom: "Florida State", elaHomerooms: ["Florida State"], grades: [2], school: "Elementary", grade: 2 },
+  { id: 900010, name: "Lorenza Goncalves", isTeacher: true, role: "HR & ELA", hrHomeroom: "Harvard", elaHomerooms: ["Harvard", "Seton Hall", "UCLA"], grades: [6], school: "Middle", grade: 6 },
+  { id: 900011, name: "Mariamelia Rodriguez", isTeacher: true, role: "HR", hrHomeroom: "NJIT", elaHomerooms: [], grades: [3], school: "Elementary", grade: 3 },
+  { id: 900012, name: "Monica Chien", isTeacher: true, role: "HR & ELA", hrHomeroom: "Univ of Texas", elaHomerooms: ["Rutgers", "Univ of Texas"], grades: [5], school: "Middle", grade: 5 },
+  { id: 900013, name: "Tynique Robins", isTeacher: true, role: "HR & ELA", hrHomeroom: "Duke", elaHomerooms: ["Duke"], grades: [2], school: "Elementary", grade: 2 },
+  { id: 900014, name: "Vanessa Soto", isTeacher: true, role: "HR", hrHomeroom: "FDU", elaHomerooms: [], grades: [3], school: "Elementary", grade: 3 },
+];
+
+const ALL_PARTICIPANTS = [...STUDENTS, ...TEACHERS];
+
+const SAMPLE_LOGS = [
+  { sid: 1, bookId: 1, pages: 45, wordsRead: 11250, genre: "fiction", date: "2025-02-10", reflection: "Percy just found out he's a demigod! I couldn't stop reading.", compAnswer: "Percy is the main character and he just found out he's half god half human.", recommended: true },
+  { sid: 1, bookId: 1, pages: 30, wordsRead: 7500, genre: "fiction", date: "2025-02-08", reflection: "The part with the minotaur was so intense.", compAnswer: "The minotaur attacked Percy's mom and she disappeared.", recommended: false },
+  { sid: 1, bookId: 1, pages: 50, wordsRead: 12500, genre: "fiction", date: "2025-02-05", reflection: "Annabeth is really smart. The quest is getting exciting.", compAnswer: "I think Percy will find Zeus's lightning bolt at the end.", recommended: true },
+  { sid: 2, bookId: 2, pages: 60, wordsRead: 7200, genre: "fiction", date: "2025-02-10", reflection: "I love how Jacqueline writes about her family. It reminds me of mine.", compAnswer: "The setting is in the South and in Brooklyn and it affects how the family lives.", recommended: true },
+  { sid: 2, bookId: 2, pages: 25, wordsRead: 3000, genre: "fiction", date: "2025-02-09", reflection: "The poems are short but they say a lot.", compAnswer: "Jacqueline wants to be a writer more than anything.", recommended: false },
+  { sid: 2, bookId: 9, pages: 40, wordsRead: 9600, genre: "nonfiction", date: "2025-02-04", reflection: "Malala is so brave standing up for girls education in Pakistan.", compAnswer: "Malala was shot by the Taliban for going to school but she survived and kept fighting.", recommended: true },
+  { sid: 3, bookId: 3, pages: 80, wordsRead: 8000, genre: "fiction", date: "2025-02-10", reflection: "Josh Bell is a lot like me. I play basketball too.", compAnswer: "Josh wants to be the best at basketball but his brother is getting all the attention.", recommended: true },
+  { sid: 3, bookId: 3, pages: 65, wordsRead: 6500, genre: "fiction", date: "2025-02-07", reflection: "The poetry style makes it easy to read fast.", compAnswer: "Next I think the brothers will have to work together for the championship.", recommended: true },
+  { sid: 3, bookId: 16, pages: 55, wordsRead: 13200, genre: "fiction", date: "2025-02-02", reflection: "Three kids in different times all trying to escape danger. Josef's part is so sad.", compAnswer: "The surprising thing was that all three stories are connected at the end.", recommended: true },
+  { sid: 4, bookId: 4, pages: 55, wordsRead: 8250, genre: "fiction", date: "2025-02-10", reflection: "Greg is so funny. The cheese touch part had me laughing.", compAnswer: "Greg is the main character and he's trying to survive middle school.", recommended: true },
+  { sid: 4, bookId: 4, pages: 40, wordsRead: 6000, genre: "fiction", date: "2025-02-07", reflection: "Rowley is a good friend even when Greg isn't.", compAnswer: "I would ask Greg why he doesn't treat Rowley better since he's his only real friend.", recommended: false },
+  { sid: 4, bookId: 11, pages: 30, wordsRead: 6000, genre: "nonfiction", date: "2025-02-03", reflection: "I learned about the Montgomery bus boycott and how it lasted over a year.", compAnswer: "I learned that MLK was only 26 when he led the bus boycott.", recommended: true },
+  { sid: 5, bookId: 5, pages: 35, wordsRead: 7000, genre: "fiction", date: "2025-02-10", reflection: "The screenplay format is different but I like it.", compAnswer: "Steve is the main character and he's on trial for a crime he says he didn't commit.", recommended: false },
+  { sid: 5, bookId: 5, pages: 42, wordsRead: 8400, genre: "fiction", date: "2025-02-06", reflection: "Steve's story makes me think about fairness.", compAnswer: "The most surprising thing was how the lawyer doesn't seem to believe Steve either.", recommended: true },
+  { sid: 5, bookId: 20, pages: 50, wordsRead: 12000, genre: "nonfiction", date: "2025-02-01", reflection: "This is a real story about two teens on a bus in Oakland. It made me think about how one moment can change everything.", compAnswer: "The setting is Oakland California and it affects the story because of the different neighborhoods the characters come from.", recommended: true },
+  { sid: 6, bookId: 6, pages: 45, wordsRead: 10350, genre: "fiction", date: "2025-02-10", reflection: "Esperanza had to leave everything behind. That must be so hard.", compAnswer: "Esperanza wants to go back to her old life in Mexico more than anything.", recommended: true },
+  { sid: 6, bookId: 10, pages: 35, wordsRead: 8225, genre: "nonfiction", date: "2025-02-06", reflection: "These women were so smart and nobody even knew about them for so long.", compAnswer: "I learned that Black women mathematicians helped NASA send people to space.", recommended: true },
+  { sid: 7, bookId: 7, pages: 60, wordsRead: 13200, genre: "fiction", date: "2025-02-10", reflection: "Ghost runs so fast. His backstory is tough but he keeps going.", compAnswer: "Ghost is facing the problem of controlling his anger and his past trauma.", recommended: true },
+  { sid: 8, bookId: 14, pages: 50, wordsRead: 9000, genre: "fiction", date: "2025-02-10", reflection: "Roz learning to survive on the island is so cool. She adapts to everything.", compAnswer: "The wild robot Roz is trying to survive and fit in with the animals on the island.", recommended: true },
+  { sid: 8, bookId: 19, pages: 20, wordsRead: 3600, genre: "nonfiction", date: "2025-02-05", reflection: "The photos of deep sea creatures are amazing. Some of them glow in the dark!", compAnswer: "I learned that some animals at the bottom of the ocean make their own light called bioluminescence.", recommended: false },
+];
+
+const SAMPLE_FLUENCY = [
+  { sid: 1, totalWords: 145, errors: 3, date: "2025-02-10", period: "MOY" },
+  { sid: 1, totalWords: 130, errors: 5, date: "2025-02-03", period: "MOY" },
+  { sid: 1, totalWords: 118, errors: 8, date: "2025-01-27", period: "MOY" },
+  { sid: 2, totalWords: 162, errors: 2, date: "2025-02-10", period: "MOY" },
+  { sid: 2, totalWords: 155, errors: 4, date: "2025-02-03", period: "MOY" },
+  { sid: 3, totalWords: 170, errors: 1, date: "2025-02-10", period: "MOY" },
+  { sid: 3, totalWords: 158, errors: 3, date: "2025-02-03", period: "MOY" },
+  { sid: 4, totalWords: 125, errors: 6, date: "2025-02-10", period: "MOY" },
+  { sid: 4, totalWords: 110, errors: 9, date: "2025-02-03", period: "MOY" },
+  { sid: 5, totalWords: 148, errors: 4, date: "2025-02-10", period: "MOY" },
+  { sid: 5, totalWords: 140, errors: 6, date: "2025-02-01", period: "MOY" },
+  { sid: 6, totalWords: 155, errors: 3, date: "2025-02-10", period: "MOY" },
+  { sid: 7, totalWords: 163, errors: 2, date: "2025-02-10", period: "MOY" },
+  { sid: 8, totalWords: 130, errors: 5, date: "2025-02-10", period: "MOY" },
+];
+
+const TIERS = ["Cooking","Elite","Built Different","Main Character Energy","+1,000 Aura","S-tier","Legend","Icon","Light Work","The GOAT"];
+const TIER_EMOJI = ["🔥","⚡","💎","🎬","✨","🏆","👑","🌟","😤","🐐"];
+const TIER_COLORS = ["#78716c","#6366f1","#8b5cf6","#ec4899","#06b6d4","#f59e0b","#ef4444","#22c55e","#0ea5e9","#d946ef"];
+const GRADE_GOALS = { 5: 2500, 6: 3000, 7: 3500, 8: 4000 };
+
+function getTier(grade, totalPages) {
+  const goal = GRADE_GOALS[grade] || 3000;
+  const perTier = goal / 10;
+  const ti = Math.min(Math.floor(totalPages / perTier), 9);
+  return { tierIndex: ti, tierName: TIERS[ti], totalPages, gradeGoal: goal, perTier: Math.round(perTier), pctOverall: Math.min(Math.round(totalPages / goal * 100), 100), pctInTier: Math.round(Math.min((totalPages - ti * perTier) / perTier * 100, 100)), pagesRemaining: Math.max(0, Math.round((ti + 1) * perTier - totalPages)), nextTierName: ti < 9 ? TIERS[ti + 1] : "THE GOAT", isGoat: ti >= 9 };
+}
+
+const CSS = `
+:root {
+  --navy: #0f1729; --navy-mid: #1a2744; --navy-light: #243556;
+  --cardinal: #c41e3a; --cardinal-dark: #a01830; --cardinal-glow: rgba(196,30,58,0.12);
+  --amber: #f59e0b; --amber-glow: rgba(245,158,11,0.12);
+  --green: #22c55e; --yellow: #eab308; --orange: #f97316; --red: #ef4444;
+  --cream: #fef7ed; --cream-mid: #fdf2e4;
+  --warm-gray: #78716c; --text-primary: #1c1917; --text-secondary: #57534e;
+  --border: #e7e0d8; --card-bg: #ffffff;
+  --font-display: 'Archivo Black', sans-serif; --font-body: 'DM Sans', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.rhub { font-family: var(--font-body); background: var(--cream); min-height: 100vh; color: var(--text-primary); }
+.card { background: var(--card-bg); border-radius: 14px; padding: 20px; box-shadow: 0 2px 16px rgba(15,23,41,0.06); border: 1px solid var(--border); }
+.btn { border: none; border-radius: 8px; padding: 12px 24px; font-family: var(--font-body); font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-c { background: var(--cardinal); color: #fff; box-shadow: 0 3px 12px rgba(196,30,58,0.25); }
+.btn-c:hover { background: var(--cardinal-dark); transform: translateY(-1px); }
+.btn-o { background: transparent; color: var(--cardinal); border: 2px solid var(--cardinal); }
+.btn-o:hover { background: var(--cardinal-glow); }
+.btn-a { background: var(--amber); color: var(--navy); }
+.input { width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid var(--border); font-family: var(--font-body); font-size: 15px; outline: none; transition: border-color 0.2s; background: #fff; color: var(--text-primary); }
+.input:focus { border-color: var(--cardinal); }
+.hd { font-family: var(--font-display); }
+.progress-bar { background: #f0ebe4; border-radius: 8px; height: 12px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 10px; color: var(--warm-gray); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+td { padding: 10px; border-bottom: 1px solid #f0ebe4; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+.book-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid var(--cardinal); border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.book-dropdown-item { padding: 10px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-bottom: 1px solid #f5f0eb; }
+.book-dropdown-item:hover { background: var(--cream); }
+.badge-new { position: absolute; top: -4px; right: -4px; background: var(--cardinal); color: white; font-size: 8px; font-weight: 800; padding: 2px 5px; border-radius: 6px; letter-spacing: 0.5px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.pulse { animation: pulse 2s infinite; }
+@media (max-width: 600px) { .page { padding: 16px 12px !important; } }
+`;
+
+
+function Header({ view, setView, student, setStudent }) {
+  const isTeacher = student?.isTeacher;
+  const tabs = isTeacher ? [
+    { k: "home", icon: "🏠", label: "Home" },
+    { k: "reading", icon: "📚", label: "Reading" },
+    { k: "leaderboard", icon: "🏆", label: "Leaderboard" },
+    { k: "dashboard", icon: "📊", label: "Dashboard" },
+  ] : [
+    { k: "home", icon: "🏠", label: "Home" },
+    { k: "fluency", icon: "⏱️", label: "Fluency" },
+    { k: "reading", icon: "📚", label: "Reading" },
+    { k: "leaderboard", icon: "🏆", label: "Leaderboard" },
+    { k: "dashboard", icon: "👩‍🏫", label: "Teacher" },
+  ];
+  return (
+    <div style={{ background: "linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ fontSize: 26 }}>🐦</span>
+        <div>
+          <div className="hd" style={{ fontSize: 17, color: "#fff", letterSpacing: -0.5 }}>Cardinals' Reading Engine</div>
+          <div style={{ color: "#a8c8e8", fontSize: 11, fontWeight: 600 }}>KIPP Paterson • {student ? student.name : "Pilot"}</div>
+        </div>
+        {student && (
+          <button onClick={() => setStudent(null)} style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 8, padding: "3px 10px", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", marginLeft: 4 }}>
+            ↩ Switch
+          </button>
+        )}
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {tabs.map((t) => (
+          <button key={t.k} onClick={() => setView(t.k)}
+            style={{ background: view === t.k ? "rgba(255,255,255,0.15)" : "transparent", color: view === t.k ? "#fff" : "rgba(255,255,255,0.6)", border: view === t.k ? "1px solid rgba(255,255,255,0.2)" : "1px solid transparent", borderRadius: 8, padding: "5px 12px", fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 12, cursor: "pointer", transition: "all 0.2s" }}>
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BookSearch({ value, onChange, onSelect, selectedBook }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value || "");
+  const ref = useRef(null);
+
+  const filtered = query.length >= 2
+    ? BOOK_DATABASE.filter(b => b.title.toLowerCase().includes(query.toLowerCase()) || b.author.toLowerCase().includes(query.toLowerCase()))
+    : [];
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <input className="input" value={query}
+        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); }}
+        onFocus={() => query.length >= 2 && setOpen(true)}
+        placeholder="Search by title or author, or type your own..."
+        style={{ marginBottom: 0 }} />
+      {selectedBook && (
+        <div style={{ display: "flex", gap: 8, marginTop: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+          <span className="tag" style={{ background: selectedBook.genre === "nonfiction" ? "#dbeafe" : "#fce7f3", color: selectedBook.genre === "nonfiction" ? "#1d4ed8" : "#be185d" }}>
+            {selectedBook.genre === "nonfiction" ? "📘 Nonfiction" : "📕 Fiction"}
+          </span>
+          <span style={{ color: "var(--warm-gray)" }}>~{selectedBook.wordsPerPage} words/page • {selectedBook.pages} pages total</span>
+        </div>
+      )}
+      {!selectedBook && query.length >= 2 && (
+        <div style={{ marginTop: 4, fontSize: 11, color: "var(--warm-gray)" }}>
+          💡 Not in our library? Just type the full title — we'll estimate word counts.
+        </div>
+      )}
+      {open && filtered.length > 0 && (
+        <div className="book-dropdown">
+          {filtered.slice(0, 6).map((b) => (
+            <div key={b.id} className="book-dropdown-item"
+              onClick={() => { setQuery(b.title); onChange(b.title); onSelect(b); setOpen(false); }}>
+              <div>
+                <div style={{ fontWeight: 700, color: "var(--navy)" }}>{b.title}</div>
+                <div style={{ fontSize: 11, color: "var(--warm-gray)" }}>{b.author} • {b.pages}p</div>
+              </div>
+              <span className="tag" style={{ background: b.genre === "nonfiction" ? "#dbeafe" : "#fce7f3", color: b.genre === "nonfiction" ? "#1d4ed8" : "#be185d", fontSize: 10 }}>
+                {b.genre}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LoginView({ onLogin }) {
+  const [mode, setMode] = useState("student"); // student | teacher
+
+  const elementaryTeachers = TEACHERS.filter(t => t.school === "Elementary");
+  const middleTeachers = TEACHERS.filter(t => t.school === "Middle");
+
+  return (
+    <div style={{ maxWidth: 420, margin: "0 auto", padding: "60px 20px", textAlign: "center" }}>
+      <div style={{ fontSize: 72, marginBottom: 16 }}>🐦</div>
+      <h1 className="hd" style={{ fontSize: 28, color: "var(--cardinal)", marginBottom: 4 }}>Cardinals' Reading Engine</h1>
+      <p style={{ color: "var(--text-secondary)", marginBottom: 24, fontSize: 14 }}>KIPP Paterson • Pilot Program</p>
+
+      {/* Student / Teacher toggle */}
+      <div style={{ display: "flex", gap: 0, justifyContent: "center", marginBottom: 24, background: "#f0ebe4", borderRadius: 12, padding: 4, maxWidth: 280, margin: "0 auto 24px" }}>
+        <button onClick={() => setMode("student")}
+          style={{ flex: 1, padding: "10px 16px", borderRadius: 10, border: "none", fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "all 0.2s",
+            background: mode === "student" ? "var(--cardinal)" : "transparent", color: mode === "student" ? "#fff" : "var(--warm-gray)" }}>
+          🎒 I'm a Student
+        </button>
+        <button onClick={() => setMode("teacher")}
+          style={{ flex: 1, padding: "10px 16px", borderRadius: 10, border: "none", fontFamily: "var(--font-body)", fontWeight: 700, fontSize: 14, cursor: "pointer", transition: "all 0.2s",
+            background: mode === "teacher" ? "var(--cardinal)" : "transparent", color: mode === "teacher" ? "#fff" : "var(--warm-gray)" }}>
+          👩‍🏫 I'm a Teacher
+        </button>
+      </div>
+
+      {mode === "student" && (
+        <div className="card" style={{ padding: 28, textAlign: "left" }}>
+          <p className="hd" style={{ fontSize: 16, color: "var(--navy)", marginBottom: 16, textAlign: "center" }}>Who's reading today?</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {STUDENTS.map((s) => (
+              <button key={s.id} onClick={() => onLogin(s)} className="card"
+                style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", border: "2px solid var(--border)", transition: "all 0.15s", textAlign: "left" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--cardinal)"; e.currentTarget.style.transform = "translateX(4px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateX(0)"; }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, var(--cardinal), var(--amber))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: 14 }}>
+                  {s.name.charAt(0)}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, color: "var(--navy)", fontSize: 14 }}>{s.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>Grade {s.grade} • {s.homeroom}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {mode === "teacher" && (
+        <div className="card" style={{ padding: 28, textAlign: "left" }}>
+          <p className="hd" style={{ fontSize: 16, color: "var(--navy)", marginBottom: 16, textAlign: "center" }}>Welcome, teacher! Who are you?</p>
+
+          {[{ label: "Elementary", teachers: elementaryTeachers }, { label: "Middle School", teachers: middleTeachers }].map((group) => (
+            <div key={group.label} style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--warm-gray)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8, paddingBottom: 4, borderBottom: "1px solid var(--border)" }}>
+                {group.label}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {group.teachers.map((t) => (
+                  <button key={t.id} onClick={() => onLogin(t)} className="card"
+                    style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, cursor: "pointer", border: "2px solid var(--border)", transition: "all 0.15s", textAlign: "left" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--cardinal)"; e.currentTarget.style.transform = "translateX(4px)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateX(0)"; }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: 14 }}>
+                      {t.name.charAt(0)}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: "var(--navy)", fontSize: 14 }}>{t.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>{t.role} • {t.hrHomeroom}</div>
+                    </div>
+                    <span className="tag" style={{ background: "#ede9fe", color: "#6366f1", fontSize: 10 }}>Grade {t.grade}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HomeView({ student, setView, logs }) {
+  const studentLogs = logs.filter((l) => l.sid === student.id);
+  const totalPages = studentLogs.reduce((s, l) => s + l.pages, 0);
+  const totalWords = studentLogs.reduce((s, l) => s + l.wordsRead, 0);
+  const tier = getTier(student.grade, totalPages);
+  const ti = tier.tierIndex;
+  const nfCount = studentLogs.filter((l) => l.genre === "nonfiction").length;
+  const nfPct = studentLogs.length > 0 ? Math.round(nfCount / studentLogs.length * 100) : 0;
+  const isTeacher = student.isTeacher;
+
+  // Teacher nav items (no Fluency Check)
+  const teacherNavItems = [
+    { k: "reading", icon: "📚", label: "Reading Log", sub: "Log your reading" },
+    { k: "leaderboard", icon: "🏆", label: "Leaderboard", sub: "Competitions" },
+    { k: "dashboard", icon: "📊", label: "Dashboard", sub: "School overview" },
+  ];
+
+  // Student nav items
+  const studentNavItems = [
+    { k: "fluency", icon: "⏱️", label: "Fluency Check", sub: "Track your WPM", badge: "NEW: Passages" },
+    { k: "reading", icon: "📚", label: "Reading Log", sub: "Log pages read", badge: "NEW: Book Lookup" },
+    { k: "leaderboard", icon: "🏆", label: "Leaderboard", sub: "See top readers" },
+    { k: "dashboard", icon: "👩‍🏫", label: "Teacher View", sub: "Dashboard" },
+  ];
+
+  const navItems = isTeacher ? teacherNavItems : studentNavItems;
+
+  return (
+    <div className="page fade-in" style={{ maxWidth: 600, margin: "0 auto", padding: "24px 16px", textAlign: "center" }}>
+      {isTeacher ? (
+        <>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>👩‍🏫</div>
+          <h1 className="hd" style={{ fontSize: 24, color: "var(--navy)", marginBottom: 4 }}>Welcome, {student.name}!</h1>
+          <p style={{ color: "var(--text-secondary)", fontSize: 13, marginBottom: 20 }}>{student.role} • {student.hrHomeroom} • {student.school}</p>
+
+          {/* Teacher Reading Summary Card */}
+          <div className="card" style={{ marginBottom: 16, border: "2px solid #6366f1", background: "linear-gradient(135deg, #eef2ff, white)" }}>
+            <div className="hd" style={{ fontSize: 16, color: "#6366f1", marginBottom: 8 }}>Your Reading This Year</div>
+            <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 8 }}>
+              <div>
+                <div className="hd" style={{ fontSize: 28, color: "var(--cardinal)" }}>{totalPages.toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>pages</div>
+              </div>
+              <div>
+                <div className="hd" style={{ fontSize: 28, color: "var(--navy)" }}>{totalWords.toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>words</div>
+              </div>
+              <div>
+                <div className="hd" style={{ fontSize: 28, color: "#3b82f6" }}>{studentLogs.length}</div>
+                <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>entries</div>
+              </div>
+            </div>
+            {totalPages === 0 && (
+              <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>
+                Log your first reading to join the competition!
+              </div>
+            )}
+            {totalPages > 0 && (
+              <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                📘 {nfPct}% nonfiction • Keep reading to inspire your students!
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>{TIER_EMOJI[ti]}</div>
+          <h1 className="hd" style={{ fontSize: 24, color: "var(--navy)", marginBottom: 4 }}>Welcome, Cardinal!</h1>
+          <p style={{ color: "var(--text-secondary)", fontSize: 13, marginBottom: 20 }}>{student.name} • Grade {student.grade} • {student.homeroom}</p>
+
+          {/* Tier Card */}
+          <div className="card" style={{ marginBottom: 16, border: "2px solid var(--amber)", background: "linear-gradient(135deg, #fffbeb, white)" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: 3, marginBottom: 8 }}>
+              {TIERS.map((_, i) => (
+                <div key={i} style={{ flex: i === ti ? 2 : 1, height: 8, borderRadius: 4, background: i < ti ? "var(--amber)" : i === ti ? "linear-gradient(90deg, var(--amber), var(--cardinal))" : "#e5e0d8", transition: "all .3s" }} />
+              ))}
+            </div>
+            <div className="hd" style={{ fontSize: 32, color: TIER_COLORS[ti] }}>{TIER_EMOJI[ti]} {tier.tierName}</div>
+            <div className="hd" style={{ fontSize: 22, color: "var(--cardinal)", marginTop: 4 }}>
+              {totalPages.toLocaleString()} <span style={{ fontSize: 13, color: "var(--warm-gray)", fontFamily: "var(--font-body)" }}>pages</span>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 8, fontSize: 12 }}>
+              <div style={{ color: "var(--text-secondary)" }}>📖 <strong style={{ color: "var(--navy)" }}>{totalWords.toLocaleString()}</strong> words read</div>
+              <div style={{ color: "var(--text-secondary)" }}>📘 <strong style={{ color: "var(--navy)" }}>{nfPct}%</strong> nonfiction</div>
+            </div>
+
+            <div className="progress-bar" style={{ margin: "10px 0 6px", height: 12 }}>
+              <div className="progress-fill" style={{ width: `${tier.pctOverall}%`, background: "linear-gradient(90deg, var(--amber), var(--cardinal))" }} />
+            </div>
+            <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>
+              {!tier.isGoat ? <>Next: <strong>{tier.nextTierName}</strong> — {tier.pagesRemaining} pages to go</> : <>🐐 YOU ARE THE GOAT! 🐐</>}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Nav Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: navItems.length <= 3 ? "1fr 1fr 1fr" : "1fr 1fr", gap: 12 }}>
+        {navItems.map((item) => (
+          <button key={item.k} className="card" onClick={() => setView(item.k)}
+            style={{ cursor: "pointer", border: "2px solid var(--border)", transition: "all 0.15s", textAlign: "center", position: "relative" }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--cardinal)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+            {item.badge && <span className="badge-new">{item.badge}</span>}
+            <div style={{ fontSize: 32, marginBottom: 6 }}>{item.icon}</div>
+            <div className="hd" style={{ fontSize: 13, color: "var(--navy)" }}>{item.label}</div>
+            <div style={{ fontSize: 11, color: "var(--warm-gray)", marginTop: 2 }}>{item.sub}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FluencyView({ student, fluency, setFluency }) {
+  const [mode, setMode] = useState("choose"); // choose | passage | manual
+  const [totalWords, setTotalWords] = useState("");
+  const [errors, setErrors] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [timerState, setTimerState] = useState("idle");
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [stopIndex, setStopIndex] = useState("");
+  const intervalRef = useRef(null);
+  const period = "MOY";
+  const passage = FLUENCY_PASSAGES[student.grade] || FLUENCY_PASSAGES[6];
+  const history = fluency.filter((f) => f.sid === student.id);
+
+  const startTimer = () => {
+    setSecondsLeft(60); setTimerState("running");
+    const start = Date.now();
+    intervalRef.current = setInterval(() => {
+      const remaining = Math.max(0, 60 - Math.floor((Date.now() - start) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining <= 0) { clearInterval(intervalRef.current); setTimerState("done"); }
+    }, 100);
+  };
+  const resetTimer = () => { clearInterval(intervalRef.current); setTimerState("idle"); setSecondsLeft(60); };
+
+  useEffect(() => () => clearInterval(intervalRef.current), []);
+
+  const rr = totalWords && errors !== "" ? Math.max(0, parseInt(totalWords) - parseInt(errors || 0)) : null;
+  const bc = rr !== null ? bmColor(student.grade, period, rr) : null;
+
+  const handleSubmit = () => {
+    if (!totalWords) return;
+    const entry = { sid: student.id, totalWords: parseInt(totalWords), errors: parseInt(errors || 0), date: new Date().toISOString().split("T")[0], period };
+    setFluency((prev) => [entry, ...prev]);
+    setSubmitted(true);
+  };
+
+  const handlePassageSubmit = () => {
+    if (!stopIndex) return;
+    const words = passage.text.split(/\s+/);
+    const idx = Math.min(parseInt(stopIndex), words.length);
+    setTotalWords(String(idx));
+    setMode("manual");
+  };
+
+  const reset = () => { setTotalWords(""); setErrors(""); setSubmitted(false); resetTimer(); setMode("choose"); setStopIndex(""); };
+
+  // Passage word display with indices
+  const passageWords = passage?.text.split(/\s+/) || [];
+
+  return (
+    <div className="page fade-in" style={{ maxWidth: 600, margin: "0 auto", padding: "24px 16px" }}>
+      <h2 className="hd" style={{ fontSize: 20, color: "var(--navy)", marginBottom: 2 }}>⏱️ Fluency Check</h2>
+      <p style={{ color: "var(--warm-gray)", fontSize: 13, marginBottom: 16 }}>{student.name} • Grade {student.grade} • {period}</p>
+
+      {!submitted && mode === "choose" && (
+        <div className="card">
+          <p className="hd" style={{ fontSize: 15, color: "var(--navy)", marginBottom: 12, textAlign: "center" }}>How do you want to practice?</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <button className="card" onClick={() => setMode("passage")}
+              style={{ cursor: "pointer", border: "2px solid var(--border)", padding: 16, textAlign: "left", transition: "all 0.15s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--cardinal)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <span style={{ fontSize: 28 }}>📄</span>
+                <div>
+                  <div className="hd" style={{ fontSize: 14, color: "var(--navy)" }}>Read a Fluency Passage</div>
+                  <div style={{ fontSize: 12, color: "var(--warm-gray)", marginTop: 2 }}>Grade-level passage with built-in word counter — recommended!</div>
+                </div>
+                <span className="tag" style={{ background: "#dcfce7", color: "#166534", marginLeft: "auto" }}>Recommended</span>
+              </div>
+            </button>
+            <button className="card" onClick={() => setMode("manual")}
+              style={{ cursor: "pointer", border: "2px solid var(--border)", padding: 16, textAlign: "left", transition: "all 0.15s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--cardinal)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <span style={{ fontSize: 28 }}>📖</span>
+                <div>
+                  <div className="hd" style={{ fontSize: 14, color: "var(--navy)" }}>Read from Your Own Book</div>
+                  <div style={{ fontSize: 12, color: "var(--warm-gray)", marginTop: 2 }}>Count words yourself and enter manually</div>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* PASSAGE MODE */}
+      {!submitted && mode === "passage" && (
+        <div className="card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div className="hd" style={{ fontSize: 14, color: "var(--navy)" }}>📄 "{passage.title}"</div>
+              <div style={{ fontSize: 11, color: "var(--warm-gray)" }}>Grade {student.grade} passage • {passage.wordCount} words total</div>
+            </div>
+            <button className="btn btn-o" onClick={() => setMode("choose")} style={{ padding: "4px 12px", fontSize: 11 }}>← Back</button>
+          </div>
+
+          {/* Timer */}
+          <div style={{ textAlign: "center", marginBottom: 16 }}>
+            <div className="hd" style={{ fontSize: 36, color: timerState === "done" ? "var(--green)" : secondsLeft <= 10 ? "var(--red)" : "var(--cardinal)" }}>
+              {timerState === "done" ? "⏱️ Done!" : `0:${secondsLeft < 10 ? "0" : ""}${secondsLeft}`}
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 8 }}>
+              {timerState === "idle" && <button className="btn btn-c" onClick={startTimer}>▶️ Start Reading!</button>}
+              {timerState === "running" && <button className="btn btn-o" onClick={resetTimer}>✕ Cancel</button>}
+              {timerState === "done" && <button className="btn btn-o" onClick={resetTimer}>🔄 Reset</button>}
+            </div>
+            {timerState === "running" && <p style={{ fontSize: 13, color: "var(--cardinal)", fontWeight: 700, marginTop: 8 }}>📖 Read aloud now!</p>}
+          </div>
+
+          {/* Passage text with word numbers */}
+          <div style={{ background: "var(--cream-mid)", borderRadius: 10, padding: 16, marginBottom: 16, border: "1px solid var(--border)", lineHeight: 1.9, fontSize: 14 }}>
+            {passageWords.map((word, i) => (
+              <span key={i}>
+                {(i + 1) % 25 === 0 && <sup style={{ color: "var(--cardinal)", fontSize: 9, fontWeight: 700 }}>[{i + 1}]</sup>}
+                {word}{" "}
+              </span>
+            ))}
+            <sup style={{ color: "var(--cardinal)", fontSize: 9, fontWeight: 700 }}>[{passageWords.length}]</sup>
+          </div>
+
+          {timerState === "done" && (
+            <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+              <p style={{ fontSize: 13, color: "var(--green)", fontWeight: 700, marginBottom: 12 }}>✅ Great job! Now find the closest [number] to where you stopped.</p>
+              <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>What was the last word number you reached?</label>
+              <input className="input" type="number" value={stopIndex} onChange={(e) => setStopIndex(e.target.value)} placeholder="e.g. 150" style={{ marginBottom: 12 }} />
+              <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>Number of errors (mistakes)</label>
+              <input className="input" type="number" value={errors} onChange={(e) => setErrors(e.target.value)} placeholder="e.g. 3" style={{ marginBottom: 12 }} />
+              <button className="btn btn-c" onClick={handlePassageSubmit} disabled={!stopIndex} style={{ width: "100%", justifyContent: "center", opacity: stopIndex ? 1 : 0.5 }}>
+                Calculate My WPM →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MANUAL MODE */}
+      {!submitted && mode === "manual" && (
+        <div className="card">
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+            <div className="hd" style={{ fontSize: 14, color: "var(--navy)" }}>📖 Manual Entry</div>
+            <button className="btn btn-o" onClick={() => setMode("choose")} style={{ padding: "4px 12px", fontSize: 11 }}>← Back</button>
+          </div>
+          <div style={{ background: "var(--cream-mid)", borderRadius: 10, padding: 14, marginBottom: 16, border: "1px solid var(--border)" }}>
+            <p style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", marginBottom: 6 }}>📋 How to practice:</p>
+            <ol style={{ paddingLeft: 18, color: "var(--text-secondary)", fontSize: 13, lineHeight: 1.8 }}>
+              <li>Set a timer for <strong>one minute</strong></li>
+              <li>Read your book aloud</li>
+              <li>Count total words you read and errors</li>
+            </ol>
+          </div>
+          <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>Total words read in one minute</label>
+          <input className="input" type="number" value={totalWords} onChange={(e) => setTotalWords(e.target.value)} placeholder="e.g. 145" style={{ marginBottom: 12 }} />
+          <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>Number of errors</label>
+          <input className="input" type="number" value={errors} onChange={(e) => setErrors(e.target.value)} placeholder="e.g. 3" style={{ marginBottom: 16 }} />
+
+          {rr !== null && (
+            <div style={{ background: `${bc}15`, border: `2px solid ${bc}`, borderRadius: 12, padding: 16, marginBottom: 16, textAlign: "center" }}>
+              <div style={{ fontSize: 11, color: "var(--warm-gray)" }}>Your Reading Rate</div>
+              <div className="hd" style={{ fontSize: 42, color: bc }}>{rr}</div>
+              <div style={{ fontSize: 12, color: "var(--warm-gray)" }}>words per minute</div>
+              <div style={{ fontWeight: 700, color: bc, fontSize: 14, marginTop: 6 }}>{bmLabel(bc)}</div>
+            </div>
+          )}
+          <button className="btn btn-c" onClick={handleSubmit} disabled={!totalWords} style={{ width: "100%", justifyContent: "center", opacity: totalWords ? 1 : 0.5 }}>
+            Submit ✓
+          </button>
+        </div>
+      )}
+
+      {submitted && (
+        <div className="card fade-in" style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>🎉</div>
+          <h3 className="hd" style={{ color: "var(--navy)", marginBottom: 8 }}>Great job practicing!</h3>
+          <div className="hd" style={{ fontSize: 36, color: bc || "var(--cardinal)" }}>{rr} WPM</div>
+          <div style={{ fontWeight: 700, color: bc, fontSize: 14, marginTop: 4, marginBottom: 12 }}>{bmLabel(bc)}</div>
+          <div style={{ background: "var(--cream-mid)", borderRadius: 10, padding: 12, fontSize: 13, color: "var(--text-secondary)", marginBottom: 16, border: "1px solid var(--border)" }}>
+            💡 <strong>Tip:</strong> {bc === "#22c55e" ? "Amazing! You're above benchmark. Keep reading aloud 15 min/day!" : bc === "#eab308" ? "You're close! Practice 15 minutes of reading aloud each day." : "Keep going! 15 minutes a day will make a big difference."}
+          </div>
+          <button className="btn btn-o" onClick={reset}>Log Another Session</button>
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h3 className="hd" style={{ fontSize: 15, color: "var(--navy)", marginBottom: 12 }}>📈 Your Fluency Journey</h3>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100, marginBottom: 12 }}>
+            {[...history].reverse().slice(-8).map((e, i) => {
+              const rate = e.totalWords - e.errors;
+              const mx = Math.max(...history.map((h) => h.totalWords - h.errors), 180);
+              const h = Math.max(16, (rate / mx) * 90);
+              const c = bmColor(student.grade, e.period, rate);
+              return (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: c }}>{rate}</span>
+                  <div style={{ width: "100%", maxWidth: 36, height: h, background: `${c}25`, border: `2px solid ${c}`, borderRadius: 5 }} />
+                  <span style={{ fontSize: 9, color: "var(--warm-gray)" }}>{e.date?.slice(5)}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 12, color: "var(--warm-gray)", textAlign: "center" }}>
+            {history.length} sessions • Best: <strong>{Math.max(...history.map((h) => h.totalWords - h.errors))} WPM</strong>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReadingView({ student, logs, setLogs }) {
+  const isTeacher = student.isTeacher;
+  const [step, setStep] = useState(1); // 1=book+pages, 2=comprehension (students only), 3=reflection, 4=done
+  const [bookTitle, setBookTitle] = useState("");
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [pages, setPages] = useState("");
+  const [compQuestion, setCompQuestion] = useState("");
+  const [compAnswer, setCompAnswer] = useState("");
+  const [reflection, setReflection] = useState("");
+  const [recommended, setRecommended] = useState(false);
+  const [feedback, setFeedback] = useState("");
+
+  const studentLogs = logs.filter((l) => l.sid === student.id);
+  const totalPages = studentLogs.reduce((s, l) => s + l.pages, 0);
+  const totalWords = studentLogs.reduce((s, l) => s + l.wordsRead, 0);
+  const tier = getTier(student.grade, totalPages);
+  const ti = tier.tierIndex;
+
+  useEffect(() => {
+    setCompQuestion(COMPREHENSION_PROMPTS[Math.floor(Math.random() * COMPREHENSION_PROMPTS.length)]);
+  }, []);
+
+  const estimateWords = (pg) => {
+    if (selectedBook) return pg * selectedBook.wordsPerPage;
+    return pg * 220; // default estimate
+  };
+
+  const handleStep1 = () => {
+    if (!bookTitle || !pages) return;
+    setStep(isTeacher ? 3 : 2); // Teachers skip comprehension check
+  };
+
+  const handleStep2 = () => {
+    if (compAnswer.trim().split(/\s+/).length < 5) {
+      setFeedback("✏️ Try writing a bit more! Give us a full sentence answer.");
+      return;
+    }
+    setFeedback("");
+    setStep(3);
+  };
+
+  const handleStep3 = () => {
+    if (reflection.trim().split(/\s+/).length < 5) {
+      setFeedback("✏️ Tell us more about what you read! At least a sentence or two.");
+      return;
+    }
+    const wordsRead = estimateWords(parseInt(pages));
+    const newLog = {
+      sid: student.id,
+      bookId: selectedBook?.id || null,
+      pages: parseInt(pages),
+      wordsRead,
+      genre: selectedBook?.genre || "fiction",
+      date: new Date().toISOString().split("T")[0],
+      reflection,
+      compAnswer,
+      recommended,
+    };
+    setLogs((prev) => [newLog, ...prev]);
+    setFeedback("✅ Meets expectations! Great reading log entry.");
+    setStep(4);
+  };
+
+  const reset = () => {
+    setStep(1); setBookTitle(""); setSelectedBook(null); setPages(""); setCompAnswer(""); setReflection(""); setRecommended(false); setFeedback("");
+    setCompQuestion(COMPREHENSION_PROMPTS[Math.floor(Math.random() * COMPREHENSION_PROMPTS.length)]);
+  };
+
+  return (
+    <div className="page fade-in" style={{ maxWidth: 600, margin: "0 auto", padding: "24px 16px" }}>
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 36 }}>📚</div>
+        <h2 className="hd" style={{ fontSize: 20, color: "var(--navy)", marginBottom: 2 }}>Reading Log</h2>
+        <p style={{ color: "var(--warm-gray)", fontSize: 13 }}>
+          {student.name} • <strong style={{ color: "var(--cardinal)" }}>{totalPages} pages</strong> / <strong style={{ color: "var(--navy)" }}>{totalWords.toLocaleString()} words</strong> this year
+        </p>
+      </div>
+
+      {/* Step indicator */}
+      {step < 4 && (
+        <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+          {(isTeacher ? ["Book & Pages", "Reflection"] : ["Book & Pages", "Comprehension", "Reflection"]).map((label, i) => {
+            const stepNum = isTeacher ? (i === 0 ? 1 : 3) : i + 1;
+            return (
+              <div key={i} style={{ flex: 1, textAlign: "center" }}>
+                <div style={{ height: 4, borderRadius: 2, background: stepNum <= step ? "var(--cardinal)" : "#e5e0d8", transition: "all 0.3s", marginBottom: 4 }} />
+                <div style={{ fontSize: 10, color: stepNum <= step ? "var(--cardinal)" : "var(--warm-gray)", fontWeight: 700 }}>{label}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* STEP 1: Book & Pages */}
+      {step === 1 && (
+        <div className="card">
+          <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>📕 What book are you reading?</label>
+          <BookSearch value={bookTitle} onChange={setBookTitle} onSelect={setSelectedBook} selectedBook={selectedBook} />
+
+          <div style={{ marginTop: 14 }}>
+            <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>📄 How many pages did you read today?</label>
+            <input className="input" type="number" value={pages} onChange={(e) => setPages(e.target.value)} placeholder="e.g. 25" />
+          </div>
+
+          {pages && (
+            <div style={{ marginTop: 8, fontSize: 12, color: "var(--text-secondary)", background: "var(--cream-mid)", padding: 8, borderRadius: 8, textAlign: "center" }}>
+              📖 That's approximately <strong style={{ color: "var(--cardinal)" }}>{estimateWords(parseInt(pages)).toLocaleString()}</strong> words!
+            </div>
+          )}
+
+          <div style={{ marginTop: 14 }}>
+            <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>⭐ Would you recommend this book?</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button className={`btn ${recommended ? "btn-c" : "btn-o"}`} onClick={() => setRecommended(true)} style={{ flex: 1, justifyContent: "center", padding: "8px 12px", fontSize: 13 }}>👍 Yes!</button>
+              <button className={`btn ${!recommended ? "btn-c" : "btn-o"}`} onClick={() => setRecommended(false)} style={{ flex: 1, justifyContent: "center", padding: "8px 12px", fontSize: 13 }}>🤔 Not yet</button>
+            </div>
+          </div>
+
+          <button className="btn btn-c" onClick={handleStep1} disabled={!bookTitle || !pages}
+            style={{ width: "100%", justifyContent: "center", marginTop: 16, opacity: bookTitle && pages ? 1 : 0.5 }}>
+            Next: Quick Check →
+          </button>
+        </div>
+      )}
+
+      {/* STEP 2: Comprehension Check (Sophie/Ryan anti-cheat) — students only */}
+      {step === 2 && !isTeacher && (
+        <div className="card fade-in">
+          <div style={{ background: "#f0f7ff", borderRadius: 10, padding: 14, marginBottom: 16, border: "1px solid #bfdbfe" }}>
+            <div style={{ fontSize: 11, color: "#3b82f6", fontWeight: 700, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>🧠 Quick Comprehension Check</div>
+            <div style={{ fontSize: 14, color: "var(--navy)", fontWeight: 700 }}>{compQuestion}</div>
+          </div>
+          <textarea className="input" value={compAnswer} onChange={(e) => { setCompAnswer(e.target.value); setFeedback(""); }}
+            placeholder="Answer in a full sentence..." rows={3} style={{ resize: "vertical", lineHeight: 1.5, marginBottom: 12 }} />
+          {feedback && (
+            <div style={{ background: "#fef9f0", border: "1px solid var(--border)", borderRadius: 8, padding: 10, marginBottom: 12, fontSize: 13, fontWeight: 600, color: "#92400e" }}>{feedback}</div>
+          )}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn btn-o" onClick={() => setStep(1)} style={{ flex: 1, justifyContent: "center" }}>← Back</button>
+            <button className="btn btn-c" onClick={handleStep2} disabled={!compAnswer} style={{ flex: 2, justifyContent: "center", opacity: compAnswer ? 1 : 0.5 }}>
+              Next: Reflection →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3: Reflection */}
+      {step === 3 && (
+        <div className="card fade-in">
+          <label style={{ fontWeight: 700, fontSize: 13, color: "var(--navy)", display: "block", marginBottom: 6 }}>
+            {isTeacher ? "✏️ Quick reflection — what are you reading and why?" : "✏️ What happened in what you read? How did it make you feel?"}
+          </label>
+          <textarea className="input" value={reflection} onChange={(e) => { setReflection(e.target.value); setFeedback(""); }}
+            placeholder={isTeacher ? "What inspired you about this reading?" : "Tell us about what you read today..."} rows={4} style={{ resize: "vertical", lineHeight: 1.5, marginBottom: 12 }} />
+          {feedback && (
+            <div style={{ background: "#fef9f0", border: "1px solid var(--border)", borderRadius: 8, padding: 10, marginBottom: 12, fontSize: 13, fontWeight: 600, color: "#92400e" }}>{feedback}</div>
+          )}
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn btn-o" onClick={() => setStep(isTeacher ? 1 : 2)} style={{ flex: 1, justifyContent: "center" }}>← Back</button>
+            <button className="btn btn-c" onClick={handleStep3} disabled={!reflection} style={{ flex: 2, justifyContent: "center", opacity: reflection ? 1 : 0.5 }}>
+              Submit Reading Log ✓
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 4: Done */}
+      {step === 4 && (
+        <div className="card fade-in" style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>📚</div>
+          <h3 className="hd" style={{ color: "var(--navy)", marginBottom: 4 }}>Awesome reading!</h3>
+          <p style={{ color: "var(--green)", fontWeight: 700, fontSize: 14 }}>{feedback}</p>
+          <div className="hd" style={{ fontSize: 18, color: TIER_COLORS[ti], marginTop: 8 }}>
+            {TIER_EMOJI[ti]} {tier.tierName} — {totalPages.toLocaleString()} pages
+          </div>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 8 }}>
+            📖 <strong>{totalWords.toLocaleString()}</strong> total words read this year!
+          </p>
+          <button className="btn btn-o" onClick={reset} style={{ marginTop: 16 }}>Log More Reading</button>
+        </div>
+      )}
+
+      {/* Reading History */}
+      {studentLogs.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h3 className="hd" style={{ fontSize: 15, color: "var(--navy)", marginBottom: 12 }}>📚 Your Reading History</h3>
+          {studentLogs.slice(0, 5).map((log, i) => {
+            const book = BOOK_DATABASE.find((b) => b.id === log.bookId);
+            return (
+              <div key={i} style={{ padding: "10px 0", borderBottom: i < Math.min(studentLogs.length, 5) - 1 ? "1px solid #f0ebe4" : "none", display: "flex", gap: 10 }}>
+                <div style={{ background: "var(--cardinal-glow)", borderRadius: 8, padding: "4px 8px", fontWeight: 800, color: "var(--cardinal)", fontSize: 13, minWidth: 50, textAlign: "center" }}>
+                  {log.pages}p<br /><span style={{ fontSize: 9, color: "var(--warm-gray)", fontWeight: 600 }}>{log.wordsRead.toLocaleString()}w</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: "var(--navy)", fontSize: 13 }}>
+                    {book?.title || "Custom Book"}
+                    <span className="tag" style={{ marginLeft: 6, background: log.genre === "nonfiction" ? "#dbeafe" : "#fce7f3", color: log.genre === "nonfiction" ? "#1d4ed8" : "#be185d" }}>
+                      {log.genre}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--warm-gray)", marginTop: 2, lineHeight: 1.3 }}>"{log.reflection?.slice(0, 80)}{log.reflection?.length > 80 ? "..." : ""}"</div>
+                  <div style={{ fontSize: 10, color: "#b0a090", marginTop: 3 }}>{log.date}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LeaderboardView({ student, logs }) {
+  const [metric, setMetric] = useState("pages"); // pages | words
+  const [mode, setMode] = useState("students"); // students | teachers | everyone | homeroom
+
+  const getParticipantData = (participants) => participants.map((s) => {
+    const sLogs = logs.filter((l) => l.sid === s.id);
+    return { ...s, pages: sLogs.reduce((sum, l) => sum + l.pages, 0), words: sLogs.reduce((sum, l) => sum + l.wordsRead, 0), logs: sLogs.length, nfPct: sLogs.length > 0 ? Math.round(sLogs.filter((l) => l.genre === "nonfiction").length / sLogs.length * 100) : 0 };
+  }).sort((a, b) => metric === "words" ? b.words - a.words : b.pages - a.pages);
+
+  const studentData = getParticipantData(STUDENTS);
+  const teacherData = getParticipantData(TEACHERS);
+  const everyoneData = getParticipantData(ALL_PARTICIPANTS);
+
+  // Homeroom data
+  const homerooms = [...new Set(STUDENTS.map(s => s.homeroom))];
+  const homeroomData = homerooms.map(hr => {
+    const hrStudents = STUDENTS.filter(s => s.homeroom === hr);
+    const hrLogs = logs.filter(l => hrStudents.some(s => s.id === l.sid));
+    const totalPages = hrLogs.reduce((sum, l) => sum + l.pages, 0);
+    const totalWords = hrLogs.reduce((sum, l) => sum + l.wordsRead, 0);
+    const avgPages = hrStudents.length > 0 ? Math.round(totalPages / hrStudents.length) : 0;
+    const avgWords = hrStudents.length > 0 ? Math.round(totalWords / hrStudents.length) : 0;
+    const hrTeacher = TEACHERS.find(t => t.hrHomeroom === hr);
+    const teacherLogs = hrTeacher ? logs.filter(l => l.sid === hrTeacher.id) : [];
+    const teacherPages = teacherLogs.reduce((sum, l) => sum + l.pages, 0);
+    const teacherWords = teacherLogs.reduce((sum, l) => sum + l.wordsRead, 0);
+    const grade = hrStudents[0]?.grade;
+    const school = hrStudents[0]?.school;
+    return { homeroom: hr, students: hrStudents.length, totalPages, totalWords, avgPages, avgWords, grade, school, hrTeacher, teacherPages, teacherWords };
+  }).sort((a, b) => metric === "words" ? b.avgWords - a.avgWords : b.avgPages - a.avgPages);
+
+  const displayData = mode === "teachers" ? teacherData : mode === "everyone" ? everyoneData : studentData;
+  const medals = ["🥇", "🥈", "🥉"];
+
+  const modes = [
+    { k: "students", icon: "🏅", label: "Students" },
+    { k: "teachers", icon: "👩‍🏫", label: "Teachers" },
+    { k: "everyone", icon: "🌟", label: "Everyone" },
+    { k: "homeroom", icon: "🏠", label: "Homeroom" },
+  ];
+
+  return (
+    <div className="page fade-in" style={{ maxWidth: 600, margin: "0 auto", padding: "24px 16px" }}>
+      <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <div style={{ fontSize: 48 }}>🏆</div>
+        <h2 className="hd" style={{ fontSize: 24, color: "var(--navy)", marginBottom: 4 }}>Leaderboard</h2>
+        <p style={{ color: "var(--warm-gray)", fontSize: 13 }}>Who will read the most this year?</p>
+      </div>
+
+      {/* Mode toggle */}
+      <div style={{ display: "flex", gap: 4, justifyContent: "center", marginBottom: 12, flexWrap: "wrap" }}>
+        {modes.map((m) => (
+          <button key={m.k} className={`btn ${mode === m.k ? "btn-c" : "btn-o"}`} onClick={() => setMode(m.k)}
+            style={{ padding: "6px 12px", fontSize: 11, borderRadius: 20 }}>
+            {m.icon} {m.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Metric toggle — pages or words */}
+      <div style={{ display: "flex", gap: 8, justifyContent: "center", marginBottom: 16 }}>
+        <button className={`btn ${metric === "pages" ? "btn-c" : "btn-o"}`} onClick={() => setMetric("pages")} style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}>📄 Pages</button>
+        <button className={`btn ${metric === "words" ? "btn-c" : "btn-o"}`} onClick={() => setMetric("words")} style={{ padding: "6px 16px", fontSize: 12, borderRadius: 20 }}>📖 Words Read</button>
+      </div>
+
+      {/* Individual ranking modes: students, teachers, everyone */}
+      {mode !== "homeroom" && (
+        <>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {displayData.map((s, i) => {
+              const val = metric === "words" ? s.words : s.pages;
+              const mx = displayData.length > 0 ? (metric === "words" ? displayData[0].words : displayData[0].pages) : 1;
+              const w = mx > 0 ? Math.max(5, (val / mx) * 100) : 0;
+              const isMe = student && s.id === student.id;
+              const isT = s.isTeacher;
+              return (
+                <div key={s.id} className="card" style={{ padding: "12px 16px", display: "flex", alignItems: "center", gap: 10, border: isMe ? "2px solid var(--cardinal)" : i === 0 ? "2px solid var(--amber)" : isT ? "1px solid #c7d2fe" : "1px solid var(--border)", background: isMe ? "linear-gradient(135deg, #fef2f2, white)" : i === 0 ? "linear-gradient(135deg, #fffbeb, white)" : isT ? "linear-gradient(135deg, #eef2ff, white)" : "white", position: "relative" }}>
+                  {isMe && <div style={{ position: "absolute", top: -6, right: 12, background: "var(--cardinal)", color: "#fff", fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 6 }}>YOU</div>}
+                  <div style={{ fontSize: 20, minWidth: 32, textAlign: "center" }}>{i < 3 ? medals[i] : <span style={{ fontWeight: 800, color: "var(--warm-gray)", fontSize: 14 }}>#{i + 1}</span>}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <div>
+                        <span style={{ fontWeight: 800, color: "var(--navy)", fontSize: 14 }}>
+                          {isT && mode === "everyone" && <span title="Teacher">👩‍🏫 </span>}
+                          {s.name}
+                        </span>
+                        <span style={{ fontSize: 11, color: "var(--warm-gray)", marginLeft: 6 }}>
+                          {isT ? `${s.hrHomeroom} • ${s.school}` : `G${s.grade} • ${s.homeroom}`}
+                        </span>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <span className="hd" style={{ color: isT ? "#6366f1" : "var(--cardinal)", fontSize: 16 }}>{metric === "words" ? val.toLocaleString() : val}</span>
+                        <div style={{ fontSize: 10, color: "var(--warm-gray)" }}>{metric === "words" ? "words" : "pages"} • {s.nfPct}% NF</div>
+                      </div>
+                    </div>
+                    <div className="progress-bar" style={{ height: 8 }}>
+                      <div className="progress-fill" style={{ width: `${w}%`, background: i === 0 ? "linear-gradient(90deg, #eab308, #f59e0b)" : isT ? "linear-gradient(90deg, #6366f1, #8b5cf6)" : "linear-gradient(90deg, var(--cardinal), var(--amber))" }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="card" style={{ marginTop: 16, textAlign: "center", background: "var(--cream-mid)" }}>
+            <div style={{ fontSize: 24 }}>📊</div>
+            <div className="hd" style={{ color: "var(--navy)", fontSize: 18 }}>{displayData.reduce((s, d) => s + d.pages, 0).toLocaleString()} pages</div>
+            <div style={{ fontSize: 13, color: "var(--warm-gray)" }}>
+              {displayData.reduce((s, d) => s + d.words, 0).toLocaleString()} words read by {mode === "teachers" ? "all teachers" : mode === "everyone" ? "everyone" : "all students"}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Homeroom vs Homeroom mode */}
+      {mode === "homeroom" && (
+        <>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {homeroomData.map((hr, i) => {
+              const val = metric === "words" ? hr.avgWords : hr.avgPages;
+              const mx = homeroomData.length > 0 ? (metric === "words" ? homeroomData[0].avgWords : homeroomData[0].avgPages) : 1;
+              const w = mx > 0 ? Math.max(5, (val / mx) * 100) : 0;
+              const isMyHR = student && (student.homeroom === hr.homeroom || student.hrHomeroom === hr.homeroom);
+              return (
+                <div key={hr.homeroom} className="card" style={{ padding: "14px 16px", border: isMyHR ? "2px solid var(--cardinal)" : i === 0 ? "2px solid var(--amber)" : "1px solid var(--border)", background: isMyHR ? "linear-gradient(135deg, #fef2f2, white)" : i === 0 ? "linear-gradient(135deg, #fffbeb, white)" : "white", position: "relative" }}>
+                  {isMyHR && <div style={{ position: "absolute", top: -6, right: 12, background: "var(--cardinal)", color: "#fff", fontSize: 9, fontWeight: 800, padding: "2px 8px", borderRadius: 6 }}>YOUR HR</div>}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                    <div style={{ fontSize: 20, minWidth: 32, textAlign: "center" }}>{i < 3 ? medals[i] : <span style={{ fontWeight: 800, color: "var(--warm-gray)", fontSize: 14 }}>#{i + 1}</span>}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <span className="hd" style={{ color: "var(--navy)", fontSize: 15 }}>{hr.homeroom}</span>
+                          <span style={{ fontSize: 11, color: "var(--warm-gray)", marginLeft: 6 }}>G{hr.grade} • {hr.students} students</span>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <span className="hd" style={{ color: "var(--cardinal)", fontSize: 16 }}>{metric === "words" ? val.toLocaleString() : val}</span>
+                          <div style={{ fontSize: 10, color: "var(--warm-gray)" }}>avg {metric === "words" ? "words" : "pages"}/student</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="progress-bar" style={{ height: 8, marginBottom: 8 }}>
+                    <div className="progress-fill" style={{ width: `${w}%`, background: i === 0 ? "linear-gradient(90deg, #eab308, #f59e0b)" : "linear-gradient(90deg, var(--cardinal), var(--amber))" }} />
+                  </div>
+                  {/* HR Teacher's personal reading */}
+                  {hr.hrTeacher && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#f5f3ff", borderRadius: 8, padding: "6px 10px", fontSize: 12 }}>
+                      <span>👩‍🏫</span>
+                      <span style={{ fontWeight: 700, color: "#6366f1" }}>{hr.hrTeacher.name}</span>
+                      <span style={{ color: "var(--warm-gray)" }}>—</span>
+                      <span style={{ fontWeight: 700, color: "var(--navy)" }}>
+                        {metric === "words" ? `${hr.teacherWords.toLocaleString()} words` : `${hr.teacherPages} pages`}
+                      </span>
+                      {(metric === "pages" ? hr.teacherPages : hr.teacherWords) === 0 && (
+                        <span style={{ color: "var(--warm-gray)", fontStyle: "italic" }}>not yet logging</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="card" style={{ marginTop: 16, textAlign: "center", background: "var(--cream-mid)" }}>
+            <div style={{ fontSize: 24 }}>🏠</div>
+            <div className="hd" style={{ color: "var(--navy)", fontSize: 18 }}>{homeroomData.length} homerooms competing</div>
+            <div style={{ fontSize: 13, color: "var(--warm-gray)" }}>
+              {homeroomData.reduce((s, d) => s + d.totalPages, 0).toLocaleString()} total pages across all homerooms
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function DashboardView({ logs, fluency }) {
+  const [tab, setTab] = useState("overview");
+
+  // Reading summary by student
+  const readingByStudent = STUDENTS.map((s) => {
+    const sLogs = logs.filter((l) => l.sid === s.id);
+    const totalPages = sLogs.reduce((sum, l) => sum + l.pages, 0);
+    const totalWords = sLogs.reduce((sum, l) => sum + l.wordsRead, 0);
+    const nfCount = sLogs.filter((l) => l.genre === "nonfiction").length;
+    const nfPct = sLogs.length > 0 ? Math.round(nfCount / sLogs.length * 100) : 0;
+    const booksRead = [...new Set(sLogs.map((l) => l.bookId).filter(Boolean))].length;
+    const lastDate = sLogs.length > 0 ? sLogs[0].date : null;
+    return { ...s, totalPages, totalWords, nfPct, booksRead, logsCompleted: sLogs.length, lastDate };
+  }).sort((a, b) => b.totalPages - a.totalPages);
+
+  // Fluency summary
+  const fluencyByStudent = STUDENTS.map((s) => {
+    const fLogs = fluency.filter((f) => f.sid === s.id).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const latest = fLogs[0];
+    const first = fLogs[fLogs.length - 1];
+    const latestRate = latest ? latest.totalWords - latest.errors : null;
+    const growth = fLogs.length > 1 ? (latest.totalWords - latest.errors) - (first.totalWords - first.errors) : null;
+    return { ...s, latestRate, growth, sessions: fLogs.length, benchmarkColor: latestRate ? bmColor(s.grade, "MOY", latestRate) : null };
+  });
+
+  // Aggregate stats
+  const totalPages = readingByStudent.reduce((s, d) => s + d.totalPages, 0);
+  const totalWords = readingByStudent.reduce((s, d) => s + d.totalWords, 0);
+  const activeReaders = readingByStudent.filter((s) => s.logsCompleted > 0).length;
+  const avgNfPct = readingByStudent.length > 0 ? Math.round(readingByStudent.reduce((s, d) => s + d.nfPct, 0) / readingByStudent.length) : 0;
+
+  // Teacher reading stats
+  const teacherReadingStats = TEACHERS.map((t) => {
+    const tLogs = logs.filter((l) => l.sid === t.id);
+    return { ...t, totalPages: tLogs.reduce((sum, l) => sum + l.pages, 0), totalWords: tLogs.reduce((sum, l) => sum + l.wordsRead, 0), logsCompleted: tLogs.length };
+  });
+  const activeTeachers = teacherReadingStats.filter((t) => t.logsCompleted > 0).length;
+  const teacherTotalPages = teacherReadingStats.reduce((s, d) => s + d.totalPages, 0);
+
+  const tabs = [
+    { k: "overview", label: "📊 Overview" },
+    { k: "reading", label: "📖 Reading" },
+    { k: "fluency", label: "⏱️ Fluency" },
+    { k: "insights", label: "🔍 Insights" },
+  ];
+
+  return (
+    <div className="page fade-in" style={{ maxWidth: 800, margin: "0 auto", padding: "24px 16px" }}>
+      <h2 className="hd" style={{ fontSize: 20, color: "var(--navy)", marginBottom: 2 }}>👩‍🏫 Teacher Dashboard</h2>
+      <p style={{ color: "var(--warm-gray)", fontSize: 13, marginBottom: 16 }}>KIPP Paterson • Pilot Overview</p>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+        {tabs.map((t) => (
+          <button key={t.k} className={`btn ${tab === t.k ? "btn-c" : "btn-o"}`} onClick={() => setTab(t.k)} style={{ padding: "6px 14px", fontSize: 12 }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* OVERVIEW TAB */}
+      {tab === "overview" && (
+        <>
+          {/* AR-competitive top-line stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 16 }}>
+            {[
+              { n: totalPages.toLocaleString(), l: "Student Pages", c: "var(--cardinal)" },
+              { n: totalWords.toLocaleString(), l: "Words Read", c: "var(--navy)" },
+              { n: `${activeReaders}/${STUDENTS.length}`, l: "Active Students", c: "var(--green)" },
+              { n: `${avgNfPct}%`, l: "Nonfiction", c: "#3b82f6" },
+            ].map((s, i) => (
+              <div key={i} className="card" style={{ textAlign: "center", padding: 14 }}>
+                <div className="hd" style={{ fontSize: 22, color: s.c }}>{s.n}</div>
+                <div style={{ fontSize: 11, color: "var(--warm-gray)", fontWeight: 600, marginTop: 2 }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Teacher reading participation */}
+          <div className="card" style={{ marginBottom: 16, border: "1px solid #c7d2fe", background: "linear-gradient(135deg, #eef2ff, white)" }}>
+            <h3 className="hd" style={{ fontSize: 14, color: "#6366f1", marginBottom: 10 }}>👩‍🏫 Teacher Reading Participation</h3>
+            <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+              <div style={{ textAlign: "center" }}>
+                <div className="hd" style={{ fontSize: 22, color: "#6366f1" }}>{activeTeachers}/{TEACHERS.length}</div>
+                <div style={{ fontSize: 11, color: "var(--warm-gray)" }}>Teachers Logging</div>
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <div className="hd" style={{ fontSize: 22, color: "var(--cardinal)" }}>{teacherTotalPages.toLocaleString()}</div>
+                <div style={{ fontSize: 11, color: "var(--warm-gray)" }}>Teacher Pages</div>
+              </div>
+              <div style={{ flex: 1, fontSize: 12, color: "var(--text-secondary)" }}>
+                {activeTeachers === 0 ? "No teachers have logged reading yet. Lead by example!" : `${activeTeachers} teacher${activeTeachers > 1 ? "s" : ""} reading alongside students!`}
+              </div>
+            </div>
+          </div>
+
+          {/* Who needs attention? (AR gap: actionable teacher view) */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 className="hd" style={{ fontSize: 14, color: "var(--navy)", marginBottom: 10 }}>🚨 Needs Attention</h3>
+            {(() => {
+              const noLogs = readingByStudent.filter((s) => s.logsCompleted === 0);
+              const lowFluency = fluencyByStudent.filter((s) => s.benchmarkColor === "#ef4444" || s.benchmarkColor === "#f97316");
+              const items = [];
+              noLogs.forEach((s) => items.push({ name: s.name, grade: s.grade, issue: "No reading logs yet", color: "#ef4444", icon: "📕" }));
+              lowFluency.forEach((s) => items.push({ name: s.name, grade: s.grade, issue: `Fluency: ${s.latestRate} WPM (below benchmark)`, color: "#f97316", icon: "⏱️" }));
+              if (items.length === 0) return <p style={{ fontSize: 13, color: "var(--green)", textAlign: "center" }}>✅ All students on track!</p>;
+              return items.slice(0, 5).map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", padding: "8px 0", borderBottom: i < items.length - 1 ? "1px solid #f0ebe4" : "none" }}>
+                  <span>{item.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontWeight: 700, color: "var(--navy)", fontSize: 13 }}>{item.name}</span>
+                    <span style={{ fontSize: 11, color: "var(--warm-gray)", marginLeft: 6 }}>G{item.grade}</span>
+                  </div>
+                  <span className="tag" style={{ background: `${item.color}15`, color: item.color }}>{item.issue}</span>
+                </div>
+              ));
+            })()}
+          </div>
+        </>
+      )}
+
+      {/* READING TAB (enhanced with words read, nonfiction % — AR parity) */}
+      {tab === "reading" && (
+        <div className="card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3 className="hd" style={{ fontSize: 14, color: "var(--navy)", margin: 0 }}>📖 Student Reading Summary</h3>
+            <span style={{ fontSize: 11, color: "var(--warm-gray)" }}>{readingByStudent.length} students</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th style={{ textAlign: "center" }}>Pages</th>
+                  <th style={{ textAlign: "center" }}>Words</th>
+                  <th style={{ textAlign: "center" }}>Books</th>
+                  <th style={{ textAlign: "center" }}>NF %</th>
+                  <th style={{ textAlign: "center" }}>Logs</th>
+                  <th style={{ textAlign: "center" }}>Last</th>
+                </tr>
+              </thead>
+              <tbody>
+                {readingByStudent.map((s, i) => (
+                  <tr key={s.id}>
+                    <td style={{ fontWeight: 700 }}>{s.name}<span style={{ fontSize: 11, color: "var(--warm-gray)", marginLeft: 6 }}>G{s.grade}</span></td>
+                    <td style={{ textAlign: "center", fontWeight: 800, color: "var(--cardinal)" }}>{s.totalPages}</td>
+                    <td style={{ textAlign: "center", color: "var(--navy)", fontWeight: 600 }}>{s.totalWords.toLocaleString()}</td>
+                    <td style={{ textAlign: "center" }}>{s.booksRead}</td>
+                    <td style={{ textAlign: "center" }}>
+                      <span className="tag" style={{ background: s.nfPct >= 20 ? "#dbeafe" : "#fef9f0", color: s.nfPct >= 20 ? "#1d4ed8" : "#92400e" }}>{s.nfPct}%</span>
+                    </td>
+                    <td style={{ textAlign: "center" }}>{s.logsCompleted}</td>
+                    <td style={{ textAlign: "center", fontSize: 12, color: "var(--warm-gray)" }}>{s.lastDate || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* FLUENCY TAB */}
+      {tab === "fluency" && (
+        <div className="card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h3 className="hd" style={{ fontSize: 14, color: "var(--navy)", margin: 0 }}>⏱️ Student Fluency Summary</h3>
+            <span style={{ fontSize: 11, color: "var(--warm-gray)" }}>{fluencyByStudent.length} students</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th style={{ textAlign: "center" }}>Latest WPM</th>
+                <th style={{ textAlign: "center" }}>Growth</th>
+                <th style={{ textAlign: "center" }}>Sessions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fluencyByStudent.map((s) => (
+                <tr key={s.id}>
+                  <td style={{ fontWeight: 700 }}>{s.name}<span style={{ fontSize: 11, color: "var(--warm-gray)", marginLeft: 6 }}>G{s.grade}</span></td>
+                  <td style={{ textAlign: "center" }}>
+                    {s.latestRate ? (
+                      <span className="tag" style={{ background: `${s.benchmarkColor}15`, color: s.benchmarkColor, fontWeight: 800 }}>{s.latestRate}</span>
+                    ) : "—"}
+                  </td>
+                  <td style={{ textAlign: "center", fontWeight: 700, color: s.growth > 0 ? "var(--green)" : s.growth < 0 ? "var(--red)" : "var(--warm-gray)" }}>
+                    {s.growth !== null ? (s.growth > 0 ? `+${s.growth}` : s.growth) : "—"}
+                  </td>
+                  <td style={{ textAlign: "center" }}>{s.sessions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* INSIGHTS TAB (new — what AR can't do in 10 seconds) */}
+      {tab === "insights" && (
+        <>
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 className="hd" style={{ fontSize: 14, color: "var(--navy)", marginBottom: 10 }}>🎯 10-Second Insights</h3>
+            <p style={{ fontSize: 12, color: "var(--warm-gray)", marginBottom: 12 }}>What AR can't show you at a glance:</p>
+
+            {/* Genre balance across class */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>📚 Genre Balance (Fiction vs Nonfiction)</div>
+              {(() => {
+                const ficCount = logs.filter((l) => l.genre === "fiction").length;
+                const nfCount = logs.filter((l) => l.genre === "nonfiction").length;
+                const total = ficCount + nfCount || 1;
+                return (
+                  <div>
+                    <div style={{ display: "flex", height: 20, borderRadius: 10, overflow: "hidden", marginBottom: 4 }}>
+                      <div style={{ width: `${ficCount / total * 100}%`, background: "#ec4899", transition: "width 0.5s" }} />
+                      <div style={{ width: `${nfCount / total * 100}%`, background: "#3b82f6", transition: "width 0.5s" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
+                      <span style={{ color: "#ec4899", fontWeight: 700 }}>📕 Fiction: {Math.round(ficCount / total * 100)}%</span>
+                      <span style={{ color: "#3b82f6", fontWeight: 700 }}>📘 Nonfiction: {Math.round(nfCount / total * 100)}%</span>
+                    </div>
+                    {nfCount / total < 0.15 && (
+                      <div style={{ marginTop: 6, fontSize: 12, color: "#92400e", background: "#fef9f0", padding: 8, borderRadius: 6, border: "1px solid var(--border)" }}>
+                        ⚠️ Nonfiction is under 15%. Consider encouraging students to try nonfiction titles.
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Student engagement patterns */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>📊 Engagement Patterns</div>
+              {(() => {
+                const high = readingByStudent.filter((s) => s.logsCompleted >= 3);
+                const mid = readingByStudent.filter((s) => s.logsCompleted >= 1 && s.logsCompleted < 3);
+                const none = readingByStudent.filter((s) => s.logsCompleted === 0);
+                return (
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <div style={{ flex: 1, background: "#f0fdf4", borderRadius: 8, padding: 10, textAlign: "center", border: "1px solid #bbf7d0" }}>
+                      <div className="hd" style={{ fontSize: 20, color: "var(--green)" }}>{high.length}</div>
+                      <div style={{ fontSize: 10, color: "var(--green)", fontWeight: 700 }}>Consistent (3+ logs)</div>
+                    </div>
+                    <div style={{ flex: 1, background: "#fffbeb", borderRadius: 8, padding: 10, textAlign: "center", border: "1px solid #fde68a" }}>
+                      <div className="hd" style={{ fontSize: 20, color: "var(--amber)" }}>{mid.length}</div>
+                      <div style={{ fontSize: 10, color: "var(--amber)", fontWeight: 700 }}>Starting (1-2 logs)</div>
+                    </div>
+                    <div style={{ flex: 1, background: "#fef2f2", borderRadius: 8, padding: 10, textAlign: "center", border: "1px solid #fca5a5" }}>
+                      <div className="hd" style={{ fontSize: 20, color: "var(--red)" }}>{none.length}</div>
+                      <div style={{ fontSize: 10, color: "var(--red)", fontWeight: 700 }}>Not Started</div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Recommended books (from student recs) */}
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>💬 Student-Recommended Books</div>
+              {(() => {
+                const recs = {};
+                logs.filter((l) => l.recommended).forEach((l) => {
+                  const book = BOOK_DATABASE.find((b) => b.id === l.bookId);
+                  const title = book?.title || "Custom Book";
+                  recs[title] = (recs[title] || 0) + 1;
+                });
+                const sorted = Object.entries(recs).sort((a, b) => b[1] - a[1]);
+                if (sorted.length === 0) return <p style={{ fontSize: 12, color: "var(--warm-gray)" }}>No recommendations yet.</p>;
+                return sorted.slice(0, 5).map(([title, count], i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: i < sorted.length - 1 ? "1px solid #f0ebe4" : "none" }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--navy)" }}>{i === 0 ? "🌟" : "📖"} {title}</span>
+                    <span className="tag" style={{ background: "var(--amber-glow)", color: "var(--amber)" }}>👍 {count}</span>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ReadingHubV2() {
+  const [view, setView] = useState("login");
+  const [student, setStudent] = useState(null);
+  const [logs, setLogs] = useState(SAMPLE_LOGS);
+  const [fluency, setFluency] = useState(SAMPLE_FLUENCY);
+
+  const handleLogin = (s) => { setStudent(s); setView("home"); };
+  const handleLogout = () => { setStudent(null); setView("login"); };
+
+  return (
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+      <style>{CSS}</style>
+      <div className="rhub">
+        {/* Test data banner */}
+        <div style={{ background: "#fef3c7", borderBottom: "2px solid #f59e0b", padding: "6px 16px", textAlign: "center", fontSize: 12, color: "#92400e", fontWeight: 600 }}>
+          ⚠️ PROTOTYPE — Sample data for demonstration. New: Teacher login, Teacher vs Student leaderboards, Homeroom competitions.
+        </div>
+
+        {view !== "login" && <Header view={view} setView={setView} student={student} setStudent={(s) => { if (!s) handleLogout(); }} />}
+
+        {view === "login" && <LoginView onLogin={handleLogin} />}
+        {view === "home" && student && <HomeView student={student} setView={setView} logs={logs} />}
+        {view === "fluency" && student && !student.isTeacher && <FluencyView student={student} fluency={fluency} setFluency={setFluency} />}
+        {view === "reading" && student && <ReadingView student={student} logs={logs} setLogs={setLogs} />}
+        {view === "leaderboard" && student && <LeaderboardView student={student} logs={logs} />}
+        {view === "dashboard" && <DashboardView logs={logs} fluency={fluency} />}
+
+        {view !== "login" && (
+          <div style={{ textAlign: "center", padding: "12px 0 20px" }}>
+            <button className="btn btn-o" onClick={handleLogout} style={{ padding: "4px 12px", fontSize: 11, borderWidth: 1 }}>← Switch User</button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<ReadingHubV2 />);
+  </script>
+</body>
+</html>
