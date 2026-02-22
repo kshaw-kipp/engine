@@ -1079,19 +1079,31 @@
       font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
       color: rgba(255,255,255,0.35); text-align: center; margin-bottom: 12px;
     }
-    .py-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .py-tier {
-      clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 7px 22px; cursor: pointer; transition: filter 0.15s, transform 0.1s;
-      border-radius: 1px;
+    .py-stack {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      max-width: 640px; margin: 0 auto;   /* constrain width → pyramid looks taller */
     }
-    .py-tier:hover { filter: brightness(1.12); transform: scaleX(1.01); }
-    .py-tier.py-active { filter: brightness(1.18); outline: 2px solid rgba(255,255,255,0.35); outline-offset: -2px; }
-    .py-tier-lhs { flex: 1; min-width: 0; }
+    /* Pseudo-element carries the clip-path trapezoid; the div itself is transparent
+       so text is never clipped — only the background shape is. */
+    .py-tier {
+      position: relative;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 18px; cursor: pointer; transition: filter 0.15s;
+      overflow: visible;    /* let text breathe past box edges if needed */
+    }
+    .py-tier::before {
+      content: ''; position: absolute; inset: 0;
+      clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+      background: var(--py-bg, transparent);
+      transition: filter 0.15s;
+      z-index: 0;
+    }
+    .py-tier:hover::before { filter: brightness(1.12); }
+    .py-tier.py-active::before { filter: brightness(1.2); outline: 2px solid rgba(255,255,255,0.4); outline-offset: -2px; }
+    .py-tier-lhs { flex: 1; min-width: 0; position: relative; z-index: 1; }
     .py-tier-label { font-size: 11px; font-weight: 800; line-height: 1.2; }
     .py-tier-sub   { font-size: 9px; margin-top: 1px; opacity: 0.6; font-style: italic; }
-    .py-tier-metric { font-size: 9px; text-align: right; opacity: 0.75; white-space: nowrap; }
+    .py-tier-metric { font-size: 9px; text-align: right; opacity: 0.75; white-space: nowrap; position: relative; z-index: 1; }
     .py-expanded {
       background: rgba(255,255,255,0.06); border-left: 3px solid #ccc;
       border-radius: 0 var(--radius) var(--radius) 0;
@@ -1620,7 +1632,7 @@ function KIPPPyramid() {
           <div
             key={tier.id}
             className={`py-tier${active === tier.id ? ' py-active' : ''}`}
-            style={{ width: renderWidths[i], background: tier.color, minHeight: 38 }}
+            style={{ width: renderWidths[i], '--py-bg': tier.color, minHeight: 36 }}
             onClick={() => setActive(active === tier.id ? null : tier.id)}
           >
             <div className="py-tier-lhs">
