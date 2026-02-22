@@ -13,53 +13,60 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
+      /* ── KIPP Team & Family Brand Colors ────────────────────── */
+      --kipp-indigo:  #152058;   /* KIPP TF Indigo (primary)     */
+      --kipp-orange:  #F5A020;   /* KIPP Orange (action/accent)  */
+      --kipp-red:     #DA2028;   /* KIPP Red                     */
+      --kipp-blue:    #5BB8CE;   /* KIPP Sky Blue (KIPP NJ)      */
+      --kipp-green:   #8DC63F;   /* KIPP Green                   */
+
       /* ── Base ───────────────────────────────────────────────── */
-      --navy:        #111111;
-      --navy-light:  #1A3A4A;
+      --navy:        #152058;          /* KIPP TF Indigo         */
+      --navy-light:  #2A3F7A;          /* lighter indigo         */
       --white:       #FFFFFF;
       --gray-50:     #F5F6FA;
       --gray-100:    #ECEEF5;
       --gray-200:    #D4D8E8;
       --border:      #D4D8E8;
 
-      /* ── Frozen Lake – primary action color ─────────────────── */
-      --indigo:      #69DDFF;          /* frozen lake (fill)     */
-      --indigo-d:    #4BCCF0;          /* hover / pressed        */
-      --indigo-bg:   #E8F8FF;          /* light blue tint        */
-      --indigo-text: #1A6A8A;          /* dark blue text on white */
+      /* ── KIPP Orange – primary interactive/action ───────────── */
+      --indigo:      #F5A020;          /* KIPP Orange (fill)     */
+      --indigo-d:    #D98618;          /* hover / pressed        */
+      --indigo-bg:   #FFF5E3;          /* light orange tint      */
+      --indigo-text: #7A4200;          /* dark orange text       */
 
-      /* ── Pink Orchid – secondary warm accent ─────────────────── */
-      --rose:        #DBBADD;          /* pink orchid            */
-      --rose-bg:     #F4ECF5;          /* light orchid tint      */
-      --rose-text:   #6B3A7A;          /* dark orchid text       */
+      /* ── KIPP Green – Skills & Growth accent ────────────────── */
+      --rose:        #8DC63F;          /* KIPP Green             */
+      --rose-bg:     #F1F8E6;          /* light green tint       */
+      --rose-text:   #3D6200;          /* dark green text        */
 
-      /* ── Sky Blue / Lavender – Sophie / done ─────────────────── */
-      --blue:        #96CDFF;          /* sky blue               */
-      --blue-bg:     #D8E1FF;          /* lavender               */
-      --blue-text:   #2A4A8F;          /* dark blue text         */
+      /* ── KIPP Sky Blue – O3 / Sophie / done ─────────────────── */
+      --blue:        #5BB8CE;          /* KIPP Sky Blue          */
+      --blue-bg:     #E5F5FA;          /* light sky blue tint    */
+      --blue-text:   #1A5A6A;          /* dark sky blue text     */
 
       /* ── Text greys ─────────────────────────────────────────── */
-      --slate:       #6B6360;
-      --slate-light: #9E9896;
+      --slate:       #4A5568;
+      --slate-light: #718096;
 
-      /* ── Semantic: done / complete → sky blue ───────────────── */
-      --green:       #96CDFF;
-      --green-bg:    #D8E1FF;
-      --green-text:  #2A4A8F;
+      /* ── Semantic: done / complete → KIPP Sky Blue ──────────── */
+      --green:       #5BB8CE;          /* KIPP Sky Blue          */
+      --green-bg:    #E5F5FA;
+      --green-text:  #1A5A6A;
 
-      /* ── Semantic: at-risk / warning → pink orchid ───────────── */
-      --amber:       #DBBADD;          /* pink orchid            */
-      --amber-bg:    #F4ECF5;          /* light orchid tint      */
-      --amber-text:  #6B3A7A;          /* dark orchid text       */
+      /* ── Semantic: at-risk / warning → KIPP Orange ──────────── */
+      --amber:       #F5A020;          /* KIPP Orange            */
+      --amber-bg:    #FFF5E3;          /* light orange tint      */
+      --amber-text:  #7A4200;          /* dark orange text       */
 
-      /* ── Semantic: blocked / danger → old rose ───────────────── */
-      --red:         #BE92A2;          /* old rose               */
-      --red-bg:      #F2E8EC;          /* light rose tint        */
-      --red-text:    #6B3040;          /* dark rose text         */
+      /* ── Semantic: blocked / danger → KIPP Red ──────────────── */
+      --red:         #DA2028;          /* KIPP Red               */
+      --red-bg:      #FFE8E9;          /* light red tint         */
+      --red-text:    #6B0008;          /* dark red text          */
 
-      /* ── Sophie accent → sky blue ────────────────────────────── */
-      --pink:        #96CDFF;
-      --pink-bg:     #D8E1FF;
+      /* ── Sophie accent → KIPP Sky Blue ──────────────────────── */
+      --pink:        #5BB8CE;
+      --pink-bg:     #E5F5FA;
 
       /* ── Shadows ────────────────────────────────────────────── */
       --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
@@ -105,17 +112,25 @@
     }
 
     .logo {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;
+      display: flex; align-items: center; gap: 10px;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .logo-badge {
-      width: 26px; height: 26px;
-      background: var(--indigo);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800; letter-spacing: -0.02em;
-      flex-shrink: 0;
+    /* KIPP● dot mark */
+    .logo-kipp-mark {
+      display: flex; align-items: center;
+      font-size: 16px; font-weight: 900; letter-spacing: -0.03em;
+      color: white; line-height: 1;
     }
+    .logo-kipp-dot { color: #F5A020; font-size: 14px; margin: 0 1px; }
+    .logo-tf { color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 700; }
+    /* sub-region line */
+    .logo-regions {
+      font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.45);
+      letter-spacing: 0.01em; line-height: 1;
+      display: flex; flex-direction: column; gap: 1px;
+    }
+    .logo-region-top { color: rgba(255,255,255,0.65); font-weight: 600; font-size: 9.5px; }
+    .logo-region-sub { color: rgba(255,255,255,0.38); }
     .logo-sub { font-weight: 400; opacity: 0.5; margin-left: 2px; }
 
     .header-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.12); }
@@ -214,42 +229,42 @@
       flex-shrink: 0; margin: 0 8px;
     }
 
-    /* ── Section 1: Annual Goals — amber/gold ── */
+    /* ── Section 1: Annual Goals — KIPP Orange ── */
     .tab-goals { font-weight: 600; letter-spacing: -0.01em; }
-    .tab-goals:hover { color: #92400E; background: rgba(245,158,11,0.06); border-radius: 4px 4px 0 0; }
-    .tab-goals.active { color: #92400E; border-bottom-color: #F59E0B; background: rgba(245,158,11,0.06); border-radius: 4px 4px 0 0; }
+    .tab-goals:hover { color: #7A4200; background: rgba(245,160,32,0.07); border-radius: 4px 4px 0 0; }
+    .tab-goals.active { color: #7A4200; border-bottom-color: #F5A020; background: rgba(245,160,32,0.07); border-radius: 4px 4px 0 0; }
 
-    /* ── Section 2: O3 group — frozen lake teal ── */
+    /* ── Section 2: O3 group — KIPP Indigo ── */
     .tab-group-o3 {
       display: flex; align-items: center; gap: 0;
-      background: rgba(105,221,255,0.05);
-      border-left: 1px solid rgba(105,221,255,0.22);
-      border-right: 1px solid rgba(105,221,255,0.22);
-      border-top: 2px solid rgba(105,221,255,0.35);
+      background: rgba(21,32,88,0.04);
+      border-left: 1px solid rgba(21,32,88,0.18);
+      border-right: 1px solid rgba(21,32,88,0.18);
+      border-top: 2px solid rgba(21,32,88,0.35);
       border-bottom: none;
       padding: 0 2px;
-      margin-top: 2px; /* nudge down from very top of nav */
+      margin-top: 2px;
       flex-shrink: 0;
     }
     .tab-group-badge {
       padding: 0 8px 0 10px;
       font-size: 8px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--indigo-text); white-space: nowrap;
-      border-right: 1px solid rgba(105,221,255,0.25);
+      color: #152058; white-space: nowrap;
+      border-right: 1px solid rgba(21,32,88,0.15);
       height: 100%; display: flex; align-items: center;
-      opacity: 0.9;
+      opacity: 0.8;
     }
-    .tab-o3:hover { color: var(--indigo-text); background: rgba(105,221,255,0.1); }
-    .tab-o3.active { color: var(--indigo-text); border-bottom-color: var(--indigo); background: rgba(105,221,255,0.1); }
+    .tab-o3:hover { color: #152058; background: rgba(21,32,88,0.05); }
+    .tab-o3.active { color: #152058; border-bottom-color: #152058; background: rgba(21,32,88,0.06); }
 
-    /* ── Section 3: Skills & Growth — orchid/rose ── */
-    .tab-skills:hover { color: var(--rose-text); background: rgba(219,186,221,0.1); border-radius: 4px 4px 0 0; }
-    .tab-skills.active { color: var(--rose-text); border-bottom-color: #C09BC3; background: rgba(219,186,221,0.1); border-radius: 4px 4px 0 0; }
+    /* ── Section 3: Skills & Growth — KIPP Green ── */
+    .tab-skills:hover { color: var(--rose-text); background: rgba(141,198,63,0.08); border-radius: 4px 4px 0 0; }
+    .tab-skills.active { color: var(--rose-text); border-bottom-color: #8DC63F; background: rgba(141,198,63,0.08); border-radius: 4px 4px 0 0; }
 
-    /* ── Section 4: Quarterly Priorities — sky blue ── */
+    /* ── Section 4: Quarterly Priorities — KIPP Sky Blue ── */
     .tab-manage { font-size: 11.5px; }
-    .tab-manage:hover { color: var(--blue-text); background: rgba(150,205,255,0.1); border-radius: 4px 4px 0 0; }
-    .tab-manage.active { color: var(--blue-text); border-bottom-color: var(--blue); background: rgba(150,205,255,0.1); border-radius: 4px 4px 0 0; }
+    .tab-manage:hover { color: var(--blue-text); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
+    .tab-manage.active { color: var(--blue-text); border-bottom-color: var(--blue); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
 
     /* ── Mobile label helpers ── */
     .label-short { display: none; }
@@ -270,17 +285,17 @@
         order: 1;
         width: 100%;
         border: none;
-        border-bottom: 1px solid rgba(105,221,255,0.3);
+        border-bottom: 1px solid rgba(21,32,88,0.2);
         border-top: none;
         margin-top: 0;
         border-radius: 0;
-        background: rgba(105,221,255,0.06);
+        background: rgba(21,32,88,0.04);
       }
       .tab-group-badge {
         flex: 0 0 auto;
         padding: 0 10px;
         font-size: 8px;
-        border-right: 1px solid rgba(105,221,255,0.2);
+        border-right: 1px solid rgba(21,32,88,0.15);
       }
       .tab-o3 {
         flex: 1;
@@ -1033,14 +1048,14 @@
     }
 
     /* ─── GOALS DASHBOARD TAB ─────────────────────────────────── */
-    /* KIPP brand palette — scoped to Goals tab only */
+    /* KIPP brand palette — aliases to global variables */
     :root {
-      --kipp-navy:   #0D2460;
-      --kipp-blue:   #5BB8CE;
-      --kipp-amber:  #F5A623;
-      --kipp-orange: #E26E1B;
-      --kipp-red-or: #C44E10;
-      --kipp-gold:   #D4A017;
+      --kipp-navy:   var(--navy);      /* #152058 KIPP Indigo  */
+      --kipp-blue:   var(--blue);      /* #5BB8CE KIPP Sky Blue*/
+      --kipp-amber:  var(--amber);     /* #F5A020 KIPP Orange  */
+      --kipp-orange: #E26E1B;          /* deeper orange        */
+      --kipp-red-or: #C44E10;          /* brick orange         */
+      --kipp-gold:   #D4A017;          /* gold                 */
     }
 
     .gd-section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; margin-top: 20px; }
@@ -1180,10 +1195,10 @@
     .col-title-gd { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
     .col-l1 .alignment-col-head { background: rgba(91,184,206,0.12); color: #1A6080; }
     .col-l1 .col-num { background: var(--kipp-blue); color: #0D2460; }
-    .col-l2 .alignment-col-head { background: rgba(245,166,35,0.10); color: #7A4800; }
-    .col-l2 .col-num { background: var(--kipp-amber); color: #0D2460; }
-    .col-l3 .alignment-col-head { background: rgba(13,36,96,0.07); color: #0D2460; }
-    .col-l3 .col-num { background: var(--kipp-navy); color: #fff; }
+    .col-l2 .alignment-col-head { background: rgba(245,160,32,0.10); color: #7A4200; }
+    .col-l2 .col-num { background: var(--amber); color: var(--navy); }
+    .col-l3 .alignment-col-head { background: rgba(21,32,88,0.07); color: var(--navy); }
+    .col-l3 .col-num { background: var(--navy); color: #fff; }
 
     /* Pillar cards */
     .pillar-card { background: var(--white); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; }
@@ -1272,8 +1287,8 @@ const GD_VISION_GOALS = [
   { id: 'gpa',     label: '3.0+ GPA',          target: '60% of 11th graders', color: '#E26E1B', pillar: 'college'  },
   { id: 'sat',     label: 'SAT 1010+',         target: '40% of 11th graders', color: '#E26E1B', pillar: 'college'  },
   { id: 'college', label: '4-Year Enrollment', target: '70% of seniors',      color: '#F5A623', pillar: 'college'  },
-  { id: 'attend',  label: 'Attendance',        target: '>94% avg daily',      color: '#0D2460', pillar: 'culture'  },
-  { id: 'enroll',  label: 'Enrollment',        target: '16,000 students',     color: '#0D2460', pillar: 'growth'   },
+  { id: 'attend',  label: 'Attendance',        target: '>94% avg daily',      color: '#152058', pillar: 'culture'  },
+  { id: 'enroll',  label: 'Enrollment',        target: '16,000 students',     color: '#152058', pillar: 'growth'   },
   { id: 'ai',      label: 'AI in T&L',         target: 'Advance in age of AI',color: '#5BB8CE', pillar: 'growth'   },
 ];
 
@@ -1560,7 +1575,7 @@ function KIPPPyramid() {
     {
       id: 'sfx', label: 'Student & Family Experience',
       sub: 'Outstanding Teammates Are Everything',
-      color: '#D4A017', textColor: '#0D2460',
+      color: '#D4A017', textColor: '#152058',
       metrics: [
         '88% student persistence',
         'High-quality athletics & extracurricular access for every student',
@@ -1571,7 +1586,7 @@ function KIPPPyramid() {
     {
       id: 'attend', label: 'Attendance & Enrollment',
       sub: 'Our Kids Run To School',
-      color: '#163775', textColor: 'white',
+      color: '#152058', textColor: 'white',
       metrics: [
         '100% of schools have ≥94% average daily attendance',
         '16,000 students enrolled across Newark, Camden, Miami & Paterson',
@@ -1610,7 +1625,7 @@ function KIPPPyramid() {
     },
     {
       id: 'apex', label: 'Our Kids Will Change The World',
-      sub: null, color: '#A8D4E4', textColor: '#0D2460',
+      sub: null, color: '#A8D4E4', textColor: '#152058',
       metrics: null, isApex: true,
     },
   ];
@@ -2569,8 +2584,14 @@ function Header({ sessions, session, sid, setSid, onNew, onSettings, sheetUrl, s
   return (
     <header className="header">
       <div className="logo">
-        <div className="logo-badge">K</div>
-        <span>O3 Hub <span className="logo-sub">Kevin × Sophie</span></span>
+        <div className="logo-kipp-mark">
+          KIPP<span className="logo-kipp-dot">●</span>
+          <span className="logo-tf">Team &amp; Family</span>
+        </div>
+        <div className="logo-regions">
+          <span className="logo-region-top">O3 Hub · Kevin × Sophie</span>
+          <span className="logo-region-sub">KIPP NJ (Newark · Camden · Paterson) &nbsp;|&nbsp; KIPP: Miami</span>
+        </div>
       </div>
       <div className="header-sep" />
       <div className="session-area">
