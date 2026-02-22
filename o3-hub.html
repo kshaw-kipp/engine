@@ -30,10 +30,10 @@
       --border:      #D4D8E8;
 
       /* ── KIPP Orange – primary interactive/action ───────────── */
-      --indigo:      #F5A020;          /* KIPP Orange (fill)     */
-      --indigo-d:    #D98618;          /* hover / pressed        */
-      --indigo-bg:   #FFF5E3;          /* light orange tint      */
-      --indigo-text: #7A4200;          /* dark orange text       */
+      --indigo:      #DA2028;          /* KIPP Red (primary action — indigoRed) */
+      --indigo-d:    #B01820;          /* hover / pressed                       */
+      --indigo-bg:   #FFE8E9;          /* light red tint                        */
+      --indigo-text: #6B0008;          /* dark red text                         */
 
       /* ── KIPP Green – Skills & Growth accent ────────────────── */
       --rose:        #8DC63F;          /* KIPP Green             */
@@ -115,13 +115,27 @@
       display: flex; align-items: center; gap: 10px;
       white-space: nowrap; flex-shrink: 0;
     }
-    /* KIPP● dot mark */
+    /* KIPP colon mark — two stacked dots (the real KIPP logo mark) */
     .logo-kipp-mark {
       display: flex; align-items: center;
       font-size: 16px; font-weight: 900; letter-spacing: -0.03em;
       color: white; line-height: 1;
     }
-    .logo-kipp-dot { color: #F5A020; font-size: 14px; margin: 0 1px; }
+    /* Two vertically-stacked dots matching the official KIPP logotype */
+    .logo-colon {
+      display: inline-flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; height: 14px;
+      margin: 0 3px 0 2px;
+      flex-shrink: 0;
+    }
+    .logo-colon-dot {
+      display: block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #DA2028; /* KIPP Red */
+      flex-shrink: 0;
+    }
     .logo-tf { color: rgba(255,255,255,0.85); font-size: 13px; font-weight: 700; }
     /* sub-region line */
     .logo-regions {
@@ -229,10 +243,10 @@
       flex-shrink: 0; margin: 0 8px;
     }
 
-    /* ── Section 1: Annual Goals — KIPP Orange ── */
+    /* ── Section 1: Annual Goals — KIPP Red (indigoRed) ── */
     .tab-goals { font-weight: 600; letter-spacing: -0.01em; }
-    .tab-goals:hover { color: #7A4200; background: rgba(245,160,32,0.07); border-radius: 4px 4px 0 0; }
-    .tab-goals.active { color: #7A4200; border-bottom-color: #F5A020; background: rgba(245,160,32,0.07); border-radius: 4px 4px 0 0; }
+    .tab-goals:hover { color: #6B0008; background: rgba(218,32,40,0.07); border-radius: 4px 4px 0 0; }
+    .tab-goals.active { color: #6B0008; border-bottom-color: #DA2028; background: rgba(218,32,40,0.07); border-radius: 4px 4px 0 0; }
 
     /* ── Section 2: O3 group — KIPP Indigo ── */
     .tab-group-o3 {
@@ -394,7 +408,7 @@
       position: relative; overflow: hidden;
       transition: border-color var(--transition), box-shadow var(--transition);
     }
-    .ws-card:hover { border-color: rgba(105,221,255,0.25); box-shadow: var(--shadow); }
+    .ws-card:hover { border-color: rgba(218,32,40,0.20); box-shadow: var(--shadow); }
     .ws-card.is-na { background: var(--gray-50); }
     .ws-card.is-na:hover { border-color: var(--gray-200); box-shadow: none; }
     .ws-card-stripe {
@@ -451,7 +465,7 @@
     }
     .ws-textarea:focus {
       outline: none; border-color: var(--indigo);
-      box-shadow: 0 0 0 3px rgba(105,221,255,0.15);
+      box-shadow: 0 0 0 3px rgba(218,32,40,0.15);
     }
     .ws-textarea::placeholder { color: var(--slate-light); }
 
@@ -544,7 +558,7 @@
     .status-btn.done-btn:hover, .status-btn.done-btn.active { background: var(--green); border-color: var(--green); color: white; }
     .status-btn.table-btn { background: var(--amber-bg); border-color: rgba(219,186,221,0.4); color: var(--amber-text); }
     .status-btn.table-btn:hover, .status-btn.table-btn.active { background: var(--amber); border-color: var(--amber); color: var(--navy); }
-    .status-btn.action-btn { background: var(--indigo-bg); border-color: rgba(105,221,255,0.3); color: var(--indigo-text); }
+    .status-btn.action-btn { background: var(--indigo-bg); border-color: rgba(218,32,40,0.25); color: var(--indigo-text); }
     .status-btn.action-btn:hover { background: var(--indigo); border-color: var(--indigo); color: var(--navy); }
 
     .add-action-form {
@@ -601,7 +615,7 @@
       transition: all var(--transition);
       display: flex; align-items: center; gap: 14px;
     }
-    .hist-item:hover { border-color: rgba(105,221,255,0.25); box-shadow: var(--shadow); }
+    .hist-item:hover { border-color: rgba(218,32,40,0.20); box-shadow: var(--shadow); }
     .hist-date { font-size: 14px; font-weight: 700; color: var(--navy); min-width: 110px; }
     .hist-stats { display: flex; gap: 14px; flex: 1; flex-wrap: wrap; }
     .hist-stat { font-size: 11px; color: var(--slate); }
@@ -719,7 +733,7 @@
       flex: 1; border: 1px solid var(--indigo); border-radius: 5px;
       padding: 3px 7px; font-size: 12px; font-family: var(--font);
       color: var(--navy); background: var(--white);
-      box-shadow: 0 0 0 2px rgba(105,221,255,0.2);
+      box-shadow: 0 0 0 2px rgba(218,32,40,0.15);
     }
     .inline-edit-input:focus { outline: none; }
 
@@ -789,7 +803,7 @@
       padding: 7px 11px; font-size: 13px; font-family: var(--font);
       color: var(--navy); background: var(--white); transition: border-color var(--transition);
     }
-    .f-input:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(105,221,255,0.15); }
+    .f-input:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(218,32,40,0.15); }
 
     .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all var(--transition); border: 1px solid transparent; font-family: var(--font); }
     .btn-prim { background: var(--indigo); color: var(--navy); }
@@ -1010,7 +1024,7 @@
       display: flex; align-items: flex-start; gap: 10px;
       transition: all var(--transition);
     }
-    .build-mode-card.done { border-color: rgba(105,221,255,0.4); background: var(--indigo-bg); }
+    .build-mode-card.done { border-color: rgba(218,32,40,0.30); background: var(--indigo-bg); }
     .mode-check {
       width: 16px; height: 16px; border-radius: 4px;
       border: 1.5px solid var(--gray-200); cursor: pointer;
@@ -1154,7 +1168,7 @@
     .roi-hyp.emerging .roi-hyp-desc { opacity: 0.8; }
     .roi-casestudy {
       background: rgba(91,184,206,0.10); border-radius: var(--radius);
-      padding: 12px 16px; border: 1px solid rgba(105,221,255,0.2); margin-top: 2px;
+      padding: 12px 16px; border: 1px solid rgba(218,32,40,0.15); margin-top: 2px;
     }
     .roi-cs-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
     .roi-cs-tag { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--kipp-blue); color: #0D2460; padding: 2px 7px; border-radius: 100px; }
@@ -1431,27 +1445,27 @@ const GD_PILOTS = [
 ];
 
 const GD_STATUS_CONFIG = {
-  'complete':    { label: 'Complete',    bg: '#69DDFF', color: '#111111' },
-  'on-track':    { label: 'On Track',    bg: '#96CDFF', color: '#111111' },
-  'in-progress': { label: 'In Progress', bg: '#DBBADD', color: '#111111' },
-  'at-risk':     { label: 'At Risk',     bg: '#BE92A2', color: '#111111' },
+  'complete':    { label: 'Complete',    bg: '#5BB8CE', color: '#0D3A4A' },  /* KIPP Sky Blue  */
+  'on-track':    { label: 'On Track',    bg: '#8DC63F', color: '#2B4800' },  /* KIPP Green     */
+  'in-progress': { label: 'In Progress', bg: '#F5A020', color: '#4A2800' },  /* KIPP Orange    */
+  'at-risk':     { label: 'At Risk',     bg: '#DA2028', color: '#ffffff' },  /* KIPP Red       */
   'not-started': { label: 'Not Started', bg: '#D4D8E8', color: '#6B6360' },
 };
 const GD_STATUS_ORDER = ['complete','on-track','in-progress','at-risk','not-started'];
 
 const GD_DECISION_CONFIG = {
-  'scale':     { label: '↑ Scale',    bg: '#69DDFF', color: '#1A6A8A' },
+  'scale':     { label: '↑ Scale',    bg: '#5BB8CE', color: '#0D3A4A' },  /* KIPP Sky Blue  */
   'continue':  { label: '→ Continue', bg: '#D8E1FF', color: '#2A4A8F' },
-  'caution':   { label: '⚠ Caution',  bg: '#DBBADD', color: '#6B3A7A' },
+  'caution':   { label: '⚠ Caution',  bg: '#F5A020', color: '#4A2800' },  /* KIPP Orange    */
   'too-early': { label: '◌ Too Early',bg: '#ECEEF5', color: '#6B6360' },
   'scoping':   { label: '◎ Scoping',  bg: '#F5F6FA', color: '#6B6360' },
 };
 
 const GD_PRIORITY_LABELS = {
-  'ela_math':   { label: 'ELA & Math',  color: '#69DDFF' },
-  'college':    { label: 'College CCR', color: '#DBBADD' },
-  'efficiency': { label: 'Efficiency',  color: '#BE92A2' },
-  'ai_plan':    { label: 'AI Strategy', color: '#96CDFF' },
+  'ela_math':   { label: 'ELA & Math',  color: '#5BB8CE' },  /* KIPP Sky Blue  */
+  'college':    { label: 'College CCR', color: '#F5A020' },  /* KIPP Orange    */
+  'efficiency': { label: 'Efficiency',  color: '#DA2028' },  /* KIPP Red       */
+  'ai_plan':    { label: 'AI Strategy', color: '#8DC63F' },  /* KIPP Green     */
 };
 
 function GdStatusButton({ status, onChange }) {
@@ -1526,7 +1540,7 @@ function InitiativeCard({ goal, onSave }) {
           {goal.milestones.map((m, i) => (
             <div key={i} className={`m-dot ${i < done ? 'done' : 'todo'}`} title={m}
               onClick={() => setDone(i < done ? i : i + 1)}
-              style={{ background: i < done ? (sCfg?.bg || '#69DDFF') : 'transparent' }}>
+              style={{ background: i < done ? (sCfg?.bg || '#5BB8CE') : 'transparent' }}>
               {i < done ? '✓' : ''}
             </div>
           ))}
@@ -1631,7 +1645,10 @@ function KIPPPyramid() {
   ];
 
   // widths: widest at bottom index 0, narrowest at top index 5
-  const widths = ['100%', '86%', '72%', '58%', '43%', '27%'];
+  // Steeper step (~18%) so College Enrollment doesn't look fat vs. apex
+  const widths = ['100%', '82%', '64%', '48%', '34%', '22%'];
+  // Container width (px) — matches max-width on .py-stack
+  const PY_W = 640;
 
   // Render top→bottom: reverse both arrays
   const renderTiers = [...tiers].reverse();
@@ -1643,11 +1660,20 @@ function KIPPPyramid() {
     <div className="kipp-pyramid-section">
       <div className="py-eyebrow">★ 2030 TOPLINE GOALS — tap a layer to see targets</div>
       <div className="py-stack">
-        {renderTiers.map((tier, i) => (
+        {renderTiers.map((tier, i) => {
+          // Dynamic left padding: the ::before clip-path cuts in 5% from the tier's left
+          // edge. Text must start at or past that cut — otherwise it appears to "float"
+          // outside the colored background on wider tiers.
+          const tierFrac = parseFloat(renderWidths[i]) / 100;
+          const clipInset = Math.round(PY_W * tierFrac * 0.05);  // 5% of tier px width
+          const pl = Math.max(clipInset + 8, 14);                 // inset + 8px buffer
+          const pr = Math.max(clipInset + 4, 12);
+          return (
           <div
             key={tier.id}
             className={`py-tier${active === tier.id ? ' py-active' : ''}`}
-            style={{ width: renderWidths[i], '--py-bg': tier.color, minHeight: 36 }}
+            style={{ width: renderWidths[i], '--py-bg': tier.color, minHeight: 36,
+                     paddingLeft: pl, paddingRight: pr }}
             onClick={() => setActive(active === tier.id ? null : tier.id)}
           >
             <div className="py-tier-lhs">
@@ -1664,7 +1690,8 @@ function KIPPPyramid() {
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
       {activeTier && activeTier.metrics && (
         <div className="py-expanded" style={{ borderLeftColor: activeTier.color }}>
@@ -1936,19 +1963,24 @@ function GoalsDashboardView() {
 // ═══════════════════════════════════════════════════════════════
 
 const DEFAULT_CATEGORIES = [
-  { id: 'strategic',    name: 'Strategic Initiatives',    color: '#BE92A2', workstreams: ['Project CORE', '2030 Future of Learning & Work', 'Phase A — MOY Research Report', 'Phase B — EOY Strategic Framework'] },
-  { id: 'partnerships',name: 'Partnerships & Teams',      color: '#96CDFF', workstreams: ['T&L Collab', 'CCR Support', 'KTAF Teams Support', 'Overgrad'] },
+  { id: 'strategic',    name: 'Strategic Initiatives',    color: '#152058', workstreams: ['Project CORE', '2030 Future of Learning & Work', 'Phase A — MOY Research Report', 'Phase B — EOY Strategic Framework'] },
+  { id: 'partnerships',name: 'Partnerships & Teams',      color: '#3A9DB5', workstreams: ['T&L Collab', 'CCR Support', 'KTAF Teams Support', 'Overgrad'] },
   { id: 'ai_ops',      name: 'AI Operations',             color: '#333333', workstreams: ['ChatGPT EDU', 'Gemini', 'Claude / Anthropic', 'Substack', 'Impact Methodology'] },
-  { id: 'pilot_impl',  name: 'Pilot Implementation',      color: '#69DDFF', workstreams: ['Khanmigo', 'EnlightenAI', 'CourseMojo', 'Quill', 'Goblins'] },
-  { id: 'pilot_scope', name: 'Pilot Scoping',             color: '#DBBADD', workstreams: ['U-W / colleague.ai', 'MagicSchool', 'Snorkl', 'CZI / Learning Commons'] },
+  { id: 'pilot_impl',  name: 'Pilot Implementation',      color: '#5BB8CE', workstreams: ['Khanmigo', 'EnlightenAI', 'CourseMojo', 'Quill', 'Goblins'] },
+  { id: 'pilot_scope', name: 'Pilot Scoping',             color: '#F5A020', workstreams: ['U-W / colleague.ai', 'MagicSchool', 'Snorkl', 'CZI / Learning Commons'] },
   { id: 'fundraising', name: 'Fundraising & Capacity',    color: '#555555', workstreams: ['Gates / Siegel / Ballmer', 'Tools Competition', 'CSGF', 'Capacity Building (Drew / Squared Away)'] },
-  { id: 'other',       name: 'Other',                     color: '#D8E1FF', workstreams: ['Reading Engine', 'Sustainability / Kevin Bandwidth', 'Impediments / Blockers'] }
+  { id: 'other',       name: 'Other',                     color: '#D4D8E8', workstreams: ['Reading Engine', 'Sustainability / Kevin Bandwidth', 'Impediments / Blockers'] }
 ];
 
 const COLOR_OPTIONS = [
-  '#69DDFF','#96CDFF','#D8E1FF','#DBBADD',  /* frozen lake → sky blue → lavender → orchid */
-  '#BE92A2','#111111','#333333','#555555',  /* old rose → black → greys */
-  '#6B6360','#878E89','#9E9896','#B0A8A6'  /* mid-greys → light grey */
+  /* KIPP Brand */
+  '#152058','#2A3F7A','#5BB8CE','#3A9DB5',
+  /* KIPP Action  */
+  '#DA2028','#F5A020','#8DC63F','#D4A017',
+  /* KIPP Warm    */
+  '#E26E1B','#C44E10','#A8D4E4','#E5F5FA',
+  /* Neutrals     */
+  '#111111','#333333','#4A5568','#D4D8E8'
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -2585,7 +2617,11 @@ function Header({ sessions, session, sid, setSid, onNew, onSettings, sheetUrl, s
     <header className="header">
       <div className="logo">
         <div className="logo-kipp-mark">
-          KIPP<span className="logo-kipp-dot">●</span>
+          KIPP
+          <span className="logo-colon">
+            <span className="logo-colon-dot"></span>
+            <span className="logo-colon-dot"></span>
+          </span>
           <span className="logo-tf">Team &amp; Family</span>
         </div>
         <div className="logo-regions">
@@ -2808,9 +2844,9 @@ function RunView({ session, ag, progress, categories, onUpdate, onAddAction }) {
   });
   // Urgency groups in priority order; each gets a distinctive accent color
   const URGENCY_GROUPS = [
-    { key: 'high',   label: 'High Priority',   pip: '#BE92A2' },
-    { key: 'medium', label: 'Medium Priority',  pip: '#DBBADD' },
-    { key: 'low',    label: 'Low Priority',     pip: '#96CDFF' },
+    { key: 'high',   label: 'High Priority',   pip: '#DA2028' },  /* KIPP Red    */
+    { key: 'medium', label: 'Medium Priority',  pip: '#F5A020' },  /* KIPP Orange */
+    { key: 'low',    label: 'Low Priority',     pip: '#5BB8CE' },  /* KIPP Blue   */
     { key: 'other',  label: 'Other',            pip: '#D4D8E8' },
   ];
   const discussGroups = URGENCY_GROUPS.filter(g => urgBuckets[g.key].length > 0)
@@ -3563,7 +3599,7 @@ function SkillsView({ skills, onUpdate }) {
             fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
             textTransform: 'uppercase', padding: '4px 10px', borderRadius: 20,
             background: 'var(--indigo-bg)', color: 'var(--indigo-text)',
-            border: '1px solid rgba(105,221,255,0.3)'
+            border: '1px solid rgba(218,32,40,0.25)'
           }}>
             Phase {phase}
           </span>
@@ -3590,7 +3626,7 @@ function SkillsView({ skills, onUpdate }) {
 
       {/* ── Phase Focus Callout ── */}
       <div style={{
-        background: 'var(--indigo-bg)', border: '1px solid rgba(105,221,255,0.3)',
+        background: 'var(--indigo-bg)', border: '1px solid rgba(218,32,40,0.25)',
         borderRadius: 'var(--radius)', padding: '10px 14px', marginBottom: 20,
         fontSize: 12, color: 'var(--navy)', lineHeight: 1.5
       }}>
