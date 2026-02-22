@@ -2169,6 +2169,10 @@ function App() {
   });
 
   const [D, setD] = useState(init);
+  // Always-current ref so category mutations never read a stale closure value
+  const categoriesRef = useRef(D.categories);
+  categoriesRef.current = D.categories;
+
   const [view, setView] = useState('goals');
   const [sid, setSid] = useState(() => (LS.get('o3_sessions') || [])[0]?.id || null);
   const [showNew, setShowNew] = useState(false);
@@ -2195,12 +2199,17 @@ function App() {
   // ── Merge server data (server wins except settings) ─────────
   const mergeServerData = useCallback((server) => {
     if (!server || server.error) return;
+    // If there are category writes still queued (not yet flushed), keep local state —
+    // the server version is stale relative to what the user just changed.
+    const hasPendingCatWrite = writeQueueRef.current.some(
+      item => item.action === 'syncCategories' || item.action === 'syncAll'
+    );
     setD(prev => ({
       sessions:   server.sessions   ?? prev.sessions,
       agenda:     server.agenda     ?? prev.agenda,
       actions:    server.actions    ?? prev.actions,
       settings:   prev.settings, // device-local always
-      categories: server.categories ?? prev.categories,
+      categories: hasPendingCatWrite ? prev.categories : (server.categories ?? prev.categories),
       skills:     server.skills     ?? prev.skills
     }));
     if (server.sessions?.length) {
@@ -2384,65 +2393,70 @@ function App() {
   };
 
   // ── Workstream / Category CRUD (sync full array) ──────────────
+  // All mutations read from categoriesRef.current (always fresh, never a stale closure).
+  // All enqueues share dedupeKey:'categories' + delay:500ms so rapid edits collapse
+  // into one write, preventing concurrent GAS requests that cause sheet corruption.
+  const CAT_ENQUEUE_OPTS = { delay: 500, dedupeKey: 'categories' };
+
   const addWorkstream = (catId, name) => {
     if (!name.trim()) return;
-    const newCats = D.categories.map(c =>
+    const newCats = categoriesRef.current.map(c =>
       c.id === catId ? { ...c, workstreams: [...c.workstreams, name.trim()] } : c
     );
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const renameWorkstream = (catId, oldName, newName) => {
     if (!newName.trim() || newName.trim() === oldName) return;
-    const newCats = D.categories.map(c =>
+    const newCats = categoriesRef.current.map(c =>
       c.id === catId
         ? { ...c, workstreams: c.workstreams.map(w => w === oldName ? newName.trim() : w) }
         : c
     );
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const deleteWorkstream = (catId, name) => {
-    const newCats = D.categories.map(c =>
+    const newCats = categoriesRef.current.map(c =>
       c.id === catId ? { ...c, workstreams: c.workstreams.filter(w => w !== name) } : c
     );
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const addCategory = (name, color) => {
     if (!name.trim()) return;
     const id = name.toLowerCase().replace(/\s+/g, '_') + '_' + uid();
-    const newCats = [...D.categories, { id, name: name.trim(), color, workstreams: [] }];
+    const newCats = [...categoriesRef.current, { id, name: name.trim(), color, workstreams: [] }];
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const renameCategory = (catId, newName) => {
     if (!newName.trim()) return;
-    const newCats = D.categories.map(c => c.id === catId ? { ...c, name: newName.trim() } : c);
+    const newCats = categoriesRef.current.map(c => c.id === catId ? { ...c, name: newName.trim() } : c);
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const recolorCategory = (catId, color) => {
-    const newCats = D.categories.map(c => c.id === catId ? { ...c, color } : c);
+    const newCats = categoriesRef.current.map(c => c.id === catId ? { ...c, color } : c);
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const deleteCategory = (catId) => {
-    const newCats = D.categories.filter(c => c.id !== catId);
+    const newCats = categoriesRef.current.filter(c => c.id !== catId);
     setD(d => ({ ...d, categories: newCats }));
-    enqueue({ action: 'syncCategories', categories: newCats });
+    enqueue({ action: 'syncCategories', categories: newCats }, CAT_ENQUEUE_OPTS);
   };
 
   const resetCategories = () => {
     if (confirm('Reset all workstreams to the default list? This won\'t delete any session data.')) {
       setD(d => ({ ...d, categories: DEFAULT_CATEGORIES }));
-      enqueue({ action: 'syncCategories', categories: DEFAULT_CATEGORIES });
+      enqueue({ action: 'syncCategories', categories: DEFAULT_CATEGORIES }, CAT_ENQUEUE_OPTS);
     }
   };
 
