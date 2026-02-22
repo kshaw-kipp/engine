@@ -1110,7 +1110,7 @@
     }
     .py-stack {
       display: flex; flex-direction: column; align-items: center; gap: 3px;
-      max-width: 640px; margin: 0 auto;   /* constrain width → pyramid looks taller */
+      max-width: 760px; margin: 0 auto;   /* wider so narrow tiers fit label text */
     }
     /* Pseudo-element carries the clip-path trapezoid; the div itself is transparent
        so text is never clipped — only the background shape is clipped. */
@@ -1659,7 +1659,7 @@ function KIPPPyramid() {
   // Steeper step (~18%) so College Enrollment doesn't look fat vs. apex
   const widths = ['100%', '82%', '64%', '48%', '34%', '22%'];
   // Container width (px) — matches max-width on .py-stack
-  const PY_W = 640;
+  const PY_W = 760;   // must match .py-stack max-width in CSS
 
   // Render top→bottom: reverse both arrays
   const renderTiers = [...tiers].reverse();
