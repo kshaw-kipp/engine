@@ -1109,16 +1109,19 @@
       color: rgba(255,255,255,0.35); text-align: center; margin-bottom: 12px;
     }
     .py-stack {
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
       max-width: 640px; margin: 0 auto;   /* constrain width → pyramid looks taller */
     }
     /* Pseudo-element carries the clip-path trapezoid; the div itself is transparent
-       so text is never clipped — only the background shape is. */
+       so text is never clipped — only the background shape is clipped. */
     .py-tier {
       position: relative;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
-      padding: 8px 18px; cursor: pointer; transition: filter 0.15s;
-      overflow: visible;    /* let text breathe past box edges if needed */
+      /* Fixed height keeps every tier the same regardless of text length */
+      height: 52px;
+      cursor: pointer; transition: filter 0.15s;
+      overflow: visible;
+      box-sizing: border-box;
     }
     .py-tier::before {
       content: ''; position: absolute; inset: 0;
@@ -1128,11 +1131,19 @@
       z-index: 0;
     }
     .py-tier:hover::before { filter: brightness(1.12); }
-    .py-tier.py-active::before { filter: brightness(1.2); outline: 2px solid rgba(255,255,255,0.4); outline-offset: -2px; }
-    .py-tier-lhs { flex: 1; min-width: 0; position: relative; z-index: 1; }
-    .py-tier-label { font-size: 11px; font-weight: 800; line-height: 1.2; }
-    .py-tier-sub   { font-size: 9px; margin-top: 1px; opacity: 0.6; font-style: italic; }
-    .py-tier-metric { font-size: 9px; text-align: right; opacity: 0.75; white-space: nowrap; position: relative; z-index: 1; }
+    /* Active: use box-shadow inset so it stays inside overflow:visible bounds */
+    .py-tier.py-active::before { filter: brightness(1.2); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45); }
+    /* LHS must clip so long text never overflows into the metric column */
+    .py-tier-lhs { flex: 1; min-width: 0; position: relative; z-index: 1; overflow: hidden; }
+    .py-tier-label {
+      font-size: 11px; font-weight: 800; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .py-tier-sub {
+      font-size: 9px; margin-top: 2px; opacity: 0.6; font-style: italic;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .py-tier-metric { font-size: 9px; text-align: right; opacity: 0.75; white-space: nowrap; position: relative; z-index: 1; flex-shrink: 0; max-width: 45%; }
     .py-expanded {
       background: rgba(255,255,255,0.06); border-left: 3px solid #ccc;
       border-radius: 0 var(--radius) var(--radius) 0;
@@ -1600,7 +1611,7 @@ function KIPPPyramid() {
     {
       id: 'attend', label: 'Attendance & Enrollment',
       sub: 'Our Kids Run To School',
-      color: '#152058', textColor: 'white',
+      color: '#2A3F7A', textColor: 'white',   /* slightly lighter than section bg so it's visible */
       metrics: [
         '100% of schools have ≥94% average daily attendance',
         '16,000 students enrolled across Newark, Camden, Miami & Paterson',
@@ -1672,7 +1683,7 @@ function KIPPPyramid() {
           <div
             key={tier.id}
             className={`py-tier${active === tier.id ? ' py-active' : ''}`}
-            style={{ width: renderWidths[i], '--py-bg': tier.color, minHeight: 36,
+            style={{ width: renderWidths[i], '--py-bg': tier.color,
                      paddingLeft: pl, paddingRight: pr }}
             onClick={() => setActive(active === tier.id ? null : tier.id)}
           >
