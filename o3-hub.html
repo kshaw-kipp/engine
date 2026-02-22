@@ -2605,7 +2605,7 @@ function App() {
     }
   };
 
-  const noSession = !session && view !== 'history' && view !== 'actions' && view !== 'manage' && view !== 'skills' && view !== 'quarterly' && view !== 'eval';
+  const noSession = !session && view !== 'history' && view !== 'actions' && view !== 'skills' && view !== 'quarterly' && view !== 'eval';
 
   const updSkills = (patch) => {
     setD(d => ({ ...d, skills: { ...d.skills, ...patch } }));
@@ -2720,7 +2720,17 @@ function App() {
         {view === 'goals' ? (
           <GoalsDashboardView />
         ) : view === 'quarterly' ? (
-          <QuarterlyView onManageWorkstreams={() => setView('manage')} />
+          <QuarterlyView
+            categories={D.categories}
+            onAddWorkstream={addWorkstream}
+            onRenameWorkstream={renameWorkstream}
+            onDeleteWorkstream={deleteWorkstream}
+            onAddCategory={addCategory}
+            onRenameCategory={renameCategory}
+            onRecolorCategory={recolorCategory}
+            onDeleteCategory={deleteCategory}
+            onReset={resetCategories}
+          />
         ) : view === 'eval' ? (
           <PerformanceEvalView />
         ) : noSession ? (
@@ -2742,19 +2752,7 @@ function App() {
             onEdit={editAction} onDelete={deleteAction} />
         ) : view === 'skills' ? (
           <SkillsView skills={D.skills} onUpdate={updSkills} />
-        ) : (
-          <ManageView
-            categories={D.categories}
-            onAddWorkstream={addWorkstream}
-            onRenameWorkstream={renameWorkstream}
-            onDeleteWorkstream={deleteWorkstream}
-            onAddCategory={addCategory}
-            onRenameCategory={renameCategory}
-            onRecolorCategory={recolorCategory}
-            onDeleteCategory={deleteCategory}
-            onReset={resetCategories}
-          />
-        )}
+        ) : null}
       </main>
 
       {showNew && <NewSessionModal onClose={() => setShowNew(false)} onCreate={createSession} />}
@@ -3515,20 +3513,20 @@ const QUARTERS = [
         ]
       },
       {
+        head: 'Growth Commitments (from MOY eval)',
+        items: [
+          { text: '"Go slow to go fast" — build simple systems that protect quality' },
+          { text: 'Deliberate operating cadence: standards → checkpoints → QA → measurement early' },
+          { text: 'Ruthless prioritization + delegation: fewer initiatives, clearer ownership' },
+        ]
+      },
+      {
         head: 'Active Workstreams',
         items: [
           { text: 'EOY pilot analysis preparation', sub: 'Lightweight cadence: student outcomes + implementation quality + ROI assumptions' },
           { text: 'KIPP Miami Technical HS development', sub: 'Career pathways, MGT implementation support, Apple Education partnership' },
           { text: 'Operating cadence build', sub: 'Weekly tracker; hand off / deprioritize lower-leverage workstreams' },
           { text: 'Squared Away + Drew onboarding', sub: 'Extending capacity to protect deep-work time for product dev + strategy' },
-        ]
-      },
-      {
-        head: 'Growth Commitments (from MOY eval)',
-        items: [
-          { text: '"Go slow to go fast" — build simple systems that protect quality' },
-          { text: 'Deliberate operating cadence: standards → checkpoints → QA → measurement early' },
-          { text: 'Ruthless prioritization + delegation: fewer initiatives, clearer ownership' },
         ]
       }
     ]
@@ -3558,7 +3556,8 @@ const QUARTERS = [
   }
 ];
 
-function QuarterlyView({ onManageWorkstreams }) {
+function QuarterlyView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
+                         onAddCategory, onRenameCategory, onRecolorCategory, onDeleteCategory, onReset }) {
   const [focused, setFocused] = useState('q3');
   // Editable quarters — localStorage-backed, seeded from hardcoded QUARTERS
   const [quarters, setQuarters] = useState(() => LS.get('qv_quarters') || QUARTERS);
@@ -3597,7 +3596,6 @@ function QuarterlyView({ onManageWorkstreams }) {
           <div className="page-title">Quarterly Priorities &amp; Initiatives</div>
           <div className="page-sub">SY 2025–26 · Q1 Jul–Sep · Q2 Oct–Dec · Q3 Jan–Mar (current) · Q4 Apr–Jun</div>
         </div>
-        <span className="qv-manage-link" onClick={onManageWorkstreams}>⚙ Workstreams</span>
       </div>
 
       {/* ── Timeline — labels removed, just Q + period + status ── */}
@@ -3667,6 +3665,22 @@ function QuarterlyView({ onManageWorkstreams }) {
           ))}
         </div>
       )}
+
+      {/* ── O3 Workstreams — embedded manage section ── */}
+      <div style={{ marginTop: 32, borderTop: '2px solid var(--gray-100)', paddingTop: 24 }}>
+        <ManageView
+          compact
+          categories={categories}
+          onAddWorkstream={onAddWorkstream}
+          onRenameWorkstream={onRenameWorkstream}
+          onDeleteWorkstream={onDeleteWorkstream}
+          onAddCategory={onAddCategory}
+          onRenameCategory={onRenameCategory}
+          onRecolorCategory={onRecolorCategory}
+          onDeleteCategory={onDeleteCategory}
+          onReset={onReset}
+        />
+      </div>
     </div>
   );
 }
@@ -3955,7 +3969,7 @@ function PerformanceEvalView() {
 // MANAGE VIEW — add / rename / delete workstreams & categories
 // ═══════════════════════════════════════════════════════════════
 
-function ManageView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
+function ManageView({ compact, categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
                       onAddCategory, onRenameCategory, onRecolorCategory, onDeleteCategory, onReset }) {
   const [newCatName,  setNewCatName]  = useState('');
   const [newCatColor, setNewCatColor] = useState(COLOR_OPTIONS[0]);
@@ -3963,6 +3977,18 @@ function ManageView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteW
 
   return (
     <div>
+      {compact ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div>
+            <div className="page-title" style={{ fontSize: 15 }}>O3 Workstreams</div>
+            <div className="page-sub">Add, rename, or delete workstreams and categories</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-sec btn-sm" onClick={onReset} title="Reset to defaults">↺ Reset</button>
+            <button className="btn btn-prim btn-sm" onClick={() => setShowAddCat(s => !s)}>+ Category</button>
+          </div>
+        </div>
+      ) : (
       <div className="page-header">
         <div>
           <div className="page-title">Workstreams</div>
@@ -3973,6 +3999,7 @@ function ManageView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteW
           <button className="btn btn-prim btn-sm" onClick={() => setShowAddCat(s => !s)}>+ Category</button>
         </div>
       </div>
+      )}
 
       {showAddCat && (
         <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 16 }}>
