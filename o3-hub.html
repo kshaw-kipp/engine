@@ -1,0 +1,3937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kevin × Sophie — O3 Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* ── Base ───────────────────────────────────────────────── */
+      --navy:        #111111;
+      --navy-light:  #1A3A4A;
+      --white:       #FFFFFF;
+      --gray-50:     #F5F6FA;
+      --gray-100:    #ECEEF5;
+      --gray-200:    #D4D8E8;
+      --border:      #D4D8E8;
+
+      /* ── Frozen Lake – primary action color ─────────────────── */
+      --indigo:      #69DDFF;          /* frozen lake (fill)     */
+      --indigo-d:    #4BCCF0;          /* hover / pressed        */
+      --indigo-bg:   #E8F8FF;          /* light blue tint        */
+      --indigo-text: #1A6A8A;          /* dark blue text on white */
+
+      /* ── Pink Orchid – secondary warm accent ─────────────────── */
+      --rose:        #DBBADD;          /* pink orchid            */
+      --rose-bg:     #F4ECF5;          /* light orchid tint      */
+      --rose-text:   #6B3A7A;          /* dark orchid text       */
+
+      /* ── Sky Blue / Lavender – Sophie / done ─────────────────── */
+      --blue:        #96CDFF;          /* sky blue               */
+      --blue-bg:     #D8E1FF;          /* lavender               */
+      --blue-text:   #2A4A8F;          /* dark blue text         */
+
+      /* ── Text greys ─────────────────────────────────────────── */
+      --slate:       #6B6360;
+      --slate-light: #9E9896;
+
+      /* ── Semantic: done / complete → sky blue ───────────────── */
+      --green:       #96CDFF;
+      --green-bg:    #D8E1FF;
+      --green-text:  #2A4A8F;
+
+      /* ── Semantic: at-risk / warning → pink orchid ───────────── */
+      --amber:       #DBBADD;          /* pink orchid            */
+      --amber-bg:    #F4ECF5;          /* light orchid tint      */
+      --amber-text:  #6B3A7A;          /* dark orchid text       */
+
+      /* ── Semantic: blocked / danger → old rose ───────────────── */
+      --red:         #BE92A2;          /* old rose               */
+      --red-bg:      #F2E8EC;          /* light rose tint        */
+      --red-text:    #6B3040;          /* dark rose text         */
+
+      /* ── Sophie accent → sky blue ────────────────────────────── */
+      --pink:        #96CDFF;
+      --pink-bg:     #D8E1FF;
+
+      /* ── Shadows ────────────────────────────────────────────── */
+      --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:   0 4px 8px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-lg:   0 12px 24px rgba(0,0,0,0.09), 0 4px 8px rgba(0,0,0,0.05);
+
+      --radius:      8px;
+      --radius-lg:   12px;
+      --font:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition:  150ms ease;
+    }
+
+    html { font-size: 14px; }
+    body {
+      font-family: var(--font);
+      background: var(--gray-50);
+      color: var(--navy);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────── */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+    .main { flex: 1; padding: 24px; max-width: 1080px; margin: 0 auto; width: 100%; }
+
+    /* ─── HEADER ─────────────────────────────────────────────── */
+    .header {
+      background: var(--navy);
+      color: white;
+      padding: 0 24px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap;
+    }
+    .logo-badge {
+      width: 26px; height: 26px;
+      background: var(--indigo);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+    .logo-sub { font-weight: 400; opacity: 0.5; margin-left: 2px; }
+
+    .header-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.12); }
+
+    .session-area { flex: 1; display: flex; align-items: center; gap: 8px; }
+
+    .session-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition);
+      position: relative;
+      user-select: none;
+    }
+    .session-pill:hover { background: rgba(255,255,255,0.13); }
+    .session-pill .chevron { opacity: 0.5; font-size: 9px; }
+
+    .session-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      min-width: 240px;
+      z-index: 300;
+      overflow: hidden;
+    }
+    .session-dropdown-item {
+      padding: 9px 14px;
+      font-size: 12px;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background var(--transition);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .session-dropdown-item:last-child { border-bottom: none; }
+    .session-dropdown-item:hover { background: var(--gray-50); }
+    .session-dropdown-item.active { background: var(--indigo-bg); color: var(--indigo-text); }
+    .session-dropdown-sub { font-size: 10px; color: var(--slate-light); margin-top: 1px; }
+
+    .btn-new {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--indigo);
+      color: var(--navy); border: none; border-radius: 6px;
+      padding: 5px 11px; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: background var(--transition);
+      font-family: var(--font); letter-spacing: 0.01em;
+    }
+    .btn-new:hover { background: var(--indigo-d); color: var(--navy); }
+
+    .icon-btn {
+      width: 28px; height: 28px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 13px;
+      transition: background var(--transition);
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+
+    /* ─── TABS ───────────────────────────────────────────────── */
+    .tabs {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex; align-items: center; gap: 0;
+      position: sticky; top: 54px; z-index: 100;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    /* Base tab */
+    .tab {
+      padding: 0 13px; height: 46px;
+      font-size: 12px; font-weight: 500;
+      color: var(--slate);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 5px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    /* Section separator */
+    .tab-sep {
+      width: 1px; height: 18px;
+      background: var(--border);
+      flex-shrink: 0; margin: 0 8px;
+    }
+
+    /* ── Section 1: Annual Goals — amber/gold ── */
+    .tab-goals { font-weight: 600; letter-spacing: -0.01em; }
+    .tab-goals:hover { color: #92400E; background: rgba(245,158,11,0.06); border-radius: 4px 4px 0 0; }
+    .tab-goals.active { color: #92400E; border-bottom-color: #F59E0B; background: rgba(245,158,11,0.06); border-radius: 4px 4px 0 0; }
+
+    /* ── Section 2: O3 group — frozen lake teal ── */
+    .tab-group-o3 {
+      display: flex; align-items: center; gap: 0;
+      background: rgba(105,221,255,0.05);
+      border-left: 1px solid rgba(105,221,255,0.22);
+      border-right: 1px solid rgba(105,221,255,0.22);
+      border-top: 2px solid rgba(105,221,255,0.35);
+      border-bottom: none;
+      padding: 0 2px;
+      margin-top: 2px; /* nudge down from very top of nav */
+      flex-shrink: 0;
+    }
+    .tab-group-badge {
+      padding: 0 8px 0 10px;
+      font-size: 8px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--indigo-text); white-space: nowrap;
+      border-right: 1px solid rgba(105,221,255,0.25);
+      height: 100%; display: flex; align-items: center;
+      opacity: 0.9;
+    }
+    .tab-o3:hover { color: var(--indigo-text); background: rgba(105,221,255,0.1); }
+    .tab-o3.active { color: var(--indigo-text); border-bottom-color: var(--indigo); background: rgba(105,221,255,0.1); }
+
+    /* ── Section 3: Skills & Growth — orchid/rose ── */
+    .tab-skills:hover { color: var(--rose-text); background: rgba(219,186,221,0.1); border-radius: 4px 4px 0 0; }
+    .tab-skills.active { color: var(--rose-text); border-bottom-color: #C09BC3; background: rgba(219,186,221,0.1); border-radius: 4px 4px 0 0; }
+
+    /* ── Section 4: Quarterly Priorities — sky blue ── */
+    .tab-manage { font-size: 11.5px; }
+    .tab-manage:hover { color: var(--blue-text); background: rgba(150,205,255,0.1); border-radius: 4px 4px 0 0; }
+    .tab-manage.active { color: var(--blue-text); border-bottom-color: var(--blue); background: rgba(150,205,255,0.1); border-radius: 4px 4px 0 0; }
+
+    /* ── Mobile label helpers ── */
+    .label-short { display: none; }
+    .label-full  { display: inline; }
+
+    /* ── Two-row nav on mobile ─────────────────────────────── */
+    @media (max-width: 680px) {
+      .tabs {
+        flex-wrap: wrap;
+        padding: 0;
+        height: auto;
+        overflow-x: visible;
+      }
+      .tab-sep { display: none; }
+
+      /* Row 1: O3 weekly group — full width, teal tint */
+      .tab-group-o3 {
+        order: 1;
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid rgba(105,221,255,0.3);
+        border-top: none;
+        margin-top: 0;
+        border-radius: 0;
+        background: rgba(105,221,255,0.06);
+      }
+      .tab-group-badge {
+        flex: 0 0 auto;
+        padding: 0 10px;
+        font-size: 8px;
+        border-right: 1px solid rgba(105,221,255,0.2);
+      }
+      .tab-o3 {
+        flex: 1;
+        justify-content: center;
+        padding: 0 4px;
+        height: 42px;
+        font-size: 11.5px;
+      }
+
+      /* Row 2: Strategy tabs — equal thirds */
+      .tab-goals, .tab-skills, .tab-manage {
+        order: 2;
+        flex: 1;
+        justify-content: center;
+        height: 38px;
+        padding: 0 6px;
+        border-top: 1px solid var(--border);
+        border-radius: 0;
+      }
+      .tab-goals  { font-size: 11.5px; }
+      .tab-skills { font-size: 11.5px; }
+      .tab-manage { font-size: 11px; }
+
+      /* Show short label for long tab names */
+      .label-short { display: inline; }
+      .label-full  { display: none; }
+    }
+
+    /* Action count badge */
+    .tab-badge {
+      background: var(--indigo-bg);
+      color: var(--indigo-text);
+      border-radius: 10px;
+      padding: 1px 5px;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    /* ─── PAGE HEADER ────────────────────────────────────────── */
+    .page-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 20px; gap: 16px;
+    }
+    .page-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+    .page-sub { font-size: 12px; color: var(--slate); margin-top: 2px; line-height: 1.4; }
+
+    /* ─── PROGRESS ───────────────────────────────────────────── */
+    .progress-wrap { text-align: right; flex-shrink: 0; }
+    .progress-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--slate); margin-bottom: 4px;
+    }
+    .progress-number {
+      font-size: 20px; font-weight: 800; color: var(--navy);
+      line-height: 1;
+    }
+    .progress-number.complete { color: var(--green); }
+    .progress-frac { font-size: 11px; font-weight: 400; color: var(--slate-light); margin-left: 3px; }
+    .progress-bar {
+      margin-top: 5px; width: 140px; height: 5px;
+      background: var(--gray-200); border-radius: 3px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--indigo), var(--rose));
+      transition: width 400ms cubic-bezier(.4,0,.2,1);
+    }
+    .progress-fill.done { background: linear-gradient(90deg, var(--green), #B5EEE9); }
+
+    /* ─── CATEGORY ───────────────────────────────────────────── */
+    .cat-section { margin-bottom: 24px; }
+    .cat-header {
+      display: flex; align-items: center; gap: 9px;
+      margin-bottom: 10px;
+    }
+    .cat-pip { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .cat-name {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    .cat-tally { margin-left: auto; font-size: 10px; color: var(--slate-light); }
+
+    /* ─── GRID ───────────────────────────────────────────────── */
+    .ws-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 10px;
+    }
+
+    /* ─── WORKSTREAM CARD ────────────────────────────────────── */
+    .ws-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 14px 17px;
+      position: relative; overflow: hidden;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .ws-card:hover { border-color: rgba(105,221,255,0.25); box-shadow: var(--shadow); }
+    .ws-card.is-na { background: var(--gray-50); }
+    .ws-card.is-na:hover { border-color: var(--gray-200); box-shadow: none; }
+    .ws-card-stripe {
+      position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%;
+    }
+
+    .ws-card-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .ws-name {
+      font-size: 13px; font-weight: 600; color: var(--navy);
+      line-height: 1.3; padding-right: 8px;
+    }
+    .badges { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 7px; border-radius: 100px;
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .badge-high   { background: var(--red-bg); color: var(--red-text); }
+    .badge-medium { background: var(--amber-bg); color: var(--amber-text); }
+    .badge-low    { background: var(--gray-100); color: var(--slate); }
+    .badge-done   { background: var(--green-bg); color: var(--green-text); }
+    .badge-tabled { background: var(--amber-bg); color: var(--amber-text); }
+    .badge-prep   { background: var(--indigo-bg); color: var(--indigo-text); }
+    .badge-na     { background: var(--gray-100); color: var(--slate-light); }
+
+    .na-label {
+      font-size: 12px; color: var(--slate-light);
+      font-style: italic; padding: 4px 0 8px;
+    }
+
+    .field-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--slate);
+      margin-bottom: 5px;
+    }
+    .section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--slate);
+    }
+
+    .ws-textarea {
+      width: 100%; border: 1px solid var(--gray-200);
+      border-radius: 6px; padding: 7px 9px;
+      font-size: 12px; font-family: var(--font); color: var(--navy);
+      resize: vertical; min-height: 66px;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      background: var(--white); line-height: 1.5;
+    }
+    .ws-textarea:focus {
+      outline: none; border-color: var(--indigo);
+      box-shadow: 0 0 0 3px rgba(105,221,255,0.15);
+    }
+    .ws-textarea::placeholder { color: var(--slate-light); }
+
+    .ws-input {
+      width: 100%; border: 1px solid var(--gray-200);
+      border-radius: 6px; padding: 6px 9px;
+      font-size: 12px; font-family: var(--font); color: var(--slate);
+      transition: border-color var(--transition);
+      background: var(--white);
+    }
+    .ws-input:focus { outline: none; border-color: var(--indigo); }
+    .ws-input::placeholder { color: var(--slate-light); }
+
+    .ws-card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; gap: 8px;
+    }
+
+    .mini-select {
+      border: 1px solid var(--gray-200); border-radius: 6px;
+      padding: 4px 8px; font-size: 11px; font-family: var(--font);
+      color: var(--navy); background: var(--white); cursor: pointer;
+    }
+    .mini-select:focus { outline: none; border-color: var(--indigo); }
+
+    .na-toggle {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 500; color: var(--slate);
+      cursor: pointer; padding: 4px 9px;
+      border: 1px solid var(--gray-200); border-radius: 100px;
+      background: var(--white);
+      transition: all var(--transition); user-select: none;
+    }
+    .na-toggle:hover { border-color: var(--slate-light); color: var(--navy); }
+    .na-toggle.on { background: var(--gray-100); border-color: var(--gray-200); color: var(--slate-light); }
+
+    /* ─── RUN MODE ───────────────────────────────────────────── */
+    .run-bar {
+      background: var(--navy);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px;
+      color: white;
+    }
+    .run-timer {
+      font-size: 26px; font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em; flex-shrink: 0;
+    }
+    .run-info { flex: 1; }
+    .run-session { font-size: 13px; font-weight: 600; }
+    .run-prog { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+    .run-mini-bar {
+      margin-top: 6px; height: 3px; background: rgba(255,255,255,0.15);
+      border-radius: 2px; overflow: hidden;
+    }
+    .run-mini-fill {
+      height: 100%; background: var(--blue); border-radius: 2px;
+      transition: width 400ms ease;
+    }
+    .run-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 6px 13px; border-radius: 7px; font-size: 12px;
+      font-weight: 600; cursor: pointer; border: none;
+      font-family: var(--font); transition: all var(--transition);
+    }
+    .run-btn.start { background: var(--blue); color: white; }
+    .run-btn.start:hover { background: #70C4BC; }
+    .run-btn.pause { background: var(--rose); color: white; }
+    .run-btn.pause:hover { background: #8B3050; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+    .col-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .col-kevin { color: var(--indigo-text); }
+    .col-sophie { color: var(--pink); }
+
+    .status-row { display: flex; gap: 6px; margin-top: 10px; }
+    .status-btn {
+      flex: 1; padding: 6px 8px; border-radius: 6px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+      cursor: pointer; transition: all var(--transition);
+      border: 1px solid; text-align: center; text-transform: uppercase;
+      font-family: var(--font);
+    }
+    .status-btn.done-btn { background: var(--green-bg); border-color: rgba(16,185,129,0.25); color: var(--green-text); }
+    .status-btn.done-btn:hover, .status-btn.done-btn.active { background: var(--green); border-color: var(--green); color: white; }
+    .status-btn.table-btn { background: var(--amber-bg); border-color: rgba(219,186,221,0.4); color: var(--amber-text); }
+    .status-btn.table-btn:hover, .status-btn.table-btn.active { background: var(--amber); border-color: var(--amber); color: var(--navy); }
+    .status-btn.action-btn { background: var(--indigo-bg); border-color: rgba(105,221,255,0.3); color: var(--indigo-text); }
+    .status-btn.action-btn:hover { background: var(--indigo); border-color: var(--indigo); color: var(--navy); }
+
+    .add-action-form {
+      margin-top: 10px; background: var(--gray-50);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 10px;
+    }
+
+    /* ─── MIC BUTTON ─────────────────────────────────────────── */
+    .mic-wrap { position: relative; }
+    .mic-btn {
+      position: absolute; bottom: 7px; right: 7px;
+      width: 26px; height: 26px; border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 13px;
+      transition: all var(--transition);
+      z-index: 2;
+    }
+    .mic-btn:hover { background: var(--gray-50); border-color: var(--slate-light); }
+    .mic-btn.recording {
+      background: var(--red-bg); border-color: rgba(190,146,162,0.4);
+      animation: mic-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(190,146,162,0.4); }
+      50%       { box-shadow: 0 0 0 5px rgba(190,146,162,0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.35; }
+    }
+    .mic-wrap .ws-textarea { padding-right: 36px; }
+    .mic-no-support { font-size: 10px; color: var(--slate-light); margin-top: 3px; }
+
+    .transcript-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--red-bg); border-radius: 100px;
+      padding: 2px 8px; font-size: 10px; font-weight: 600;
+      color: var(--red-text); margin-bottom: 4px;
+    }
+    .transcript-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--red); display: block;
+      animation: mic-pulse 1.2s ease-in-out infinite;
+    }
+
+    /* ─── HISTORY ────────────────────────────────────────────── */
+    .hist-item {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 18px;
+      margin-bottom: 8px; cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .hist-item:hover { border-color: rgba(105,221,255,0.25); box-shadow: var(--shadow); }
+    .hist-date { font-size: 14px; font-weight: 700; color: var(--navy); min-width: 110px; }
+    .hist-stats { display: flex; gap: 14px; flex: 1; flex-wrap: wrap; }
+    .hist-stat { font-size: 11px; color: var(--slate); }
+    .hist-stat strong { color: var(--navy); font-weight: 600; }
+    .hist-chevron { font-size: 10px; color: var(--slate-light); }
+
+    .hist-detail {
+      background: var(--white);
+      border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 14px 18px; margin-top: -8px; margin-bottom: 8px;
+    }
+    .hist-ws-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+    .hist-ws-item:last-child { border-bottom: none; }
+    .hist-ws-name {
+      font-size: 12px; font-weight: 600; color: var(--navy);
+      display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
+    }
+    .hist-ws-text { font-size: 11px; color: var(--slate); line-height: 1.5; }
+    .hist-ws-next { font-size: 11px; margin-top: 3px; }
+    .hist-ws-k { color: var(--indigo); }
+    .hist-ws-s { color: var(--pink); }
+
+    /* ─── ACTIONS ────────────────────────────────────────────── */
+    .actions-table {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .action-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 16px; border-bottom: 1px solid var(--gray-100);
+    }
+    .action-row:last-child { border-bottom: none; }
+    .action-check {
+      width: 15px; height: 15px; border-radius: 4px;
+      border: 1.5px solid var(--gray-200);
+      cursor: pointer; flex-shrink: 0; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .action-check.checked { background: var(--green); border-color: var(--green); }
+    .action-text { font-size: 12px; line-height: 1.5; color: var(--navy); }
+    .action-text.struck { text-decoration: line-through; color: var(--slate-light); }
+    .action-meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+    .owner-tag {
+      display: inline-flex; align-items: center;
+      padding: 1px 6px; border-radius: 100px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .owner-k { background: var(--indigo-bg); color: var(--indigo-text); }
+    .owner-s { background: var(--pink-bg); color: var(--pink); }
+    .owner-b { background: var(--green-bg); color: var(--green-text); }
+    .action-ws { font-size: 10px; color: var(--slate-light); }
+    .action-due { font-size: 10px; color: var(--amber-text); }
+
+    .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-pill {
+      padding: 4px 11px; border-radius: 100px;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--border); background: var(--white);
+      color: var(--slate); transition: all var(--transition);
+    }
+    .filter-pill:hover { border-color: var(--indigo); color: var(--indigo-text); }
+    .filter-pill.active { background: var(--indigo); border-color: var(--indigo); color: var(--navy); }
+
+    /* ─── MANAGE VIEW ────────────────────────────────────────── */
+    .manage-cat {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .manage-cat-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--gray-50);
+    }
+    .manage-cat-pip { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .manage-cat-name {
+      font-size: 12px; font-weight: 700; color: var(--navy);
+      flex: 1; letter-spacing: -0.01em;
+    }
+    .manage-cat-actions { display: flex; gap: 5px; }
+
+    .manage-ws-list { padding: 6px 0; }
+    .manage-ws-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 14px;
+      transition: background var(--transition);
+    }
+    .manage-ws-row:hover { background: var(--gray-50); }
+    .manage-ws-row:hover .ws-row-actions { opacity: 1; }
+    .manage-ws-drag { color: var(--slate-light); font-size: 12px; cursor: grab; flex-shrink: 0; }
+    .manage-ws-text {
+      flex: 1; font-size: 12px; color: var(--navy); line-height: 1.4;
+    }
+    .ws-row-actions {
+      display: flex; gap: 4px;
+      opacity: 0; transition: opacity var(--transition);
+      flex-shrink: 0;
+    }
+
+    .tiny-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--white);
+      cursor: pointer; font-size: 11px; color: var(--slate);
+      transition: all var(--transition);
+    }
+    .tiny-btn:hover { border-color: var(--slate-light); color: var(--navy); }
+    .tiny-btn.danger:hover { background: var(--red-bg); border-color: rgba(190,146,162,0.4); color: var(--red-text); }
+
+    .inline-edit-input {
+      flex: 1; border: 1px solid var(--indigo); border-radius: 5px;
+      padding: 3px 7px; font-size: 12px; font-family: var(--font);
+      color: var(--navy); background: var(--white);
+      box-shadow: 0 0 0 2px rgba(105,221,255,0.2);
+    }
+    .inline-edit-input:focus { outline: none; }
+
+    .add-ws-row {
+      padding: 7px 14px 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .add-ws-input {
+      flex: 1; border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 9px; font-size: 12px; font-family: var(--font);
+      color: var(--navy); background: var(--white);
+      transition: border-color var(--transition);
+    }
+    .add-ws-input:focus { outline: none; border-color: var(--indigo); }
+    .add-ws-input::placeholder { color: var(--slate-light); }
+
+    .add-cat-row {
+      display: flex; gap: 8px; margin-top: 4px; align-items: center;
+    }
+
+    /* Color picker swatches */
+    .color-swatches { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+    .swatch {
+      width: 18px; height: 18px; border-radius: 4px;
+      cursor: pointer; transition: transform var(--transition), box-shadow var(--transition);
+      border: 2px solid transparent;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch.selected { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+
+    /* ─── STAT ROW ───────────────────────────────────────────── */
+    .stat-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stat-box {
+      flex: 1; background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 14px 16px;
+    }
+    .stat-value { font-size: 24px; font-weight: 800; color: var(--navy); line-height: 1; margin-bottom: 3px; }
+    .stat-label { font-size: 10px; color: var(--slate); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ─── MODAL ──────────────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,0.55);
+      backdrop-filter: blur(3px);
+      z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal {
+      background: var(--white); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 460px;
+      overflow: hidden;
+    }
+    .modal-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .modal-sub { font-size: 11px; color: var(--slate); margin-top: 2px; }
+    .modal-body { padding: 18px 22px; }
+    .modal-foot {
+      padding: 14px 22px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    }
+
+    .f-group { margin-bottom: 14px; }
+    .f-label { display: block; font-size: 11px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
+    .f-input {
+      width: 100%; border: 1px solid var(--border); border-radius: 7px;
+      padding: 7px 11px; font-size: 13px; font-family: var(--font);
+      color: var(--navy); background: var(--white); transition: border-color var(--transition);
+    }
+    .f-input:focus { outline: none; border-color: var(--indigo); box-shadow: 0 0 0 3px rgba(105,221,255,0.15); }
+
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all var(--transition); border: 1px solid transparent; font-family: var(--font); }
+    .btn-prim { background: var(--indigo); color: var(--navy); }
+    .btn-prim:hover { background: var(--indigo-d); color: var(--navy); }
+    .btn-sec { background: var(--white); color: var(--navy); border-color: var(--border); }
+    .btn-sec:hover { background: var(--gray-50); border-color: var(--slate-light); }
+    .btn-danger { background: var(--red-bg); color: var(--red-text); border-color: rgba(190,146,162,0.4); }
+    .btn-danger:hover { background: var(--red-bg); }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+    .callout {
+      background: var(--indigo-bg); border-radius: var(--radius);
+      padding: 11px 14px; margin-bottom: 14px;
+      font-size: 12px; color: var(--indigo-text); line-height: 1.5;
+    }
+    .callout strong { font-weight: 700; }
+
+    .empty {
+      text-align: center; padding: 52px 24px; color: var(--slate-light);
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .empty-title { font-size: 15px; font-weight: 600; color: var(--slate); margin-bottom: 5px; }
+    .empty-desc { font-size: 12px; line-height: 1.5; max-width: 320px; margin: 0 auto 18px; }
+
+    .onboard {
+      background: linear-gradient(135deg, #111111 0%, #861657 100%);
+      border-radius: var(--radius-lg); padding: 22px 24px;
+      color: white; margin-bottom: 24px;
+    }
+    .onboard-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; opacity: 0.6; margin-bottom: 6px;
+    }
+    .onboard-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .onboard-quote {
+      font-size: 12px; line-height: 1.6; opacity: 0.8;
+      font-style: italic; border-left: 2px solid rgba(255,255,255,0.3);
+      padding-left: 12px; margin-bottom: 14px;
+    }
+    .onboard-quote cite { font-style: normal; opacity: 0.6; font-size: 11px; display: block; margin-top: 4px; }
+
+    code { font-family: 'SF Mono', monospace; font-size: 0.9em; background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 3px; }
+
+    /* ─── RUN VIEW — DECISIONS SECTION ──────────────────── */
+    .decide-section {
+      background: var(--amber-bg); border: 1px solid var(--amber);
+      border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 20px;
+    }
+    .decide-section-head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .decide-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--amber-text); flex: 1;
+    }
+    .decide-count {
+      font-size: 9px; font-weight: 700; padding: 2px 9px;
+      border-radius: 100px; background: var(--amber); color: white;
+    }
+    .discuss-section-head {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    }
+    .discuss-section-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--slate);
+    }
+    /* ── Fluid discussion layout ─────────────────────────────── */
+    /* Categories flow as flex items — no fixed column count.    */
+    /* Each category takes at least 260px, shares leftover space. */
+    .discuss-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .discuss-flow-cat {
+      flex: 1 1 260px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .discuss-flow-cat-head {
+      display: flex; align-items: center; gap: 7px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .discuss-cat-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--slate); flex: 1;
+    }
+    .discuss-cat-count {
+      font-size: 9px; font-weight: 700; padding: 2px 8px;
+      border-radius: 100px; background: var(--gray-200); color: var(--slate);
+    }
+
+    /* ─── ITEM TYPE SELECTOR ──────────────────────────────── */
+    .type-selector { display: flex; gap: 4px; margin-bottom: 10px; }
+    .type-pill {
+      flex: 1; padding: 5px 6px; border-radius: 6px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+      text-align: center; cursor: pointer; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--slate);
+      transition: all var(--transition); text-transform: uppercase;
+    }
+    .type-pill:hover { border-color: var(--slate-light); color: var(--navy); }
+    .type-pill.t-discuss.active  { background: var(--indigo-bg); border-color: var(--indigo);  color: var(--indigo-text); }
+    .type-pill.t-decide.active   { background: var(--amber-bg);  border-color: var(--amber);   color: var(--amber-text); }
+    .type-pill.t-fyi.active      { background: var(--gray-100);  border-color: var(--gray-200); color: var(--navy); }
+    .type-pill.t-blocked.active  { background: var(--red-bg);    border-color: rgba(190,146,162,0.5); color: var(--red-text); }
+    .type-pill.t-na.active       { background: var(--gray-50);   border-color: var(--gray-200); color: var(--slate-light); }
+    .decision-callout {
+      background: var(--amber-bg); border: 1px solid var(--amber);
+      border-left: 3px solid var(--amber); border-radius: 6px;
+      padding: 8px 10px; margin-bottom: 10px;
+    }
+    .decision-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--amber-text); margin-bottom: 4px;
+    }
+    .progress-status-row { display: flex; gap: 5px; margin-top: 8px; }
+    .prog-pill {
+      padding: 3px 10px; border-radius: 100px; font-size: 10px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--white); color: var(--slate);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .prog-pill.on-track.active  { background: var(--green-bg);  border-color: var(--green);  color: var(--green-text); }
+    .prog-pill.at-risk.active   { background: var(--amber-bg);  border-color: var(--amber);  color: var(--amber-text); }
+    .prog-pill.complete.active  { background: var(--blue-bg);   border-color: var(--blue);   color: var(--blue-text); }
+
+    /* ─── SOPHIE PRE-READ ─────────────────────────────────── */
+    .preread-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-left: 3px solid var(--indigo);
+      border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 20px;
+    }
+    .preread-title {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--indigo-text); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .preread-subtitle { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--slate); }
+    .preread-section { margin-bottom: 10px; }
+    .preread-section-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--slate-light); margin-bottom: 6px;
+    }
+    .preread-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 7px 0; border-bottom: 1px solid var(--gray-100);
+    }
+    .preread-item:last-child { border-bottom: none; }
+    .preread-ws   { font-size: 11px; font-weight: 600; color: var(--navy); min-width: 150px; flex-shrink: 0; }
+    .preread-text { font-size: 11px; color: var(--slate); line-height: 1.5; flex: 1; }
+    .preread-tag  {
+      padding: 1px 7px; border-radius: 100px; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; margin-top: 1px;
+    }
+    .preread-tag.blocked  { background: var(--red-bg); color: var(--red-text); }
+    .preread-tag.fyi      { background: var(--gray-100); color: var(--slate); }
+    .preread-tag.on-track { background: var(--green-bg); color: var(--green-text); }
+    .preread-tag.at-risk  { background: var(--amber-bg); color: var(--amber-text); }
+    .preread-tag.complete { background: var(--blue-bg);   color: var(--blue-text); }
+
+    /* ─── SKILLS VIEW ─────────────────────────────────────── */
+    .phase-track {
+      display: flex; margin-bottom: 12px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .phase-step {
+      flex: 1; padding: 14px 16px; cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .phase-step:last-child { border-right: none; }
+    .phase-step:hover  { background: var(--gray-50); }
+    .phase-step.active { background: var(--indigo-bg); }
+    .phase-step.done   { background: var(--gray-50); }
+    .phase-num {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--slate-light); margin-bottom: 2px;
+    }
+    .phase-step.active .phase-num { color: var(--indigo); }
+    .phase-step.done   .phase-num { color: var(--green-text); }
+    .phase-name  { font-size: 12px; font-weight: 700; color: var(--navy); }
+    .phase-dates { font-size: 10px; color: var(--slate-light); margin-top: 2px; }
+
+    .skill-domain { margin-bottom: 20px; }
+    .domain-head  { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .domain-label { font-size: 11px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.05em; }
+    .skill-list {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .skill-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px; border-bottom: 1px solid var(--gray-100);
+    }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-label { flex: 1; font-size: 12px; color: var(--navy); }
+    .skill-dots  { display: flex; gap: 5px; flex-shrink: 0; }
+    .skill-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid var(--gray-200); cursor: pointer;
+      transition: all var(--transition);
+    }
+    .skill-dot.filled { background: var(--indigo); border-color: var(--indigo); }
+    .skill-dot:hover  { border-color: var(--indigo); }
+
+    .build-mode-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 8px; margin-bottom: 20px;
+    }
+    .build-mode-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px;
+      display: flex; align-items: flex-start; gap: 10px;
+      transition: all var(--transition);
+    }
+    .build-mode-card.done { border-color: rgba(105,221,255,0.4); background: var(--indigo-bg); }
+    .mode-check {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--gray-200); cursor: pointer;
+      flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    .mode-check.checked { background: var(--indigo); border-color: var(--indigo); }
+    .mode-label { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+    .mode-desc  { font-size: 10px; color: var(--slate); line-height: 1.4; }
+    .mode-note-input {
+      margin-top: 6px; width: 100%; border: 1px solid var(--border);
+      border-radius: 5px; padding: 4px 7px; font-size: 10px;
+      font-family: var(--font); color: var(--navy); background: var(--white);
+    }
+    .mode-note-input:focus { outline: none; border-color: var(--indigo); }
+    .coaching-box {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px; margin-top: 4px;
+    }
+    .coaching-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--indigo-text); margin-bottom: 8px;
+    }
+
+    @media (max-width: 680px) {
+      .main { padding: 14px; }
+      .ws-grid { grid-template-columns: 1fr; }
+      .discuss-flow-cat { flex: 1 1 100%; }
+      .two-col { grid-template-columns: 1fr; }
+      .stat-row { flex-wrap: wrap; }
+      .phase-track { flex-direction: column; }
+      .phase-step { border-right: none; border-bottom: 1px solid var(--border); }
+      .phase-step:last-child { border-bottom: none; }
+    }
+
+    /* ─── GOALS DASHBOARD TAB ─────────────────────────────────── */
+    /* KIPP brand palette — scoped to Goals tab only */
+    :root {
+      --kipp-navy:   #0D2460;
+      --kipp-blue:   #5BB8CE;
+      --kipp-amber:  #F5A623;
+      --kipp-orange: #E26E1B;
+      --kipp-red-or: #C44E10;
+      --kipp-gold:   #D4A017;
+    }
+
+    .gd-section-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; margin-top: 20px; }
+    .gd-section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); }
+    .gd-section-sub { font-size: 11px; color: var(--slate-light); }
+
+    /* ── KIPP brand header ── */
+    .kipp-brand-hdr {
+      background: var(--kipp-navy); border-radius: var(--radius-lg);
+      padding: 14px 20px; margin-bottom: 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .kipp-logo-lockup { display: flex; flex-direction: column; gap: 3px; }
+    .kipp-logo-row {
+      display: flex; align-items: center; gap: 0;
+      font-size: 19px; font-weight: 900; letter-spacing: -0.02em; line-height: 1;
+    }
+    .kipp-logo-nj    { color: #fff; }
+    .kipp-logo-dot-nj { color: var(--kipp-blue); font-weight: 900; }
+    .kipp-logo-sep   { color: rgba(255,255,255,0.25); margin: 0 8px; font-weight: 300; }
+    .kipp-logo-miami { color: var(--kipp-amber); }
+    .kipp-logo-dot-mi { color: var(--kipp-amber); }
+    .kipp-logo-plan  { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); padding-left: 2px; }
+    .kipp-vision-phrase {
+      font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.55;
+      max-width: 380px; text-align: right;
+    }
+    .kipp-vision-phrase strong { color: rgba(255,255,255,0.9); font-weight: 700; }
+
+    /* ── 2030 Pyramid ── */
+    .kipp-pyramid-section {
+      background: var(--kipp-navy); border-radius: var(--radius-lg);
+      padding: 18px 20px 14px; margin-bottom: 20px;
+    }
+    .py-eyebrow {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); text-align: center; margin-bottom: 12px;
+    }
+    .py-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .py-tier {
+      clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 7px 22px; cursor: pointer; transition: filter 0.15s, transform 0.1s;
+      border-radius: 1px;
+    }
+    .py-tier:hover { filter: brightness(1.12); transform: scaleX(1.01); }
+    .py-tier.py-active { filter: brightness(1.18); outline: 2px solid rgba(255,255,255,0.35); outline-offset: -2px; }
+    .py-tier-lhs { flex: 1; min-width: 0; }
+    .py-tier-label { font-size: 11px; font-weight: 800; line-height: 1.2; }
+    .py-tier-sub   { font-size: 9px; margin-top: 1px; opacity: 0.6; font-style: italic; }
+    .py-tier-metric { font-size: 9px; text-align: right; opacity: 0.75; white-space: nowrap; }
+    .py-expanded {
+      background: rgba(255,255,255,0.06); border-left: 3px solid #ccc;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 10px 14px; margin-top: 8px;
+    }
+    .py-exp-title  { font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+    .py-exp-sub    { font-size: 9px; color: rgba(255,255,255,0.45); font-style: italic; margin-bottom: 8px; }
+    .py-exp-metric { display: flex; align-items: flex-start; gap: 7px; font-size: 10px; color: rgba(255,255,255,0.8); padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.07); line-height: 1.4; }
+    .py-exp-metric:last-child { border-bottom: none; }
+    .py-exp-dot    { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .py-hint       { font-size: 9px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 10px; }
+
+    /* ROI Goal card */
+    .roi-goal-card {
+      background: var(--kipp-navy); color: white;
+      border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 20px;
+      border-top: 3px solid var(--kipp-blue);
+    }
+    .roi-goal-year { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; }
+    .roi-goal-title { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; }
+    .roi-goal-desc { font-size: 12px; opacity: 0.65; line-height: 1.5; margin-bottom: 16px; }
+    .roi-hypotheses { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .roi-hyp {
+      flex: 1; min-width: 160px;
+      background: rgba(255,255,255,0.07); border-radius: var(--radius);
+      padding: 12px 14px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .roi-hyp.emerging { border-color: var(--kipp-blue); background: rgba(91,184,206,0.12); }
+    .roi-hyp-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; }
+    .roi-hyp.emerging .roi-hyp-label { color: var(--kipp-blue); opacity: 1; }
+    .roi-hyp-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .roi-hyp-desc { font-size: 10px; opacity: 0.65; line-height: 1.45; }
+    .roi-hyp.emerging .roi-hyp-desc { opacity: 0.8; }
+    .roi-casestudy {
+      background: rgba(91,184,206,0.10); border-radius: var(--radius);
+      padding: 12px 16px; border: 1px solid rgba(105,221,255,0.2); margin-top: 2px;
+    }
+    .roi-cs-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .roi-cs-tag { font-size: 8px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--kipp-blue); color: #0D2460; padding: 2px 7px; border-radius: 100px; }
+    .roi-cs-name { font-size: 11px; font-weight: 700; }
+    .roi-cs-date { font-size: 9px; opacity: 0.45; margin-left: auto; }
+    .roi-cs-quote { font-size: 11px; line-height: 1.55; opacity: 0.85; font-style: italic; margin-bottom: 6px; }
+    .roi-cs-note { font-size: 9px; opacity: 0.5; line-height: 1.4; }
+    .roi-status-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(255,255,255,0.09); padding: 3px 10px; border-radius: 100px; margin-top: 10px;
+    }
+    .roi-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--kipp-blue); flex-shrink: 0; }
+
+    /* Vision strip */
+    .vision-strip {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      padding: 12px 14px; background: var(--blue-bg);
+      border-radius: var(--radius-lg); margin-bottom: 20px;
+      border: 1px solid rgba(150,205,255,0.35);
+    }
+    .vision-chip {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 10px; border-radius: 8px;
+      background: var(--white); border: 1px solid var(--border);
+      flex: 1; min-width: 150px;
+    }
+    .vision-pip { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .vision-label { font-size: 11px; font-weight: 600; color: var(--navy); white-space: nowrap; }
+    .vision-target { font-size: 10px; color: var(--slate); }
+    .vision-strip-label { align-self: center; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-text); white-space: nowrap; padding-right: 4px; }
+
+    /* Alignment grid */
+    .alignment-grid { display: grid; grid-template-columns: 200px 255px 1fr; gap: 14px; margin-bottom: 24px; align-items: start; }
+    @media (max-width: 900px) { .alignment-grid { grid-template-columns: 1fr; } }
+    .alignment-col-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px 8px 0 0; margin-bottom: 8px; }
+    .col-num { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; }
+    .col-title-gd { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+    .col-l1 .alignment-col-head { background: rgba(91,184,206,0.12); color: #1A6080; }
+    .col-l1 .col-num { background: var(--kipp-blue); color: #0D2460; }
+    .col-l2 .alignment-col-head { background: rgba(245,166,35,0.10); color: #7A4800; }
+    .col-l2 .col-num { background: var(--kipp-amber); color: #0D2460; }
+    .col-l3 .alignment-col-head { background: rgba(13,36,96,0.07); color: #0D2460; }
+    .col-l3 .col-num { background: var(--kipp-navy); color: #fff; }
+
+    /* Pillar cards */
+    .pillar-card { background: var(--white); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; }
+    .pillar-name { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .pillar-goals { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .pillar-goal-chip { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 100px; background: var(--gray-100); color: var(--slate); }
+
+    /* Priority cards */
+    .priority-card-gd { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
+    .priority-head-gd { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px 8px; border-bottom: 1px solid var(--gray-100); }
+    .priority-color-gd { width: 4px; border-radius: 2px; flex-shrink: 0; align-self: stretch; }
+    .priority-name-gd { font-size: 12px; font-weight: 700; color: var(--navy); line-height: 1.3; flex: 1; }
+    .priority-body-gd { padding: 8px 12px; }
+    .priority-kpi { display: flex; align-items: flex-start; gap: 7px; padding: 4px 0; border-bottom: 1px solid var(--gray-50); font-size: 10px; line-height: 1.4; }
+    .priority-kpi:last-child { border-bottom: none; }
+    .kpi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+    .kpi-text { flex: 1; color: var(--slate); }
+
+    /* Initiative cards */
+    .initiative-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 8px; }
+    .goal-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .goal-card-head { display: flex; align-items: flex-start; padding: 10px 12px 8px; gap: 8px; border-bottom: 1px solid var(--gray-100); }
+    .goal-color-bar { width: 4px; border-radius: 2px; flex-shrink: 0; align-self: stretch; }
+    .goal-title-gd { font-size: 11px; font-weight: 700; color: var(--navy); line-height: 1.35; flex: 1; }
+    .goal-card-body { padding: 8px 12px 10px; }
+    .goal-desc-gd { font-size: 10px; color: var(--slate); line-height: 1.5; margin-bottom: 8px; }
+    .milestone-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .milestone-track { flex: 1; height: 5px; background: var(--gray-100); border-radius: 100px; overflow: hidden; }
+    .milestone-fill { height: 100%; border-radius: 100px; transition: width 0.3s; }
+    .milestone-label { font-size: 9px; color: var(--slate-light); white-space: nowrap; }
+    .milestone-dots { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+    .m-dot { width: 14px; height: 14px; border-radius: 4px; font-size: 7px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+    .m-dot.done { background: var(--indigo); border-color: var(--indigo); color: var(--navy); }
+    .m-dot.todo { background: transparent; border-color: var(--gray-200); color: var(--slate-light); }
+    .goal-notes-area { width: 100%; font-size: 10px; color: var(--navy); border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px; font-family: var(--font); resize: none; background: var(--gray-50); margin-top: 6px; line-height: 1.45; transition: border-color 0.15s; }
+    .goal-notes-area:focus { outline: none; border-color: var(--indigo); background: var(--white); }
+    .priority-tag-gd { font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 100px; letter-spacing: 0.05em; text-transform: uppercase; margin-top: 6px; display: inline-block; }
+    .gd-status-btn { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; border: none; white-space: nowrap; font-family: var(--font); transition: opacity 0.15s; }
+    .gd-status-btn:hover { opacity: 0.8; }
+
+    /* Pilot table */
+    .pilot-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; width: 100%; border-collapse: collapse; }
+    .pilot-table thead { background: var(--kipp-navy); }
+    .pilot-table th { padding: 9px 12px; text-align: left; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+    .pilot-table td { padding: 9px 12px; font-size: 11px; color: var(--navy); border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+    .pilot-table tbody tr:last-child td { border-bottom: none; }
+    .pilot-table tbody tr:hover td { background: var(--gray-50); }
+    .pilot-name { font-weight: 700; }
+    .area-tag { display: inline-block; padding: 1px 7px; border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; }
+    .decision-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+    .signal-bar { display: flex; gap: 3px; align-items: center; }
+    .signal-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Stats row */
+    .gd-stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .gd-stat-card { flex: 1; min-width: 120px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+    .gd-stat-num { font-size: 22px; font-weight: 800; letter-spacing: -1px; color: var(--navy); }
+    .gd-stat-label { font-size: 10px; color: var(--slate); margin-top: 2px; }
+    .gd-stat-sub { font-size: 9px; color: var(--slate-light); margin-top: 2px; }
+
+    /* External resources (moved lower, lower emphasis) */
+    .ext-resources-row {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      background: var(--gray-100); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 12px 16px; margin-top: 24px;
+    }
+    .ext-resources-row .fb-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); }
+    .ext-resources-row .fb-amount { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; color: var(--navy); }
+    .ext-resources-row .fb-desc { font-size: 10px; color: var(--slate); margin-top: 1px; }
+    .fb-partners { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .fb-partner { padding: 3px 10px; border-radius: 100px; background: var(--white); color: var(--slate); font-size: 9px; font-weight: 600; white-space: nowrap; border: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ═══════════════════════════════════════════════════════════════
+// GOALS DASHBOARD — Static Data & Components
+// ═══════════════════════════════════════════════════════════════
+
+const GD_VISION_GOALS = [
+  { id: 'ela',     label: 'ELA Proficiency',   target: '64% grades 3-8',      color: '#5BB8CE', pillar: 'academic' },
+  { id: 'math',    label: 'Math Proficiency',  target: '58% grades 3-8',      color: '#5BB8CE', pillar: 'academic' },
+  { id: 'gpa',     label: '3.0+ GPA',          target: '60% of 11th graders', color: '#E26E1B', pillar: 'college'  },
+  { id: 'sat',     label: 'SAT 1010+',         target: '40% of 11th graders', color: '#E26E1B', pillar: 'college'  },
+  { id: 'college', label: '4-Year Enrollment', target: '70% of seniors',      color: '#F5A623', pillar: 'college'  },
+  { id: 'attend',  label: 'Attendance',        target: '>94% avg daily',      color: '#0D2460', pillar: 'culture'  },
+  { id: 'enroll',  label: 'Enrollment',        target: '16,000 students',     color: '#0D2460', pillar: 'growth'   },
+  { id: 'ai',      label: 'AI in T&L',         target: 'Advance in age of AI',color: '#5BB8CE', pillar: 'growth'   },
+];
+
+const GD_PILLARS = [
+  { id: 'academic', name: 'Teaching Excellence',  desc: 'Drive T&L excellence in every classroom', color: '#5BB8CE', goals: ['ela','math']          },
+  { id: 'college',  name: 'High School & CCR',    desc: 'Reimagine high school; improve CCR outcomes', color: '#F5A623', goals: ['gpa','sat','college'] },
+  { id: 'culture',  name: 'Leadership & Culture', desc: 'Develop outstanding leaders & culture',   color: '#D4A017', goals: ['attend']               },
+  { id: 'growth',   name: 'Growth & Innovation',  desc: 'Grow with quality; AI in T&L',            color: '#5BB8CE', goals: ['enroll','ai']          },
+];
+
+const GD_TEAM_PRIORITIES = [
+  {
+    id: 'ela_math', name: 'Accelerate ELA & Math', color: '#5BB8CE', pillar: 'academic',
+    kpis: [
+      { text: 'Pilot students > matched peers on i-Ready',       status: 'in-progress' },
+      { text: 'Pilot students > matched peers on NJSLA/FAST',    status: 'in-progress' },
+      { text: 'EnlightenAI: time savings + feedback quality',    status: 'on-track'    },
+      { text: 'Quill: ↑ "exemplary" student responses',         status: 'in-progress' },
+    ],
+    initiatives: 'Khanmigo · Goblins · EnlightenAI · Quill · CourseMojo · Colleague.ai'
+  },
+  {
+    id: 'college', name: 'College Matriculation & CCR', color: '#F5A623', pillar: 'college',
+    kpis: [
+      { text: '↓15% students enrolling below potential (Class 2027)', status: 'in-progress' },
+      { text: 'Counselors save time on personal statements',          status: 'on-track'    },
+      { text: 'AI literacy: students demonstrate proficient habits',  status: 'in-progress' },
+    ],
+    initiatives: 'Overgrad · Personal statement tool · AI literacy curriculum'
+  },
+  {
+    id: 'efficiency', name: 'Employee Efficiency & Impact', color: '#E26E1B', pillar: 'growth',
+    kpis: [
+      { text: 'Free 20% of AP time for instructional leadership', status: 'in-progress' },
+      { text: '40%+ time savings on MLL curriculum creation',     status: 'complete'    },
+      { text: 'Staff competency with Gemini / ChatGPT tools',     status: 'on-track'    },
+    ],
+    initiatives: 'AP Time Study (CSGF) · MLL Curriculum Tool · ChatGPT EDU · Gemini'
+  },
+  {
+    id: 'ai_plan', name: 'Build 2030 AI & Innovation Plan', color: '#5BB8CE', pillar: 'growth',
+    kpis: [
+      { text: 'Integrated into 2030 strategic plan',                  status: 'on-track'    },
+      { text: 'ROI measured for every pilot (methodology in dev)',     status: 'in-progress' },
+      { text: 'External resources secured to fund innovation',        status: 'on-track'    },
+    ],
+    initiatives: 'KF Engagement · Research partnerships · Substack · External fundraising'
+  },
+];
+
+const GD_DEFAULT_INITIATIVES = [
+  {
+    id: 'kf_moy', priority: 'ai_plan',
+    title: 'KF Consulting: MOY Research Report',
+    desc: 'Network-wide survey + interviews across all KIPP regions → MOY Research Report delivered to Petal Walker / KF',
+    due: 'Apr 2026',
+    milestones: ['Survey design', 'Data collection', 'Interviews', 'Analysis', 'Report delivered'],
+    doneMilestones: 1, status: 'in-progress',
+    notes: 'Phase A of two-phase engagement. Survey deployed; interviews being scheduled.'
+  },
+  {
+    id: 'kf_eoy', priority: 'ai_plan',
+    title: 'KF Consulting: EOY Strategic Framework',
+    desc: 'Follow-up research + Combined Strategic Framework for KF network-wide AI adoption (Phase B)',
+    due: 'Aug 2026',
+    milestones: ['Phase A complete', 'EOY research design', 'Data collection', 'Framework draft', 'Final delivery'],
+    doneMilestones: 0, status: 'not-started', notes: ''
+  },
+  {
+    id: 'pilot_moy', priority: 'ela_math',
+    title: 'KTAF Pilot Portfolio: MOY Review',
+    desc: 'MOY review complete — Scale/Continue/Stop decisions for all active pilots documented and shared',
+    due: 'Feb 2026',
+    milestones: ['Data collected', 'Analysis', 'Recommendations', 'Decisions finalized'],
+    doneMilestones: 4, status: 'complete',
+    notes: 'COMPLETE. Scale: EnlightenAI, Goblins · Continue: Khan, Quill · Caution: CourseMojo · Too Early: Colleague.ai, Magic School.'
+  },
+  {
+    id: 'pilot_eoy', priority: 'ela_math',
+    title: 'KTAF Pilot Portfolio: EOY Analysis',
+    desc: 'EOY impact analysis; final scale/stop decisions for SY26-27 across full pilot portfolio',
+    due: 'Jun 2026',
+    milestones: ['EOY data collection', 'Impact analysis', 'Recommendations', 'SY26-27 decisions'],
+    doneMilestones: 0, status: 'not-started', notes: ''
+  },
+  {
+    id: 'roi_method', priority: 'ai_plan',
+    title: 'AI Adoption ROI Methodology',
+    desc: 'Develop and validate ROI measurement framework — original 2-prong hypothesis (time savings + student outcomes) + emerging output multiplier hypothesis. Research and document methodology for KF report.',
+    due: 'Apr 2026',
+    milestones: ['Time savings framework', 'Student outcomes framework', 'Output multiplier lit review', 'Case studies documented', 'Methodology published'],
+    doneMilestones: 2, status: 'in-progress',
+    notes: 'Ryan Hill case study (Feb 20): ~100x output in deliverables. Researching to validate output multiplier as 3rd ROI dimension.'
+  },
+  {
+    id: 'im_lc', priority: 'ela_math',
+    title: 'Learning Commons / IM Partnership',
+    desc: 'Prototypes aligned to Illustrative Mathematics — intellectual prep, coaching support, time savings',
+    due: 'Jun 2026',
+    milestones: ['Scope defined', 'Prototype v1', 'Pilot with teachers', 'Evaluation'],
+    doneMilestones: 1, status: 'in-progress', notes: ''
+  },
+  {
+    id: 'reading_engine', priority: 'ela_math',
+    title: 'KIPP Reading Engine',
+    desc: 'Apps Script + Google Sheets prototype supporting student/family engagement and love of reading',
+    due: 'Jun 2026',
+    milestones: ['Architecture', 'MVP built', 'Student/family pilot', 'Iteration'],
+    doneMilestones: 2, status: 'in-progress', notes: ''
+  },
+  {
+    id: 'partnerships', priority: 'ai_plan',
+    title: 'Research Partnerships & Fundraising',
+    desc: 'Khan/Gates AIMS, U-W / MIT Blueprint Labs, CSGF (AP time study), Tools Competition — sustain and grow external support',
+    due: 'Aug 2026',
+    milestones: ['MIT Blueprint grant submitted', 'Gates AIMS ongoing', 'Tools Competition proposal', 'Year-end report'],
+    doneMilestones: 2, status: 'on-track',
+    notes: '$725K secured for FY25-26. Two additional proposals pending.'
+  },
+  {
+    id: 'knowledge', priority: 'ai_plan',
+    title: 'Knowledge Sharing (Substack / PD)',
+    desc: 'Document, share, and scale innovation practices through Substack, PD sessions, and office hours',
+    due: 'Aug 2026',
+    milestones: ['Cadence established', 'MOY insights published', 'EOY insights published', 'Annual synthesis'],
+    doneMilestones: 1, status: 'in-progress', notes: ''
+  },
+];
+
+const GD_PILOTS = [
+  { name: 'EnlightenAI',  area: 'ELA',   where: 'Newark + Camden Gr 3-8',       signal: 'positive', decision: 'scale',     metric: '1–3 hrs/wk saved per teacher',        path: 'Expand Gr 3-12 w/ KF pass-through' },
+  { name: 'Goblins',      area: 'Math',  where: 'Newark MS Gr 6 (n=587)',       signal: 'positive', decision: 'scale',     metric: '+5pp proficiency YoY; +9.8 LEP pts',  path: 'Plan all Newark MS SY26-27' },
+  { name: 'Khan Academy', area: 'Math',  where: 'Camden Gr 5-8',                signal: 'mixed',    decision: 'continue',  metric: 'Positive: 1-grade-behind students',   path: 'Tighten impl; allow LEP → i-Ready' },
+  { name: 'Quill',        area: 'ELA',   where: 'Newark Gr 8 (n=236)',          signal: 'early',    decision: 'continue',  metric: '97% coaching rate; strong samples',   path: 'Wait for EOY; explore IEP use case' },
+  { name: 'CourseMojo',   area: 'ELA',   where: 'Newark Gr 7 + Miami MS',       signal: 'caution',  decision: 'caution',   metric: 'Students love it; FL align TBD',      path: 'Continue if FL alignment resolved' },
+  { name: 'Colleague.ai', area: 'SPED',  where: 'Research partnership',         signal: 'early',    decision: 'too-early', metric: 'PD postponed to March',               path: 'March PD; MIT Blueprint grant' },
+  { name: 'Magic School', area: 'Math',  where: 'Newark ES',                    signal: 'early',    decision: 'too-early', metric: 'Just launched',                       path: 'Check usage March' },
+  { name: 'Overgrad',     area: 'CCR',   where: 'KIPP NJ (CSGF-funded)',        signal: 'positive', decision: 'continue',  metric: 'New AI features in dev',              path: 'Target: ↓15% undermatching Class 2027' },
+  { name: 'Colleague.ai (P2)', area: 'SPED', where: 'Scoping',                  signal: 'scoping',  decision: 'scoping',   metric: 'Grant pending',                       path: 'MIT Blueprint Labs (SY26-27)' },
+];
+
+const GD_STATUS_CONFIG = {
+  'complete':    { label: 'Complete',    bg: '#69DDFF', color: '#111111' },
+  'on-track':    { label: 'On Track',    bg: '#96CDFF', color: '#111111' },
+  'in-progress': { label: 'In Progress', bg: '#DBBADD', color: '#111111' },
+  'at-risk':     { label: 'At Risk',     bg: '#BE92A2', color: '#111111' },
+  'not-started': { label: 'Not Started', bg: '#D4D8E8', color: '#6B6360' },
+};
+const GD_STATUS_ORDER = ['complete','on-track','in-progress','at-risk','not-started'];
+
+const GD_DECISION_CONFIG = {
+  'scale':     { label: '↑ Scale',    bg: '#69DDFF', color: '#1A6A8A' },
+  'continue':  { label: '→ Continue', bg: '#D8E1FF', color: '#2A4A8F' },
+  'caution':   { label: '⚠ Caution',  bg: '#DBBADD', color: '#6B3A7A' },
+  'too-early': { label: '◌ Too Early',bg: '#ECEEF5', color: '#6B6360' },
+  'scoping':   { label: '◎ Scoping',  bg: '#F5F6FA', color: '#6B6360' },
+};
+
+const GD_PRIORITY_LABELS = {
+  'ela_math':   { label: 'ELA & Math',  color: '#69DDFF' },
+  'college':    { label: 'College CCR', color: '#DBBADD' },
+  'efficiency': { label: 'Efficiency',  color: '#BE92A2' },
+  'ai_plan':    { label: 'AI Strategy', color: '#96CDFF' },
+};
+
+function GdStatusButton({ status, onChange }) {
+  const cfg = GD_STATUS_CONFIG[status] || GD_STATUS_CONFIG['not-started'];
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ position: 'relative' }}>
+      <button className="gd-status-btn" onClick={() => setOpen(o => !o)}
+        style={{ background: cfg.bg, color: cfg.color }}>
+        {cfg.label} ▾
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', right: 0, zIndex: 100, marginTop: 4,
+          background: 'var(--white)', border: '1px solid var(--border)',
+          borderRadius: 8, padding: 4, boxShadow: 'var(--shadow-md)', minWidth: 120
+        }}>
+          {GD_STATUS_ORDER.map(s => {
+            const c = GD_STATUS_CONFIG[s];
+            return (
+              <div key={s} onClick={() => { onChange(s); setOpen(false); }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px',
+                  cursor: 'pointer', borderRadius: 5, fontSize: 10, fontWeight: 600,
+                  color: s === status ? c.color : 'var(--navy)',
+                  background: s === status ? c.bg : 'transparent',
+                }}
+                onMouseEnter={e => { if (s !== status) e.currentTarget.style.background = 'var(--gray-50)'; }}
+                onMouseLeave={e => { if (s !== status) e.currentTarget.style.background = 'transparent'; }}
+              >
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: c.bg, border: '1px solid rgba(0,0,0,0.1)', flexShrink: 0 }} />
+                {c.label}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InitiativeCard({ goal, onSave }) {
+  const [notes, setNotes] = useState(goal.notes || '');
+  const [status, setStatus] = useState(goal.status || 'not-started');
+  const [done, setDone] = useState(goal.doneMilestones || 0);
+  const pct = goal.milestones.length > 0 ? Math.round((done / goal.milestones.length) * 100) : 0;
+  const pri = GD_PRIORITY_LABELS[goal.priority];
+  const sCfg = GD_STATUS_CONFIG[status];
+  useEffect(() => { onSave(goal.id, { notes, status, doneMilestones: done }); }, [notes, status, done]);
+  return (
+    <div className="goal-card">
+      <div className="goal-card-head">
+        <div className="goal-color-bar" style={{ background: pri?.color || '#D4D8E8' }} />
+        <div style={{ flex: 1 }}>
+          <div className="goal-title-gd">{goal.title}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+            <span className="priority-tag-gd" style={{ background: (pri?.color || '#D4D8E8') + '44', color: '#111' }}>{pri?.label}</span>
+            {goal.due && <span style={{ fontSize: 9, color: 'var(--slate-light)' }}>Due {goal.due}</span>}
+          </div>
+        </div>
+        <GdStatusButton status={status} onChange={s => setStatus(s)} />
+      </div>
+      <div className="goal-card-body">
+        <div className="goal-desc-gd">{goal.desc}</div>
+        <div className="milestone-bar">
+          <div className="milestone-track">
+            <div className="milestone-fill" style={{ width: `${pct}%`, background: sCfg?.bg || '#D4D8E8' }} />
+          </div>
+          <span className="milestone-label">{done}/{goal.milestones.length}</span>
+        </div>
+        <div className="milestone-dots">
+          {goal.milestones.map((m, i) => (
+            <div key={i} className={`m-dot ${i < done ? 'done' : 'todo'}`} title={m}
+              onClick={() => setDone(i < done ? i : i + 1)}
+              style={{ background: i < done ? (sCfg?.bg || '#69DDFF') : 'transparent' }}>
+              {i < done ? '✓' : ''}
+            </div>
+          ))}
+        </div>
+        {goal.milestones.map((m, i) => (
+          <div key={i} style={{ fontSize: 9, color: i < done ? 'var(--slate)' : 'var(--slate-light)', lineHeight: 1.6, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <span style={{ color: i < done ? sCfg?.bg : 'var(--gray-200)', fontWeight: 700, fontSize: 8 }}>{i < done ? '✓' : '○'}</span>
+            <span style={{ textDecoration: i < done ? 'line-through' : 'none', opacity: i < done ? 0.6 : 1 }}>{m}</span>
+          </div>
+        ))}
+        <textarea className="goal-notes-area" rows={2} placeholder="Add notes…"
+          value={notes} onChange={e => setNotes(e.target.value)} />
+      </div>
+    </div>
+  );
+}
+
+// ── KIPP Brand Header ──────────────────────────────────────────
+function KIPPBrandHeader() {
+  return (
+    <div className="kipp-brand-hdr">
+      <div className="kipp-logo-lockup">
+        <div className="kipp-logo-row">
+          <span className="kipp-logo-nj">KIPP<span className="kipp-logo-dot-nj">●</span>NJ</span>
+          <span className="kipp-logo-sep">|</span>
+          <span className="kipp-logo-miami">KIPP<span className="kipp-logo-dot-mi">●</span>MIAMI</span>
+        </div>
+        <div className="kipp-logo-plan">2030 Strategic Plan</div>
+      </div>
+      <div className="kipp-vision-phrase">
+        All schools academically excellent.{' '}
+        <strong>70% of graduates attend four-year colleges.</strong>{' '}
+        16,000 students. All of this powered by{' '}
+        <strong>outstanding teammates.</strong>
+      </div>
+    </div>
+  );
+}
+
+// ── 2030 Pyramid ──────────────────────────────────────────────
+function KIPPPyramid() {
+  const [active, setActive] = React.useState(null);
+
+  const tiers = [
+    // Listed bottom → top; reversed for DOM rendering (top → bottom)
+    {
+      id: 'sfx', label: 'Student & Family Experience',
+      sub: 'Outstanding Teammates Are Everything',
+      color: '#D4A017', textColor: '#0D2460',
+      metrics: [
+        '88% student persistence',
+        'High-quality athletics & extracurricular access for every student',
+        'School pride, belonging, and lifelong habits of health & well-being',
+        'A culture that brings out the best in every teammate',
+      ],
+    },
+    {
+      id: 'attend', label: 'Attendance & Enrollment',
+      sub: 'Our Kids Run To School',
+      color: '#163775', textColor: 'white',
+      metrics: [
+        '100% of schools have ≥94% average daily attendance',
+        '16,000 students enrolled across Newark, Camden, Miami & Paterson',
+        '10% annual growth rate — expanding access in current cities & new markets',
+      ],
+    },
+    {
+      id: 'k8', label: 'K-8 Reading & Math',
+      sub: 'Promises to Children Are Sacred',
+      color: '#C44E10', textColor: 'white',
+      metrics: [
+        '85% of 2nd graders on grade level in reading & math',
+        '64% ELA proficiency — grades 3–8',
+        '58% Math proficiency — grades 3–8',
+        '100% of schools beat the state average for 3–8 ELA & math',
+      ],
+    },
+    {
+      id: 'gpa', label: 'GPA + SAT',
+      sub: 'Promises to Children Are Sacred',
+      color: '#E26E1B', textColor: 'white',
+      metrics: [
+        '60% of 11th graders have 3.0+ cumulative GPA',
+        '40% of 11th graders score 1010+ on SAT',
+        'Newark & Miami proficiency rates in the top quartile in their states',
+      ],
+    },
+    {
+      id: 'college', label: 'College Enrollment',
+      sub: 'Our Kids Will Change The World',
+      color: '#3A9DB5', textColor: 'white',
+      metrics: [
+        '70% of seniors enroll in a four-year college',
+        'Every graduate has access to a choice-filled future',
+      ],
+    },
+    {
+      id: 'apex', label: 'Our Kids Will Change The World',
+      sub: null, color: '#A8D4E4', textColor: '#0D2460',
+      metrics: null, isApex: true,
+    },
+  ];
+
+  // widths: widest at bottom index 0, narrowest at top index 5
+  const widths = ['100%', '86%', '72%', '58%', '43%', '27%'];
+
+  // Render top→bottom: reverse both arrays
+  const renderTiers = [...tiers].reverse();
+  const renderWidths = [...widths].reverse();
+
+  const activeTier = tiers.find(t => t.id === active);
+
+  return (
+    <div className="kipp-pyramid-section">
+      <div className="py-eyebrow">★ 2030 TOPLINE GOALS — tap a layer to see targets</div>
+      <div className="py-stack">
+        {renderTiers.map((tier, i) => (
+          <div
+            key={tier.id}
+            className={`py-tier${active === tier.id ? ' py-active' : ''}`}
+            style={{ width: renderWidths[i], background: tier.color, minHeight: 38 }}
+            onClick={() => setActive(active === tier.id ? null : tier.id)}
+          >
+            <div className="py-tier-lhs">
+              <div className="py-tier-label" style={{ color: tier.textColor }}>{tier.label}</div>
+              {tier.sub && !tier.isApex && (
+                <div className="py-tier-sub" style={{ color: tier.textColor === 'white' ? 'rgba(255,255,255,0.55)' : 'rgba(13,36,96,0.55)' }}>
+                  {tier.sub}
+                </div>
+              )}
+            </div>
+            {tier.metrics && (
+              <div className="py-tier-metric" style={{ color: tier.textColor === 'white' ? 'rgba(255,255,255,0.7)' : 'rgba(13,36,96,0.6)' }}>
+                {tier.metrics[0].length > 38 ? tier.metrics[0].substring(0,36) + '…' : tier.metrics[0]}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      {activeTier && activeTier.metrics && (
+        <div className="py-expanded" style={{ borderLeftColor: activeTier.color }}>
+          <div className="py-exp-title">{activeTier.label}</div>
+          {activeTier.sub && <div className="py-exp-sub">{activeTier.sub}</div>}
+          {activeTier.metrics.map((m, i) => (
+            <div key={i} className="py-exp-metric">
+              <div className="py-exp-dot" style={{ background: activeTier.color }} />
+              <span>{m}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="py-hint">Pyramid shows how each layer builds toward the north star</div>
+    </div>
+  );
+}
+
+function GoalsDashboardView() {
+  const [initiatives, setInitiatives] = useState(() => {
+    const saved = LS.get('ktaf_goals_v2') || {};
+    return GD_DEFAULT_INITIATIVES.map(g => ({ ...g, ...(saved[g.id] || {}) }));
+  });
+
+  const saveInitiative = useCallback((id, patch) => {
+    setInitiatives(prev => {
+      const updated = prev.map(g => g.id === id ? { ...g, ...patch } : g);
+      const toSave = {};
+      updated.forEach(g => { toSave[g.id] = { status: g.status, notes: g.notes, doneMilestones: g.doneMilestones }; });
+      LS.set('ktaf_goals_v2', toSave);
+      return updated;
+    });
+  }, []);
+
+  const complete   = initiatives.filter(g => g.status === 'complete').length;
+  const onTrack    = initiatives.filter(g => g.status === 'on-track').length;
+  const inProgress = initiatives.filter(g => g.status === 'in-progress').length;
+  const notStarted = initiatives.filter(g => g.status === 'not-started').length;
+  const atRisk     = initiatives.filter(g => g.status === 'at-risk').length;
+  const scaleCount = GD_PILOTS.filter(p => p.decision === 'scale').length;
+  const areaColors = { 'ELA': '#5BB8CE', 'Math': '#3A9DB5', 'SPED': '#F5A623', 'CCR': '#E26E1B' };
+  const sigColors  = { 'positive': '#5BB8CE', 'mixed': '#F5A623', 'early': '#A8D4E4', 'caution': '#E26E1B', 'scoping': '#D4D8E8' };
+
+  return (
+    <div className="goals-view">
+      {/* ── KIPP BRAND + 2030 PYRAMID ── */}
+      <KIPPBrandHeader />
+      <KIPPPyramid />
+
+      {/* ── SY 2025-26 ANNUAL GOAL ── */}
+      <div className="roi-goal-card">
+        <div className="roi-goal-year">SY 2025–26 Annual Goal</div>
+        <div className="roi-goal-title">Measure the ROI of AI Adoption at KTAF</div>
+        <div className="roi-goal-desc">
+          Develop and validate a rigorous methodology for measuring the return on AI investment — across student outcomes, staff efficiency, and organizational output. This single goal drives all research, pilots, and partnerships this year.
+        </div>
+
+        <div className="roi-hypotheses">
+          <div className="roi-hyp">
+            <div className="roi-hyp-label">Original Hypothesis · Benefit 1</div>
+            <div className="roi-hyp-title">⏱ Time Savings</div>
+            <div className="roi-hyp-desc">AI reduces hours spent on planning, feedback, and administrative tasks — freeing staff for higher-leverage work. Measured in hours/week per role.</div>
+          </div>
+          <div className="roi-hyp">
+            <div className="roi-hyp-label">Original Hypothesis · Benefit 2</div>
+            <div className="roi-hyp-title">🎓 Student Outcomes</div>
+            <div className="roi-hyp-desc">AI-assisted instruction improves learning acceleration — measured vs. matched peers on i-Ready, NJSLA, FAST and other assessments.</div>
+          </div>
+          <div className="roi-hyp emerging">
+            <div className="roi-hyp-label">⚡ Emerging Paradigm · Benefit 3 — In Research</div>
+            <div className="roi-hyp-title">📈 Increased Output</div>
+            <div className="roi-hyp-desc">Growing evidence suggests AI's biggest benefit isn't saving time — it's dramatically multiplying deliverables and strategic impact. Kevin is researching to validate this as a third ROI dimension.</div>
+          </div>
+        </div>
+
+        <div className="roi-casestudy">
+          <div className="roi-cs-header">
+            <span className="roi-cs-tag">Case Study</span>
+            <span className="roi-cs-name">Ryan Hill, CEO — KIPP Team &amp; Family</span>
+            <span className="roi-cs-date">Feb 20, 2026</span>
+          </div>
+          <div className="roi-cs-quote">
+            "My productivity is up like 100x in terms of deliverables" — drafting a new high school design strategy, sending strategic documents to key stakeholders on core issues, boosting momentum for the organization. Working more now than in a long time, and having so much fun.
+          </div>
+          <div className="roi-cs-note">
+            Collaboration tool: Claude &amp; Claude Code. The 100x figure may be a multiplier rather than a precise count, but the signal is significant and warrants rigorous measurement. Kevin is developing methodology to capture output volume, quality, and organizational impact — not just hours saved.
+          </div>
+        </div>
+
+        <div className="roi-status-chip">
+          <div className="roi-status-dot" />
+          Hypothesis in development · Methodology research in progress
+        </div>
+      </div>
+
+      {/* ── QUICK STATS ── */}
+      <div className="gd-stats-row">
+        {[
+          { num: complete,              label: 'Initiatives Complete', sub: `of ${initiatives.length} total`,              bg: '#5BB8CE' },
+          { num: onTrack + inProgress,  label: 'Active Initiatives',   sub: `${onTrack} on track · ${inProgress} in prog`, bg: '#3A9DB5' },
+          { num: atRisk,                label: 'At Risk',              sub: 'need attention',                               bg: '#E26E1B' },
+          { num: notStarted,            label: 'Not Yet Started',      sub: 'upcoming this SY',                             bg: '#D4D8E8' },
+          { num: scaleCount,            label: 'Pilots to Scale',      sub: `of ${GD_PILOTS.length} tracked pilots`,        bg: '#F5A623' },
+        ].map(s => (
+          <div className="gd-stat-card" key={s.label}>
+            <div className="gd-stat-num" style={{ color: s.bg === '#D4D8E8' ? 'var(--slate)' : 'var(--navy)' }}>{s.num}</div>
+            <div className="gd-stat-label">{s.label}</div>
+            <div className="gd-stat-sub">{s.sub}</div>
+            <div style={{ marginTop: 8, height: 3, borderRadius: 100, background: s.bg }} />
+          </div>
+        ))}
+      </div>
+
+      {/* ── THREE-COLUMN ALIGNMENT MAP ── */}
+      <div className="gd-section-header">
+        <span className="gd-section-title">Goal Alignment Map</span>
+        <span className="gd-section-sub">2030 Vision → SY25-26 Team Priorities → Kevin's Initiatives</span>
+      </div>
+
+      <div className="alignment-grid">
+        {/* COLUMN 1: 2030 Strategic Pillars */}
+        <div className="col-l1">
+          <div className="alignment-col-head">
+            <div className="col-num">1</div>
+            <div><div className="col-title-gd">2030 Pillars</div></div>
+          </div>
+          {GD_PILLARS.map(p => (
+            <div className="pillar-card" key={p.id} style={{ borderLeftColor: p.color }}>
+              <div className="pillar-name">{p.name}</div>
+              <div style={{ fontSize: 9, color: 'var(--slate)', lineHeight: 1.4 }}>{p.desc}</div>
+              <div className="pillar-goals">
+                {p.goals.map(gid => {
+                  const g = GD_VISION_GOALS.find(v => v.id === gid);
+                  return g ? (
+                    <span key={gid} className="pillar-goal-chip" style={{ background: g.color + '33', color: 'var(--navy)' }}>
+                      {g.label}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* COLUMN 2: SY25-26 Team Priorities */}
+        <div className="col-l2">
+          <div className="alignment-col-head">
+            <div className="col-num">2</div>
+            <div><div className="col-title-gd">SY 25-26 Priorities</div></div>
+          </div>
+          {GD_TEAM_PRIORITIES.map(p => {
+            const pillar = GD_PILLARS.find(pi => pi.id === p.pillar);
+            return (
+              <div className="priority-card-gd" key={p.id}>
+                <div className="priority-head-gd">
+                  <div className="priority-color-gd" style={{ background: p.color }} />
+                  <div style={{ flex: 1 }}>
+                    <div className="priority-name-gd">{p.name}</div>
+                    {pillar && (
+                      <span style={{ background: pillar.color + '33', color: 'var(--navy)', fontSize: 8, marginTop: 4, display: 'inline-block', padding: '1px 6px', borderRadius: 100, fontWeight: 700, letterSpacing: '0.05em' }}>
+                        ↑ {pillar.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="priority-body-gd">
+                  {p.kpis.map((k, i) => {
+                    const cfg = GD_STATUS_CONFIG[k.status];
+                    return (
+                      <div className="priority-kpi" key={i}>
+                        <div className="kpi-dot" style={{ background: cfg?.bg || '#D4D8E8' }} />
+                        <div className="kpi-text">{k.text}</div>
+                      </div>
+                    );
+                  })}
+                  <div style={{ fontSize: 9, color: 'var(--slate-light)', marginTop: 6, lineHeight: 1.4 }}>{p.initiatives}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* COLUMN 3: Kevin's Initiatives */}
+        <div className="col-l3">
+          <div className="alignment-col-head">
+            <div className="col-num">3</div>
+            <div><div className="col-title-gd">Kevin's Initiatives</div></div>
+          </div>
+          <div className="initiative-cards-grid">
+            {initiatives.map(g => (
+              <InitiativeCard key={g.id} goal={g} onSave={saveInitiative} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── AI PILOT PORTFOLIO ── */}
+      <div className="gd-section-header">
+        <span className="gd-section-title">AI Pilot Portfolio</span>
+        <span className="gd-section-sub">SY 25-26 · MOY Signal &amp; Path Forward</span>
+      </div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
+        <span style={{ fontSize: 9, color: 'var(--slate-light)', marginRight: 4 }}>DECISION:</span>
+        {Object.entries(GD_DECISION_CONFIG).map(([k,v]) => (
+          <span key={k} className="decision-chip" style={{ background: v.bg, color: v.color }}>{v.label}</span>
+        ))}
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table className="pilot-table">
+          <thead>
+            <tr>
+              <th>Pilot</th><th>Area</th><th>Where</th><th>MOY Signal</th>
+              <th>Decision</th><th>Key Metric</th><th>Q3–Q4 Path</th>
+            </tr>
+          </thead>
+          <tbody>
+            {GD_PILOTS.map(p => {
+              const dec = GD_DECISION_CONFIG[p.decision];
+              return (
+                <tr key={p.name}>
+                  <td><span className="pilot-name">{p.name}</span></td>
+                  <td><span className="area-tag" style={{ background: (areaColors[p.area] || '#D4D8E8') + '33', color: 'var(--navy)' }}>{p.area}</span></td>
+                  <td style={{ fontSize: 10, color: 'var(--slate)', maxWidth: 150 }}>{p.where}</td>
+                  <td>
+                    <div className="signal-bar">
+                      {[...Array(p.signal === 'positive' ? 3 : p.signal === 'mixed' ? 2 : 1)].map((_,i) => (
+                        <div key={i} className="signal-dot" style={{ background: sigColors[p.signal] || '#D4D8E8' }} />
+                      ))}
+                      {[...Array(3 - (p.signal === 'positive' ? 3 : p.signal === 'mixed' ? 2 : 1))].map((_,i) => (
+                        <div key={`e${i}`} className="signal-dot" style={{ background: 'var(--gray-200)' }} />
+                      ))}
+                      <span style={{ fontSize: 9, color: 'var(--slate)', marginLeft: 4, textTransform: 'capitalize' }}>{p.signal}</span>
+                    </div>
+                  </td>
+                  <td><span className="decision-chip" style={{ background: dec?.bg, color: dec?.color }}>{dec?.label}</span></td>
+                  <td style={{ fontSize: 10, color: 'var(--slate)', maxWidth: 190 }}>{p.metric}</td>
+                  <td style={{ fontSize: 10, color: 'var(--slate)', maxWidth: 190 }}>{p.path}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── EXTERNAL RESOURCES (lower emphasis) ── */}
+      <div className="ext-resources-row">
+        <div>
+          <div className="fb-label">SY25-26 External Resources Secured</div>
+          <div className="fb-amount">$725K</div>
+          <div className="fb-desc">FY25 innovation costs + FY26 pilots &amp; initiatives</div>
+        </div>
+        <div className="fb-partners">
+          {['Charter School Growth Fund', 'Gates Foundation / AIMS', 'U-W / MIT Blueprint Labs (pending)', 'Tools Competition (pending)'].map(p => (
+            <span key={p} className="fb-partner">{p}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginTop: 20, paddingTop: 14, borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ fontSize: 10, color: 'var(--slate-light)' }}>KTAF AI Strategy · Kevin Shaw · SY 2025–26</div>
+        <div style={{ fontSize: 10, color: 'var(--slate-light)' }}>Initiative status &amp; notes saved locally · {new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEFAULT WORKSTREAM STRUCTURE (used if nothing in localStorage)
+// ═══════════════════════════════════════════════════════════════
+
+const DEFAULT_CATEGORIES = [
+  { id: 'strategic',    name: 'Strategic Initiatives',    color: '#BE92A2', workstreams: ['Project CORE', '2030 Future of Learning & Work', 'Phase A — MOY Research Report', 'Phase B — EOY Strategic Framework'] },
+  { id: 'partnerships',name: 'Partnerships & Teams',      color: '#96CDFF', workstreams: ['T&L Collab', 'CCR Support', 'KTAF Teams Support', 'Overgrad'] },
+  { id: 'ai_ops',      name: 'AI Operations',             color: '#333333', workstreams: ['ChatGPT EDU', 'Gemini', 'Claude / Anthropic', 'Substack', 'Impact Methodology'] },
+  { id: 'pilot_impl',  name: 'Pilot Implementation',      color: '#69DDFF', workstreams: ['Khanmigo', 'EnlightenAI', 'CourseMojo', 'Quill', 'Goblins'] },
+  { id: 'pilot_scope', name: 'Pilot Scoping',             color: '#DBBADD', workstreams: ['U-W / colleague.ai', 'MagicSchool', 'Snorkl', 'CZI / Learning Commons'] },
+  { id: 'fundraising', name: 'Fundraising & Capacity',    color: '#555555', workstreams: ['Gates / Siegel / Ballmer', 'Tools Competition', 'CSGF', 'Capacity Building (Drew / Squared Away)'] },
+  { id: 'other',       name: 'Other',                     color: '#D8E1FF', workstreams: ['Reading Engine', 'Sustainability / Kevin Bandwidth', 'Impediments / Blockers'] }
+];
+
+const COLOR_OPTIONS = [
+  '#69DDFF','#96CDFF','#D8E1FF','#DBBADD',  /* frozen lake → sky blue → lavender → orchid */
+  '#BE92A2','#111111','#333333','#555555',  /* old rose → black → greys */
+  '#6B6360','#878E89','#9E9896','#B0A8A6'  /* mid-greys → light grey */
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SKILL DEVELOPMENT FRAMEWORK (from Skill Development & Product Strategy doc)
+// ═══════════════════════════════════════════════════════════════
+
+const PHASES = [
+  { id: 1, name: 'Guided Co-Builder',    dates: 'Weeks 1–2', focus: 'Claude Code fundamentals; build mode selection; MCP/KG integration basics; Google Sheets backend patterns' },
+  { id: 2, name: 'Parallel Builder',     dates: 'Weeks 3–4', focus: 'Complex data integration (Illuminate, PowerSchool); LC Knowledge Graph querying; multi-source data views' },
+  { id: 3, name: 'Independent Iterator', dates: 'Weeks 5–8', focus: 'Feedback-driven iteration; Build to React / Persuade modes; pilot data interpretation; fundraising demo prep' },
+  { id: 4, name: 'Cohort Leader',        dates: 'Weeks 9+',  focus: 'Onboarding 2–3 additional builders; teaching methodology transfer; scaling governed environments' },
+];
+
+const SKILL_DOMAINS = [
+  { id: 'claude_code', label: 'Claude Code Fluency', skills: [
+    { id: 'agentic_workflow',  label: 'Agentic workflow design' },
+    { id: 'context_mgmt',     label: 'Context management & compacting' },
+    { id: 'claude_md',        label: 'CLAUDE.md & project configuration' },
+    { id: 'skills_creation',  label: 'Skills creation & maintenance' },
+    { id: 'mcp_integration',  label: 'MCP integration' },
+  ]},
+  { id: 'data_arch', label: 'Educational Data Architecture', skills: [
+    { id: 'lc_kg',            label: 'LC Knowledge Graph querying' },
+    { id: 'im_integration',   label: 'Illustrative Math integration' },
+    { id: 'student_data',     label: 'Student data patterns (PowerSchool / Illuminate / iReady)' },
+    { id: 'sheets_backend',   label: 'Google Sheets as lightweight backend' },
+    { id: 'data_validation',  label: 'Data validation & semantic layer' },
+  ]},
+  { id: 'product_craft', label: 'Product Development Craft', skills: [
+    { id: 'user_research',    label: 'User research synthesis' },
+    { id: 'pilot_design',     label: 'Pilot design & success metrics' },
+    { id: 'feedback_loops',   label: 'Feedback loops (Build to React)' },
+    { id: 'demo_prep',        label: 'Demo preparation (Build to Persuade)' },
+  ]},
+];
+
+const BUILD_MODES = [
+  { id: 'experience', label: 'Build to Experience', desc: 'Make stakeholders feel the product before committing' },
+  { id: 'react',      label: 'Build to React',      desc: 'Discover direction through stakeholder response to a working thing' },
+  { id: 'scope',      label: 'Build to Scope',      desc: 'Surface hidden complexity that design docs miss' },
+  { id: 'reveal',     label: 'Build to Reveal',     desc: 'Make invisible data patterns visible and actionable' },
+  { id: 'persuade',   label: 'Build to Persuade',   desc: 'Bring stakeholders to the same page with a shared artifact' },
+  { id: 'set_bar',    label: 'Build to Set a Bar',  desc: 'Recalibrate organizational expectations for velocity and quality' },
+  { id: 'accelerate', label: 'Build to Accelerate', desc: 'Ship fast once the pipeline is validated' },
+  { id: 'explore',    label: 'Build to Explore',    desc: 'Push into LC Knowledge Graph, standards progressions, new integrations' },
+  { id: 'push',       label: 'Build to Push Boundaries', desc: 'Test the frontier: coaching starters, predictive signals, agent delegation' },
+];
+
+const DEFAULT_SKILLS = {
+  phase: 1,
+  ratings:   {},   // { skill_id: 1–5 }
+  modes:     {},   // { mode_id: true/false }
+  modeNotes: {},   // { mode_id: 'context note' }
+  sophieNotes: ''
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STORAGE + UTILS
+// ═══════════════════════════════════════════════════════════════
+
+const LS = {
+  get: (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+// ── API Layer (Vercel Proxy → Google Apps Script) ──────────────
+const API_BASE = '/api/gas';
+const api = {
+  get: async (action, params = {}) => {
+    const qs = new URLSearchParams({ action, ...params }).toString();
+    const res = await fetch(`${API_BASE}?${qs}`);
+    if (!res.ok) throw new Error(`GET ${action}: ${res.status}`);
+    return res.json();
+  },
+  post: async (payload) => {
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`POST ${payload.action}: ${res.status}`);
+    return res.json();
+  }
+};
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+const fmtDate = (ds) => {
+  if (!ds) return '';
+  let d;
+  if (typeof ds === 'number') {
+    d = new Date(ds);                        // timestamp
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(String(ds))) {
+    d = new Date(ds + 'T12:00:00');          // plain YYYY-MM-DD → add noon to avoid UTC-shift
+  } else {
+    d = new Date(ds);                        // ISO string with time, or any other format
+  }
+  if (isNaN(d.getTime())) return String(ds); // last resort: show raw value rather than crash
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const nextTue = () => {
+  const d = new Date();
+  const diff = (2 - d.getDay() + 7) % 7 || 7;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split('T')[0];
+};
+
+const getItemType = (it) => {
+  if (!it) return null;
+  if (it.itemType) return it.itemType;
+  if (it.na) return 'na';
+  if (it.questions?.trim()) return 'discuss';
+  return null;
+};
+
+const calcPrep = (ag, allWs) => {
+  if (!ag || !allWs) return { pct: 0, filled: 0, total: 0 };
+  const filled = allWs.filter(ws => {
+    const it = ag[ws]; if (!it) return false;
+    const t = getItemType(it);
+    if (t === 'na') return true;
+    if (t === 'fyi') return !!it.updateText?.trim();
+    if (t === 'blocked') return !!(it.blockerText?.trim() || it.questions?.trim());
+    if (t === 'discuss' || t === 'decide') return !!it.questions?.trim();
+    return false;
+  }).length;
+  return { pct: allWs.length ? Math.round((filled / allWs.length) * 100) : 0, filled, total: allWs.length };
+};
+
+const calcRun = (ag, allWs) => {
+  if (!ag || !allWs) return { total: 0, done: 0 };
+  const relevant = allWs.filter(ws => {
+    const it = ag[ws]; if (!it) return false;
+    const t = getItemType(it);
+    if (t === 'na' || t === 'fyi') return false;
+    if (t === 'blocked' || t === 'decide') return true;   // decisions always surface
+    if (t === 'discuss') return !!it.questions?.trim();
+    return false;
+  });
+  const done = relevant.filter(ws => ['done','tabled'].includes(ag[ws]?.status)).length;
+  return { total: relevant.length, done };
+};
+
+// Render links field as clickable anchor tags, splitting on whitespace/commas
+const renderLinks = (links) => {
+  if (!links?.trim()) return null;
+  return links.split(/[\s,\n]+/).filter(u => u.trim()).map((url, i) => {
+    const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    return (
+      <a key={i} href={href} target="_blank" rel="noopener noreferrer"
+        style={{ fontSize: 11, color: 'var(--blue-text)', display: 'block',
+          wordBreak: 'break-all', textDecoration: 'underline', marginTop: 2 }}>
+        {url}
+      </a>
+    );
+  });
+};
+
+const fmtTimer = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+
+// ═══════════════════════════════════════════════════════════════
+// APP ROOT
+// ═══════════════════════════════════════════════════════════════
+
+function App() {
+  // ── State: localStorage-first, server-merged ────────────────
+  const init = () => ({
+    sessions:   LS.get('o3_sessions')   || [],
+    agenda:     LS.get('o3_agenda')     || {},
+    actions:    LS.get('o3_actions')    || [],
+    settings:   LS.get('o3_settings')   || { sheetUrl: '' },
+    categories: LS.get('o3_categories') || DEFAULT_CATEGORIES,
+    skills:     LS.get('o3_skills')     || DEFAULT_SKILLS
+  });
+
+  const [D, setD] = useState(init);
+  const [view, setView] = useState('goals');
+  const [sid, setSid] = useState(() => (LS.get('o3_sessions') || [])[0]?.id || null);
+  const [showNew, setShowNew] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [syncStatus, setSyncStatus] = useState('loading'); // synced | saving | loading | offline | error
+
+  // ── Refs for sync machinery ─────────────────────────────────
+  const writeQueueRef = useRef(JSON.parse(localStorage.getItem('o3_writeQueue') || '[]'));
+  const flushTimerRef = useRef(null);
+  const pollTimerRef  = useRef(null);
+  const lastSyncRef   = useRef(0);
+  const mountedRef    = useRef(true);
+
+  // ── Persist to localStorage on every state change ───────────
+  useEffect(() => {
+    LS.set('o3_sessions',   D.sessions);
+    LS.set('o3_agenda',     D.agenda);
+    LS.set('o3_actions',    D.actions);
+    LS.set('o3_settings',   D.settings);
+    LS.set('o3_categories', D.categories);
+    LS.set('o3_skills',     D.skills);
+  }, [D]);
+
+  // ── Merge server data (server wins except settings) ─────────
+  const mergeServerData = useCallback((server) => {
+    if (!server || server.error) return;
+    setD(prev => ({
+      sessions:   server.sessions   ?? prev.sessions,
+      agenda:     server.agenda     ?? prev.agenda,
+      actions:    server.actions    ?? prev.actions,
+      settings:   prev.settings, // device-local always
+      categories: server.categories ?? prev.categories,
+      skills:     server.skills     ?? prev.skills
+    }));
+    if (server.sessions?.length) {
+      setSid(prev => {
+        if (server.sessions.find(s => s.id === prev)) return prev;
+        return server.sessions[0]?.id || null;
+      });
+    }
+    lastSyncRef.current = Date.now();
+  }, []);
+
+  // ── Load from server ────────────────────────────────────────
+  const loadFromServer = useCallback(async (quiet = false) => {
+    if (!navigator.onLine) { setSyncStatus('offline'); return; }
+    if (!quiet) setSyncStatus('loading');
+    try {
+      const data = await api.get('getAll');
+      if (mountedRef.current) {
+        mergeServerData(data);
+        setSyncStatus('synced');
+      }
+    } catch (err) {
+      console.warn('O3 Hub – loadFromServer:', err.message);
+      if (mountedRef.current) setSyncStatus(prev => prev === 'loading' ? 'error' : prev);
+    }
+  }, [mergeServerData]);
+
+  // ── Write queue: persist → flush → schedule → enqueue ───────
+  const persistQueue = useCallback(() => {
+    try { localStorage.setItem('o3_writeQueue', JSON.stringify(writeQueueRef.current)); } catch {}
+  }, []);
+
+  const flushWrites = useCallback(async () => {
+    const queue = [...writeQueueRef.current];
+    if (!queue.length) return;
+    if (!navigator.onLine) { setSyncStatus('offline'); return; }
+    setSyncStatus('saving');
+    // Deduplicate: merge items sharing the same _dedupeKey
+    const deduped = [];
+    const keyIdx = new Map();
+    for (const item of queue) {
+      const key = item._dedupeKey;
+      if (key && keyIdx.has(key)) {
+        const idx = keyIdx.get(key);
+        if (item.data) {
+          deduped[idx] = { ...deduped[idx], data: { ...(deduped[idx].data || {}), ...item.data } };
+        } else {
+          deduped[idx] = item;
+        }
+      } else {
+        if (key) keyIdx.set(key, deduped.length);
+        deduped.push({ ...item });
+      }
+    }
+    let allOk = true;
+    for (const item of deduped) {
+      const payload = { ...item };
+      delete payload._dedupeKey;
+      try { await api.post(payload); }
+      catch (err) { console.warn('O3 Hub – flush failed:', err.message); allOk = false; break; }
+    }
+    if (allOk) {
+      writeQueueRef.current = [];
+      persistQueue();
+      if (mountedRef.current) setSyncStatus('synced');
+    } else {
+      if (mountedRef.current) setSyncStatus('error');
+    }
+  }, [persistQueue]);
+
+  const scheduleFlush = useCallback((delayMs = 0) => {
+    clearTimeout(flushTimerRef.current);
+    flushTimerRef.current = setTimeout(flushWrites, delayMs);
+  }, [flushWrites]);
+
+  const enqueue = useCallback((payload, opts = {}) => {
+    const item = { ...payload };
+    if (opts.dedupeKey) item._dedupeKey = opts.dedupeKey;
+    writeQueueRef.current.push(item);
+    persistQueue();
+    scheduleFlush(opts.delay ?? 0);
+  }, [persistQueue, scheduleFlush]);
+
+  // ── Polling: mount, 30 s interval, tab focus, online/offline ──
+  useEffect(() => {
+    mountedRef.current = true;
+    loadFromServer();
+
+    pollTimerRef.current = setInterval(() => {
+      if (!document.hidden) loadFromServer(true);
+    }, 30000);
+
+    const onVis     = () => { if (!document.hidden) loadFromServer(true); };
+    const onOnline  = () => { setSyncStatus('loading'); loadFromServer(); flushWrites(); };
+    const onOffline = () => setSyncStatus('offline');
+
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('online',  onOnline);
+    window.addEventListener('offline', onOffline);
+
+    if (writeQueueRef.current.length) flushWrites();
+
+    return () => {
+      mountedRef.current = false;
+      clearInterval(pollTimerRef.current);
+      clearTimeout(flushTimerRef.current);
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('online',  onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, [loadFromServer, flushWrites]);
+
+  // ── Derived values ──────────────────────────────────────────
+  const session = D.sessions.find(s => s.id === sid) || null;
+  const ag      = sid ? (D.agenda[sid] || {}) : {};
+  const allWs   = D.categories.flatMap(c => c.workstreams);
+  const prepProgress = calcPrep(ag, allWs);
+  const runProgress  = calcRun(ag, allWs);
+  const openActions  = D.actions.filter(a => a.status === 'open').length;
+
+  // ── Session CRUD ──────────────────────────────────────────────
+  const createSession = (date, label) => {
+    const id = uid();
+    const created = Date.now();
+    setD(d => ({ ...d, sessions: [{ id, date, label, status: 'prep', created }, ...d.sessions] }));
+    setSid(id);
+    setShowNew(false);
+    setView('prepare');
+    enqueue({ action: 'createSession', id, date, label, status: 'prep', created });
+  };
+
+  const editSession = (id, newDate) => {
+    setD(d => ({ ...d, sessions: d.sessions.map(s => s.id === id ? { ...s, date: newDate } : s) }));
+    enqueue({ action: 'updateSession', id, date: newDate });
+  };
+
+  const deleteSession = (id) => {
+    setD(d => { const { [id]: _gone, ...agenda } = d.agenda; return { ...d, sessions: d.sessions.filter(s => s.id !== id), agenda }; });
+    setSid(prev => prev === id ? (D.sessions.find(s => s.id !== id)?.id || null) : prev);
+    enqueue({ action: 'deleteSession', id });
+  };
+
+  // ── Agenda update (debounced 1.5 s — typing) ───────────────
+  const updAg = (ws, patch) => {
+    setD(d => ({
+      ...d,
+      agenda: {
+        ...d.agenda,
+        [sid]: { ...(d.agenda[sid] || {}), [ws]: { ...(d.agenda[sid]?.[ws] || {}), ...patch } }
+      }
+    }));
+    enqueue(
+      { action: 'updateAgendaItem', sessionId: sid, workstream: ws, data: patch },
+      { delay: 1500, dedupeKey: `agenda:${sid}:${ws}` }
+    );
+  };
+
+  // ── Actions ───────────────────────────────────────────────────
+  const addAction = (ws, text, owner, due) => {
+    const id = uid();
+    const created = Date.now();
+    setD(d => ({ ...d, actions: [{ id, sid, ws, text, owner, due, status: 'open', created }, ...d.actions] }));
+    enqueue({ action: 'createAction', id, sessionId: sid, workstream: ws, text, owner, due, status: 'open', created });
+  };
+
+  const toggleAction = (id) => {
+    const current = D.actions.find(a => a.id === id);
+    const newStatus = current?.status === 'open' ? 'done' : 'open';
+    setD(d => ({ ...d, actions: d.actions.map(a => a.id === id ? { ...a, status: newStatus } : a) }));
+    enqueue({ action: 'updateActionStatus', id, status: newStatus });
+  };
+
+  const editAction = (id, patch) => {
+    setD(d => ({ ...d, actions: d.actions.map(a => a.id === id ? { ...a, ...patch } : a) }));
+    enqueue({ action: 'updateAction', id, ...patch }, { delay: 500, dedupeKey: `action:${id}` });
+  };
+
+  const deleteAction = (id) => {
+    setD(d => ({ ...d, actions: d.actions.filter(a => a.id !== id) }));
+    enqueue({ action: 'deleteAction', id });
+  };
+
+  // ── Workstream / Category CRUD (sync full array) ──────────────
+  const addWorkstream = (catId, name) => {
+    if (!name.trim()) return;
+    const newCats = D.categories.map(c =>
+      c.id === catId ? { ...c, workstreams: [...c.workstreams, name.trim()] } : c
+    );
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const renameWorkstream = (catId, oldName, newName) => {
+    if (!newName.trim() || newName.trim() === oldName) return;
+    const newCats = D.categories.map(c =>
+      c.id === catId
+        ? { ...c, workstreams: c.workstreams.map(w => w === oldName ? newName.trim() : w) }
+        : c
+    );
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const deleteWorkstream = (catId, name) => {
+    const newCats = D.categories.map(c =>
+      c.id === catId ? { ...c, workstreams: c.workstreams.filter(w => w !== name) } : c
+    );
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const addCategory = (name, color) => {
+    if (!name.trim()) return;
+    const id = name.toLowerCase().replace(/\s+/g, '_') + '_' + uid();
+    const newCats = [...D.categories, { id, name: name.trim(), color, workstreams: [] }];
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const renameCategory = (catId, newName) => {
+    if (!newName.trim()) return;
+    const newCats = D.categories.map(c => c.id === catId ? { ...c, name: newName.trim() } : c);
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const recolorCategory = (catId, color) => {
+    const newCats = D.categories.map(c => c.id === catId ? { ...c, color } : c);
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const deleteCategory = (catId) => {
+    const newCats = D.categories.filter(c => c.id !== catId);
+    setD(d => ({ ...d, categories: newCats }));
+    enqueue({ action: 'syncCategories', categories: newCats });
+  };
+
+  const resetCategories = () => {
+    if (confirm('Reset all workstreams to the default list? This won\'t delete any session data.')) {
+      setD(d => ({ ...d, categories: DEFAULT_CATEGORIES }));
+      enqueue({ action: 'syncCategories', categories: DEFAULT_CATEGORIES });
+    }
+  };
+
+  const noSession = !session && view !== 'history' && view !== 'actions' && view !== 'manage' && view !== 'skills';
+
+  const updSkills = (patch) => {
+    setD(d => ({ ...d, skills: { ...d.skills, ...patch } }));
+    const merged = { ...D.skills, ...patch };
+    enqueue({ action: 'syncSkills', skills: merged }, { delay: 1000, dedupeKey: 'skills' });
+  };
+
+  // ── Backup Export / Import ────────────────────────────────────
+  const exportState = () => {
+    const payload = JSON.stringify({
+      sessions: D.sessions, agenda: D.agenda, actions: D.actions,
+      settings: D.settings, categories: D.categories, skills: D.skills
+    });
+    return navigator.clipboard.writeText(payload);
+  };
+
+  const importState = (json) => {
+    try {
+      const data = JSON.parse(json);
+      if (!data.sessions || !data.agenda) { alert('Invalid data — expected sessions + agenda fields.'); return; }
+      setD(prev => ({
+        sessions:   data.sessions   || prev.sessions,
+        agenda:     data.agenda     || prev.agenda,
+        actions:    data.actions    || prev.actions,
+        settings:   data.settings   || prev.settings,
+        categories: data.categories || prev.categories,
+        skills:     data.skills     || prev.skills,
+      }));
+      setSid((data.sessions || [])[0]?.id || null);
+      // Push imported data to server
+      enqueue({
+        action: 'syncAll',
+        sessions: data.sessions, agenda: data.agenda, actions: data.actions,
+        categories: data.categories, skills: data.skills
+      });
+    } catch { alert('Could not parse data — make sure you pasted the full export text.'); }
+  };
+
+  return (
+    <div className="app">
+      <Header sessions={D.sessions} session={session} sid={sid} setSid={setSid}
+        onNew={() => setShowNew(true)} onSettings={() => setShowSettings(true)}
+        sheetUrl={D.settings.sheetUrl || ''}
+        syncStatus={syncStatus} lastSync={lastSyncRef.current} />
+
+      {syncStatus === 'offline' && (
+        <div style={{
+          background: 'rgba(248,113,113,0.12)', color: 'var(--red, #f87171)',
+          fontSize: 11, fontWeight: 600, textAlign: 'center',
+          padding: '5px 12px', borderBottom: '1px solid rgba(248,113,113,0.25)'
+        }}>
+          Offline — changes are saved locally and will sync when reconnected
+        </div>
+      )}
+
+      <nav className="tabs">
+
+        {/* ── 1. Annual Goals ──────────────────────────────── */}
+        <div className={`tab tab-goals ${view === 'goals' ? 'active' : ''}`}
+             onClick={() => setView('goals')}>
+          ★ Annual Goals
+        </div>
+
+        <div className="tab-sep" />
+
+        {/* ── 2. O3 Group ──────────────────────────────────── */}
+        <div className="tab-group-o3">
+          <span className="tab-group-badge">O3</span>
+          {[
+            { id: 'prepare', label: 'Prep' },
+            { id: 'run',     label: 'Meeting' },
+            { id: 'actions', label: 'Actions', badge: openActions || null },
+            { id: 'history', label: 'History' },
+          ].map(t => (
+            <div key={t.id} className={`tab tab-o3 ${view === t.id ? 'active' : ''}`}
+                 onClick={() => setView(t.id)}>
+              {t.label}
+              {t.badge ? <span className="tab-badge">{t.badge}</span> : null}
+            </div>
+          ))}
+        </div>
+
+        <div className="tab-sep" />
+
+        {/* ── 3. Skills & Growth ───────────────────────────── */}
+        <div className={`tab tab-skills ${view === 'skills' ? 'active' : ''}`}
+             onClick={() => setView('skills')}>
+          Skills &amp; Growth
+        </div>
+
+        <div className="tab-sep" />
+
+        {/* ── 4. Quarterly Priorities & Initiatives ────────── */}
+        <div className={`tab tab-manage ${view === 'manage' ? 'active' : ''}`}
+             onClick={() => setView('manage')}>
+          <span className="label-full">Quarterly Priorities &amp; Initiatives</span>
+          <span className="label-short">Priorities</span>
+        </div>
+
+      </nav>
+
+      <main className="main" style={view === 'goals' ? { maxWidth: 1300 } : {}}>
+        {view === 'goals' ? (
+          <GoalsDashboardView />
+        ) : noSession ? (
+          <NoSession onNew={() => setShowNew(true)} />
+        ) : view === 'prepare' ? (
+          <PrepareView session={session} ag={ag} progress={prepProgress}
+            categories={D.categories} onUpdate={updAg} />
+        ) : view === 'run' ? (
+          <RunView session={session} ag={ag} progress={runProgress}
+            categories={D.categories} onUpdate={updAg} onAddAction={addAction} />
+        ) : view === 'history' ? (
+          <HistoryView sessions={D.sessions} allAg={D.agenda} allWs={allWs}
+            onOpen={(id) => { setSid(id); setView('prepare'); }}
+            onEditDate={editSession}
+            onDelete={deleteSession} />
+        ) : view === 'actions' ? (
+          <ActionsView actions={D.actions} categories={D.categories}
+            onToggle={toggleAction} onAdd={addAction}
+            onEdit={editAction} onDelete={deleteAction} />
+        ) : view === 'skills' ? (
+          <SkillsView skills={D.skills} onUpdate={updSkills} />
+        ) : (
+          <ManageView
+            categories={D.categories}
+            onAddWorkstream={addWorkstream}
+            onRenameWorkstream={renameWorkstream}
+            onDeleteWorkstream={deleteWorkstream}
+            onAddCategory={addCategory}
+            onRenameCategory={renameCategory}
+            onRecolorCategory={recolorCategory}
+            onDeleteCategory={deleteCategory}
+            onReset={resetCategories}
+          />
+        )}
+      </main>
+
+      {showNew && <NewSessionModal onClose={() => setShowNew(false)} onCreate={createSession} />}
+      {showSettings && (
+        <SettingsModal settings={D.settings}
+          onSave={s => setD(d => ({ ...d, settings: s }))}
+          onClose={() => setShowSettings(false)}
+          onExport={exportState}
+          onImport={importState} />
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════════════════════════
+
+function Header({ sessions, session, sid, setSid, onNew, onSettings, sheetUrl, syncStatus, lastSync }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+
+  // Sync status indicator config
+  const syncCfg = {
+    synced:  { color: 'var(--green, #34d399)', bg: 'rgba(52,211,153,0.10)', label: 'Synced' },
+    saving:  { color: 'var(--amber, #fbbf24)', bg: 'rgba(251,191,36,0.10)', label: 'Saving…' },
+    loading: { color: 'var(--blue)',            bg: 'var(--blue-bg)',         label: 'Loading…' },
+    offline: { color: 'var(--red, #f87171)',    bg: 'rgba(248,113,113,0.10)', label: 'Offline' },
+    error:   { color: 'var(--red, #f87171)',    bg: 'rgba(248,113,113,0.10)', label: 'Error' },
+  }[syncStatus] || { color: 'var(--slate)', bg: 'transparent', label: '' };
+
+  const agoText = lastSync
+    ? `Last synced ${Math.round((Date.now() - lastSync) / 1000)}s ago`
+    : 'Connecting…';
+
+  return (
+    <header className="header">
+      <div className="logo">
+        <div className="logo-badge">K</div>
+        <span>O3 Hub <span className="logo-sub">Kevin × Sophie</span></span>
+      </div>
+      <div className="header-sep" />
+      <div className="session-area">
+        <div className="session-pill" ref={ref} onClick={() => setOpen(o => !o)}>
+          <span>{session ? fmtDate(session.date) : 'Select session'}</span>
+          <span className="chevron">▾</span>
+          {open && sessions.length > 0 && (
+            <div className="session-dropdown" onClick={e => e.stopPropagation()}>
+              {sessions.map(s => (
+                <div key={s.id} className={`session-dropdown-item ${s.id === sid ? 'active' : ''}`}
+                  onClick={() => { setSid(s.id); setOpen(false); }}>
+                  {fmtDate(s.date)}
+                  {s.label && <div className="session-dropdown-sub">{s.label}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button className="btn-new" onClick={onNew}>+ New O3</button>
+      </div>
+      {/* Auto-sync status indicator */}
+      <div title={agoText} style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        fontSize: 10, fontWeight: 600, color: syncCfg.color,
+        padding: '4px 10px', borderRadius: 'var(--radius)',
+        background: syncCfg.bg, marginRight: 4,
+        transition: 'all var(--transition)', cursor: 'default',
+        border: `1px solid ${syncStatus === 'error' || syncStatus === 'offline' ? syncCfg.color : 'transparent'}`
+      }}>
+        <span style={{
+          width: 7, height: 7, borderRadius: '50%', background: syncCfg.color, flexShrink: 0,
+          animation: syncStatus === 'saving' || syncStatus === 'loading' ? 'pulse 1.2s infinite' : 'none'
+        }} />
+        {syncCfg.label}
+      </div>
+      {sheetUrl && (
+        <a
+          href={sheetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open Google Sheet"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            fontSize: 11, fontWeight: 600, color: 'var(--slate)',
+            textDecoration: 'none', padding: '4px 8px',
+            borderRadius: 'var(--radius)', border: '1px solid var(--border)',
+            transition: 'all var(--transition)', marginRight: 4,
+            background: 'var(--white)'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--indigo)'; e.currentTarget.style.color = 'var(--indigo)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--slate)'; }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="1" width="10" height="10" rx="1.5"/>
+            <path d="M1 4h10M4 4v7"/>
+          </svg>
+          Sheets
+        </a>
+      )}
+      <div className="icon-btn" onClick={onSettings} title="Settings">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="6.5" cy="6.5" r="1.5"/>
+          <path d="M6.5 1v1.2M6.5 10.8V12M1 6.5h1.2M10.8 6.5H12M2.3 2.3l.85.85M9.85 9.85l.85.85M9.85 2.3l-.85.85M3.15 9.85l-.85.85"/>
+        </svg>
+      </div>
+    </header>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NO SESSION STATE
+// ═══════════════════════════════════════════════════════════════
+
+function NoSession({ onNew }) {
+  return (
+    <div>
+      <div className="onboard">
+        <div className="onboard-eyebrow">Sophie's suggestion</div>
+        <div className="onboard-title">Restructure O3s around workstreams</div>
+        <div className="onboard-quote">
+          "I wonder if it's worth restructuring our O3s so that each big project/workstream is a topic and you add core questions we need to discuss for each of them (or write N/A if there's nothing to discuss)..."
+          <cite>— Sophie</cite>
+        </div>
+        <button className="btn btn-prim" onClick={onNew}
+          style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.25)', color: 'white' }}>
+          + Create your first O3
+        </button>
+      </div>
+      <div className="stat-row">
+        {[
+          { title: 'Prepare', desc: 'Add questions per workstream before each O3. Mark N/A where there\'s nothing to discuss.' },
+          { title: 'Run O3',  desc: 'Work through each workstream live. Capture notes and next steps in real time.' },
+          { title: 'Manage',  desc: 'Add, rename, or remove workstreams and categories to match your current priorities.' }
+        ].map(s => (
+          <div key={s.title} className="stat-box">
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4, color: 'var(--indigo)' }}>{s.title}</div>
+            <div style={{ fontSize: 11, color: 'var(--slate)', lineHeight: 1.5 }}>{s.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PREPARE VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function PrepareView({ session, ag, progress, categories, onUpdate }) {
+  const { pct, filled, total } = progress;
+
+  // Build Sophie's pre-read from FYI + Blocked items
+  const fyiItems = [], blockedItems = [];
+  categories.forEach(cat => cat.workstreams.forEach(ws => {
+    const it = ag[ws]; if (!it) return;
+    const t = getItemType(it);
+    if (t === 'fyi' && it.updateText?.trim()) fyiItems.push({ ws, it });
+    if (t === 'blocked' && (it.blockerText?.trim() || it.questions?.trim())) blockedItems.push({ ws, it });
+  }));
+  const prereadCount = fyiItems.length + blockedItems.length;
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">Prepare — {fmtDate(session?.date)}</div>
+          <div className="page-sub">Set each workstream to Discuss, FYI, Blocked, or N/A. FYI items go into Sophie's pre-read.</div>
+        </div>
+        <div className="progress-wrap">
+          <div className="progress-label">Prep complete</div>
+          <div className={`progress-number ${pct === 100 ? 'complete' : ''}`}>
+            {pct}%<span className="progress-frac">{filled}/{total}</span>
+          </div>
+          <div className="progress-bar">
+            <div className={`progress-fill ${pct === 100 ? 'done' : ''}`} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {prereadCount > 0 && (
+        <div className="preread-card">
+          <div className="preread-title">
+            Sophie's Pre-Read
+            <span className="preread-subtitle">— {prereadCount} item{prereadCount !== 1 ? 's' : ''} to review before the call</span>
+          </div>
+          {blockedItems.length > 0 && (
+            <div className="preread-section">
+              <div className="preread-section-label">Blocked — needs Sophie's action</div>
+              {blockedItems.map(({ws, it}) => (
+                <div key={ws} className="preread-item">
+                  <span className="preread-tag blocked">Blocked</span>
+                  <div className="preread-ws">{ws}</div>
+                  <div className="preread-text">{it.blockerText}{it.questions ? <><br/><em>Needs:</em> {it.questions}</> : ''}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {fyiItems.length > 0 && (
+            <div className="preread-section">
+              <div className="preread-section-label">FYI — read async, no discussion needed</div>
+              {fyiItems.map(({ws, it}) => (
+                <div key={ws} className="preread-item">
+                  <span className={`preread-tag ${it.progressStatus || 'fyi'}`}>
+                    {it.progressStatus ? it.progressStatus.replace('-',' ') : 'FYI'}
+                  </span>
+                  <div className="preread-ws">{ws}</div>
+                  <div className="preread-text">{it.updateText}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {categories.map(cat => (
+        <CategorySection key={cat.id} cat={cat} ag={ag} onUpdate={onUpdate} mode="prepare" />
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function RunView({ session, ag, progress, categories, onUpdate, onAddAction }) {
+  const [elapsed, setElapsed] = useState(0);
+  const [running, setRunning] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (running) { timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000); }
+    else { clearInterval(timerRef.current); }
+    return () => clearInterval(timerRef.current);
+  }, [running]);
+
+  const { total, done } = progress;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  // Split workstreams: 'decide' items get dedicated section; the rest group by urgency
+  const decideItems = [];
+  const urgBuckets  = { high: [], medium: [], low: [], other: [] };
+  categories.forEach(cat => {
+    cat.workstreams.forEach(ws => {
+      const it = ag[ws]; if (!it) return;
+      const t = getItemType(it);
+      if (t === 'na' || t === 'fyi') return;
+      if (t === 'decide') { decideItems.push({ ws, color: cat.color }); return; }
+      if (t === 'blocked' || (t === 'discuss' && it.questions?.trim())) {
+        const key = ['high','medium','low'].includes(it.urgency) ? it.urgency : 'other';
+        urgBuckets[key].push({ ws, color: cat.color });
+      }
+    });
+  });
+  // Urgency groups in priority order; each gets a distinctive accent color
+  const URGENCY_GROUPS = [
+    { key: 'high',   label: 'High Priority',   pip: '#BE92A2' },
+    { key: 'medium', label: 'Medium Priority',  pip: '#DBBADD' },
+    { key: 'low',    label: 'Low Priority',     pip: '#96CDFF' },
+    { key: 'other',  label: 'Other',            pip: '#D4D8E8' },
+  ];
+  const discussGroups = URGENCY_GROUPS.filter(g => urgBuckets[g.key].length > 0)
+    .map(g => ({ ...g, items: urgBuckets[g.key] }));
+  const totalItems = decideItems.length + discussGroups.reduce((s,g) => s + g.items.length, 0);
+
+  return (
+    <div>
+      <div className="run-bar">
+        <div>
+          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.5, marginBottom: 2 }}>
+            {running ? 'In progress' : 'Ready'}
+          </div>
+          <div className="run-timer">{fmtTimer(elapsed)}</div>
+        </div>
+        <div className="run-info">
+          <div className="run-session">{fmtDate(session?.date)}</div>
+          <div className="run-prog">{done}/{total} topics covered</div>
+          <div className="run-mini-bar">
+            <div className="run-mini-fill" style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+        <button className={`run-btn ${running ? 'pause' : 'start'}`} onClick={() => setRunning(r => !r)}>
+          {running ? 'Pause' : 'Start'}
+        </button>
+      </div>
+
+      {totalItems === 0 ? (
+        <div className="empty">
+          <div className="empty-title">No topics prepared yet</div>
+          <div className="empty-desc">Go to the Prepare tab and set workstreams to Discuss, Decide, or Blocked.</div>
+        </div>
+      ) : (
+        <>
+          {/* ── DECISIONS section ── */}
+          {decideItems.length > 0 && (
+            <div className="decide-section">
+              <div className="decide-section-head">
+                <div className="decide-section-label">Decisions needed today</div>
+                <span className="decide-count">{decideItems.length} item{decideItems.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="ws-grid">
+                {decideItems.map(({ ws, color }) => (
+                  <RunCard key={ws} ws={ws} color={color} item={ag[ws] || {}}
+                    onUpdate={p => onUpdate(ws, p)}
+                    onAddAction={(t, o, d) => onAddAction(ws, t, o, d)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── DISCUSSION TOPICS grouped by urgency ── */}
+          {discussGroups.length > 0 && (
+            <>
+              {decideItems.length > 0 && (
+                <div className="discuss-section-head">
+                  <div className="discuss-section-label">Discussion topics</div>
+                </div>
+              )}
+              <div className="discuss-flow">
+                {discussGroups.map(grp => (
+                  <div key={grp.key} className="discuss-flow-cat">
+                    <div className="discuss-flow-cat-head">
+                      <div className="cat-pip" style={{ background: grp.pip }} />
+                      <div className="discuss-cat-label">{grp.label}</div>
+                      <span className="discuss-cat-count">{grp.items.length}</span>
+                    </div>
+                    {grp.items.map(({ ws, color }) => (
+                      <RunCard key={ws} ws={ws} color={color} item={ag[ws] || {}}
+                        onUpdate={p => onUpdate(ws, p)}
+                        onAddAction={(t, o, d) => onAddAction(ws, t, o, d)} />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CATEGORY SECTION (shared Prepare + Run)
+// ═══════════════════════════════════════════════════════════════
+
+function CategorySection({ cat, ag, onUpdate, mode, onAddAction }) {
+  const prepped = cat.workstreams.filter(ws => { const it = ag[ws]; return it && (it.na || it.questions?.trim()); }).length;
+  return (
+    <div className="cat-section">
+      <div className="cat-header">
+        <div className="cat-pip" style={{ background: cat.color }} />
+        <div className="cat-name">{cat.name}</div>
+        <div className="cat-tally">{prepped}/{cat.workstreams.length}</div>
+      </div>
+      <div className="ws-grid">
+        {cat.workstreams.map(ws =>
+          mode === 'prepare' ? (
+            <PrepCard key={ws} ws={ws} color={cat.color} item={ag[ws] || {}}
+              onUpdate={p => onUpdate(ws, p)} />
+          ) : (
+            <RunCard key={ws} ws={ws} color={cat.color} item={ag[ws] || {}}
+              onUpdate={p => onUpdate(ws, p)}
+              onAddAction={(t, o, d) => onAddAction && onAddAction(ws, t, o, d)} />
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PREP CARD
+// ═══════════════════════════════════════════════════════════════
+
+function PrepCard({ ws, color, item, onUpdate }) {
+  const type = getItemType(item) || 'discuss';
+  const setType = (t) => onUpdate({ itemType: t, na: t === 'na' });
+  const stripeColor = type === 'blocked' ? '#EF4444' : type === 'na' ? 'var(--gray-200)' : color;
+
+  const badgeEl = () => {
+    if (type === 'na')      return <span className="badge badge-na">N/A</span>;
+    if (type === 'blocked') return <span className="badge badge-high">Blocked</span>;
+    if (type === 'fyi') {
+      const s = item.progressStatus;
+      if (s === 'on-track') return <span className="badge badge-done">On Track</span>;
+      if (s === 'at-risk')  return <span className="badge badge-tabled">At Risk</span>;
+      if (s === 'complete') return <span className="badge badge-prep">Complete</span>;
+      return <span className="badge badge-na">FYI</span>;
+    }
+    if (type === 'discuss') {
+      if (item.urgency === 'high')   return <span className="badge badge-high">High</span>;
+      if (item.urgency === 'medium') return <span className="badge badge-medium">Med</span>;
+      if (item.questions?.trim())    return <span className="badge badge-prep">Ready</span>;
+    }
+    return null;
+  };
+
+  return (
+    <div className={`ws-card ${type === 'na' ? 'is-na' : ''}`}>
+      <div className="ws-card-stripe" style={{ background: stripeColor }} />
+      <div className="ws-card-top">
+        <div className="ws-name">{ws}</div>
+        <div className="badges">{badgeEl()}</div>
+      </div>
+
+      <div className="type-selector">
+        {[{t:'discuss',l:'Discuss'},{t:'decide',l:'Decide'},{t:'fyi',l:'FYI'},{t:'blocked',l:'Blocked'},{t:'na',l:'N/A'}].map(({t,l}) => (
+          <div key={t} className={`type-pill t-${t} ${type === t ? 'active' : ''}`}
+            onClick={() => setType(t)}>{l}</div>
+        ))}
+      </div>
+
+      {type === 'discuss' && (
+        <>
+          <div className="field-label">Questions / Topics for Sophie</div>
+          <textarea className="ws-textarea" rows={3}
+            placeholder={"What needs Sophie's input?\n\nE.g. \"Align on Camden pilot next steps\" or \"Need approval on budget...\""}
+            value={item.questions || ''} onChange={e => onUpdate({ questions: e.target.value })} />
+          <div style={{ marginTop: 8 }}>
+            <select className="mini-select" value={item.urgency || ''}
+              onChange={e => onUpdate({ urgency: e.target.value })}>
+              <option value="">— Priority —</option>
+              <option value="high">High — Must cover</option>
+              <option value="medium">Medium — Ideally today</option>
+              <option value="low">Low — Can wait</option>
+            </select>
+          </div>
+        </>
+      )}
+
+      {type === 'decide' && (
+        <>
+          <div className="field-label">Decision question</div>
+          <textarea className="ws-textarea" rows={3}
+            placeholder={"What specific choice or call needs to be made?\n\nE.g. \"Should we expand Khanmigo to Grade 6 this semester?\" or \"Confirm budget ask for Tools Competition\""}
+            value={item.questions || ''} onChange={e => onUpdate({ questions: e.target.value })} />
+          <div style={{ marginTop: 6, fontSize: 11, color: 'var(--amber-text)', lineHeight: 1.4, background: 'var(--amber-bg)', borderRadius: 5, padding: '5px 8px' }}>
+            Decisions will surface in Run O3 with a dedicated outcome field to record what was decided.
+          </div>
+        </>
+      )}
+
+      {type === 'fyi' && (
+        <>
+          <div className="field-label">Progress Update <span style={{fontWeight:400,textTransform:'none',letterSpacing:0,fontSize:9}}>Sophie reads this before the call</span></div>
+          <textarea className="ws-textarea" rows={2}
+            placeholder="Brief update Sophie can read async — what's the current status?"
+            value={item.updateText || ''} onChange={e => onUpdate({ updateText: e.target.value })} />
+          <div className="progress-status-row">
+            {[{id:'on-track',l:'On Track'},{id:'at-risk',l:'At Risk'},{id:'complete',l:'Complete'}].map(({id,l}) => (
+              <div key={id} className={`prog-pill ${id} ${item.progressStatus === id ? 'active' : ''}`}
+                onClick={() => onUpdate({ progressStatus: id })}>{l}</div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {type === 'blocked' && (
+        <>
+          <div className="field-label">What's blocked</div>
+          <textarea className="ws-textarea" rows={2}
+            placeholder="Describe the blocker clearly..."
+            value={item.blockerText || ''} onChange={e => onUpdate({ blockerText: e.target.value })} />
+          <div style={{ marginTop: 8 }}>
+            <div className="field-label">What I need from Sophie</div>
+            <textarea className="ws-textarea" rows={2}
+              placeholder="Specific decision, intro, approval, or unblock needed..."
+              value={item.questions || ''} onChange={e => onUpdate({ questions: e.target.value })} />
+          </div>
+        </>
+      )}
+
+      {type === 'na' && <div className="na-label">Nothing to discuss this week</div>}
+
+      {type !== 'na' && (
+        <div style={{ marginTop: 8 }}>
+          <div className="field-label">Links / Docs</div>
+          <input className="ws-input" placeholder="Paste relevant links here..."
+            value={item.links || ''} onChange={e => onUpdate({ links: e.target.value })} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MIC BUTTON — Web Speech API, Chrome only, no API key needed
+// ═══════════════════════════════════════════════════════════════
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const hasSpeech = !!SpeechRecognition;
+
+function MicButton({ value, onChange }) {
+  const [recording, setRecording] = useState(false);
+  const recRef = useRef(null);
+  const baseRef = useRef(''); // value at start of recording session
+
+  const start = () => {
+    if (!hasSpeech) return;
+    baseRef.current = value || '';
+    const rec = new SpeechRecognition();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+
+    rec.onresult = (e) => {
+      let interim = '';
+      let final = baseRef.current;
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) { final += (final && !final.endsWith(' ') ? ' ' : '') + t; }
+        else { interim = t; }
+      }
+      baseRef.current = final;
+      onChange(final + (interim ? ' ' + interim : ''));
+    };
+
+    rec.onerror = () => { setRecording(false); };
+    rec.onend   = () => { setRecording(false); };
+
+    rec.start();
+    recRef.current = rec;
+    setRecording(true);
+  };
+
+  const stop = () => {
+    recRef.current?.stop();
+    setRecording(false);
+  };
+
+  if (!hasSpeech) return null;
+
+  return (
+    <div className={`mic-btn ${recording ? 'recording' : ''}`}
+      onClick={recording ? stop : start}
+      title={recording ? 'Stop recording' : 'Dictate (speak to transcribe)'}>
+      {recording ? (
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+          <rect x="1.5" y="1.5" width="7" height="7" rx="1.5"/>
+        </svg>
+      ) : (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+          <rect x="4" y="0.75" width="4" height="7" rx="2" fill="none"/>
+          <path d="M2 6.5c0 2.2 1.8 3.75 4 3.75s4-1.55 4-3.75"/>
+          <line x1="6" y1="10.25" x2="6" y2="11.5"/>
+          <line x1="4" y1="11.5" x2="8" y2="11.5"/>
+        </svg>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN CARD
+// ═══════════════════════════════════════════════════════════════
+
+function RunCard({ ws, color, item, onUpdate, onAddAction }) {
+  const [showAdd, setShowAdd] = useState(false);
+  const [addText, setAddText] = useState('');
+  const [addOwner, setAddOwner] = useState('Kevin');
+  const [addDue, setAddDue] = useState('');
+
+  const status = item.status || 'pending';
+  const type   = getItemType(item) || 'discuss';
+
+  const submitAction = () => {
+    if (addText.trim()) {
+      onAddAction(addText.trim(), addOwner, addDue);
+      setAddText(''); setAddDue('');
+      setShowAdd(false);
+    }
+  };
+
+  const borderColor = status === 'done' ? 'var(--green)' : status === 'tabled' ? 'var(--amber)' : color;
+
+  return (
+    <div className="ws-card" style={{ borderLeft: `3px solid ${borderColor}` }}>
+      <div className="ws-card-top">
+        <div className="ws-name">{ws}</div>
+        <div className="badges">
+          {item.urgency === 'high'    && <span className="badge badge-high">High</span>}
+          {item.urgency === 'medium'  && <span className="badge badge-medium">Med</span>}
+          {status === 'done'   && <span className="badge badge-done">✓ Done</span>}
+          {status === 'tabled' && <span className="badge badge-tabled">⤵ Tabled</span>}
+        </div>
+      </div>
+
+      {/* Decision callout (Decide type only) */}
+      {type === 'decide' && (
+        <div className="decision-callout">
+          <div className="decision-label">Decision needed</div>
+          <div style={{ fontSize: 12, lineHeight: 1.55, color: 'var(--navy)', whiteSpace: 'pre-wrap', marginBottom: 8 }}>{item.questions}</div>
+          <div className="field-label">Decision outcome</div>
+          <input className="ws-input"
+            placeholder="What did Kevin and Sophie decide?"
+            value={item.decisionMade || ''}
+            onChange={e => onUpdate({ decisionMade: e.target.value })} />
+        </div>
+      )}
+
+      {/* Agenda (read-only) — shown for Discuss and Blocked */}
+      {type !== 'decide' && (
+        <div style={{ background: 'var(--gray-50)', borderRadius: 6, padding: '8px 10px', marginBottom: 10, border: '1px solid var(--gray-200)' }}>
+          <div className="field-label" style={{ marginBottom: 4 }}>Agenda</div>
+          <div style={{ fontSize: 12, lineHeight: 1.55, color: 'var(--navy)', whiteSpace: 'pre-wrap' }}>{item.questions}</div>
+          {item.links && (
+            <div style={{ marginTop: 6 }}>{renderLinks(item.links)}</div>
+          )}
+        </div>
+      )}
+
+      {/* Notes with mic */}
+      <div className="field-label">Notes</div>
+      <div className="mic-wrap" style={{ marginBottom: 8 }}>
+        <textarea className="ws-textarea" rows={3}
+          placeholder="Key decisions, context, insights discussed... or click 🎙 to dictate"
+          value={item.notes || ''} onChange={e => onUpdate({ notes: e.target.value })} />
+        <MicButton value={item.notes || ''} onChange={v => onUpdate({ notes: v })} />
+      </div>
+
+      {/* Two-column next steps with mics */}
+      <div className="two-col">
+        <div>
+          <div className="col-label col-kevin">Kevin's Next Steps</div>
+          <div className="mic-wrap">
+            <textarea className="ws-textarea" rows={2} placeholder="Kevin will..."
+              value={item.kevinNext || ''} onChange={e => onUpdate({ kevinNext: e.target.value })} />
+            <MicButton value={item.kevinNext || ''} onChange={v => onUpdate({ kevinNext: v })} />
+          </div>
+        </div>
+        <div>
+          <div className="col-label col-sophie">Sophie's Next Steps</div>
+          <div className="mic-wrap">
+            <textarea className="ws-textarea" rows={2} placeholder="Sophie will..."
+              value={item.sophieNext || ''} onChange={e => onUpdate({ sophieNext: e.target.value })} />
+            <MicButton value={item.sophieNext || ''} onChange={v => onUpdate({ sophieNext: v })} />
+          </div>
+        </div>
+      </div>
+
+      {/* Status row */}
+      <div className="status-row">
+        <button className={`status-btn done-btn ${status === 'done' ? 'active' : ''}`}
+          onClick={() => onUpdate({ status: status === 'done' ? 'pending' : 'done' })}>✓ Done</button>
+        <button className={`status-btn table-btn ${status === 'tabled' ? 'active' : ''}`}
+          onClick={() => onUpdate({ status: status === 'tabled' ? 'pending' : 'tabled' })}>⤵ Table</button>
+        <button className="status-btn action-btn" onClick={() => setShowAdd(s => !s)}>+ Action</button>
+      </div>
+
+      {/* Add action mini-form with mic */}
+      {showAdd && (
+        <div className="add-action-form">
+          <div className="field-label" style={{ marginBottom: 6 }}>Add Action Item</div>
+          <div className="mic-wrap" style={{ marginBottom: 6 }}>
+            <textarea className="ws-textarea" rows={2} autoFocus
+              placeholder="What needs to happen? Be specific..."
+              value={addText} onChange={e => setAddText(e.target.value)} />
+            <MicButton value={addText} onChange={setAddText} />
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <select className="mini-select" value={addOwner} onChange={e => setAddOwner(e.target.value)}>
+              <option>Kevin</option><option>Sophie</option><option>Both</option>
+            </select>
+            <input type="date" className="mini-select" value={addDue} onChange={e => setAddDue(e.target.value)} style={{ flex: 1 }} />
+            <button className="btn btn-prim btn-sm" onClick={submitAction}>Save</button>
+            <button className="btn btn-sec btn-sm" onClick={() => { setShowAdd(false); setAddText(''); }}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MANAGE VIEW — add / rename / delete workstreams & categories
+// ═══════════════════════════════════════════════════════════════
+
+function ManageView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
+                      onAddCategory, onRenameCategory, onRecolorCategory, onDeleteCategory, onReset }) {
+  const [newCatName,  setNewCatName]  = useState('');
+  const [newCatColor, setNewCatColor] = useState(COLOR_OPTIONS[0]);
+  const [showAddCat,  setShowAddCat]  = useState(false);
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">Workstreams</div>
+          <div className="page-sub">Add, rename, or delete workstreams and categories. Changes apply to all future sessions.</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-sec btn-sm" onClick={onReset} title="Reset to defaults">↺ Reset defaults</button>
+          <button className="btn btn-prim btn-sm" onClick={() => setShowAddCat(s => !s)}>+ Category</button>
+        </div>
+      </div>
+
+      {showAddCat && (
+        <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 16 }}>
+          <div className="field-label" style={{ marginBottom: 6 }}>New Category Name</div>
+          <input className="ws-input" style={{ marginBottom: 8 }} placeholder="e.g. Board & Governance"
+            value={newCatName} onChange={e => setNewCatName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && newCatName.trim()) { onAddCategory(newCatName, newCatColor); setNewCatName(''); setShowAddCat(false); } }} />
+          <div className="field-label" style={{ marginBottom: 4 }}>Color</div>
+          <div className="color-swatches">
+            {COLOR_OPTIONS.map(c => (
+              <div key={c} className={`swatch ${newCatColor === c ? 'selected' : ''}`}
+                style={{ background: c }} onClick={() => setNewCatColor(c)} />
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+            <button className="btn btn-prim btn-sm"
+              onClick={() => { onAddCategory(newCatName, newCatColor); setNewCatName(''); setShowAddCat(false); }}
+              disabled={!newCatName.trim()}>Add Category</button>
+            <button className="btn btn-sec btn-sm" onClick={() => setShowAddCat(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {categories.map(cat => (
+        <ManageCategoryCard key={cat.id} cat={cat}
+          onAddWorkstream={(name) => onAddWorkstream(cat.id, name)}
+          onRenameWorkstream={(old, n) => onRenameWorkstream(cat.id, old, n)}
+          onDeleteWorkstream={(name) => onDeleteWorkstream(cat.id, name)}
+          onRename={(name) => onRenameCategory(cat.id, name)}
+          onRecolor={(c) => onRecolorCategory(cat.id, c)}
+          onDelete={() => onDeleteCategory(cat.id)} />
+      ))}
+
+      {categories.length === 0 && (
+        <div className="empty">
+          <div className="empty-title">No categories</div>
+          <div className="empty-desc">Click "+ Category" to add your first workstream category, or "↺ Reset defaults" to restore the original list.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ManageCategoryCard({ cat, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream, onRename, onRecolor, onDelete }) {
+  const [editingCat, setEditingCat]   = useState(false);
+  const [catDraft,   setCatDraft]     = useState(cat.name);
+  const [newWsName,  setNewWsName]    = useState('');
+  const [showAddWs,  setShowAddWs]    = useState(false);
+  const [showColors, setShowColors]   = useState(false);
+  const [editingWs,  setEditingWs]    = useState(null); // workstream name being edited
+  const [wsDraft,    setWsDraft]      = useState('');
+
+  const submitCatRename = () => {
+    onRename(catDraft);
+    setEditingCat(false);
+  };
+
+  const submitWsRename = (old) => {
+    onRenameWorkstream(old, wsDraft);
+    setEditingWs(null);
+  };
+
+  const submitAddWs = () => {
+    if (newWsName.trim()) {
+      onAddWorkstream(newWsName.trim());
+      setNewWsName('');
+      setShowAddWs(false);
+    }
+  };
+
+  return (
+    <div className="manage-cat">
+      {/* Category header */}
+      <div className="manage-cat-head">
+        <div className="manage-cat-pip" style={{ background: cat.color, cursor: 'pointer' }}
+          onClick={() => setShowColors(s => !s)} title="Change color" />
+
+        {editingCat ? (
+          <input className="inline-edit-input" value={catDraft} autoFocus
+            onChange={e => setCatDraft(e.target.value)}
+            onBlur={submitCatRename}
+            onKeyDown={e => { if (e.key === 'Enter') submitCatRename(); if (e.key === 'Escape') setEditingCat(false); }} />
+        ) : (
+          <div className="manage-cat-name">{cat.name}
+            <span style={{ fontSize: 10, color: 'var(--slate-light)', fontWeight: 400, marginLeft: 6 }}>
+              {cat.workstreams.length} workstream{cat.workstreams.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
+
+        <div className="manage-cat-actions">
+          <div className="tiny-btn" title="Rename category" onClick={() => { setCatDraft(cat.name); setEditingCat(true); }}>✎</div>
+          <div className="tiny-btn" title="Add workstream" onClick={() => setShowAddWs(s => !s)}>+</div>
+          <div className="tiny-btn danger" title="Delete category" onClick={() => {
+            if (cat.workstreams.length === 0 || confirm(`Delete "${cat.name}" and its ${cat.workstreams.length} workstream(s)?`)) onDelete();
+          }}>×</div>
+        </div>
+      </div>
+
+      {/* Color picker */}
+      {showColors && (
+        <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'var(--gray-50)' }}>
+          <div className="field-label" style={{ marginBottom: 6 }}>Category color</div>
+          <div className="color-swatches">
+            {COLOR_OPTIONS.map(c => (
+              <div key={c} className={`swatch ${cat.color === c ? 'selected' : ''}`}
+                style={{ background: c }}
+                onClick={() => { onRecolor(c); setShowColors(false); }} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Workstream list */}
+      <div className="manage-ws-list">
+        {cat.workstreams.map(ws => (
+          <div key={ws} className="manage-ws-row">
+            <span className="manage-ws-drag">⠿</span>
+
+            {editingWs === ws ? (
+              <input className="inline-edit-input" value={wsDraft} autoFocus
+                onChange={e => setWsDraft(e.target.value)}
+                onBlur={() => submitWsRename(ws)}
+                onKeyDown={e => { if (e.key === 'Enter') submitWsRename(ws); if (e.key === 'Escape') setEditingWs(null); }} />
+            ) : (
+              <div className="manage-ws-text">{ws}</div>
+            )}
+
+            <div className="ws-row-actions">
+              <div className="tiny-btn" title="Rename" onClick={() => { setWsDraft(ws); setEditingWs(ws); }}>✎</div>
+              <div className="tiny-btn danger" title="Delete"
+                onClick={() => { if (confirm(`Remove "${ws}" from this category?`)) onDeleteWorkstream(ws); }}>×</div>
+            </div>
+          </div>
+        ))}
+
+        {cat.workstreams.length === 0 && !showAddWs && (
+          <div style={{ padding: '8px 14px', fontSize: 11, color: 'var(--slate-light)', fontStyle: 'italic' }}>
+            No workstreams — click + to add one
+          </div>
+        )}
+      </div>
+
+      {/* Add workstream row */}
+      {showAddWs && (
+        <div className="add-ws-row">
+          <input className="add-ws-input" placeholder="New workstream name..." autoFocus
+            value={newWsName} onChange={e => setNewWsName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') submitAddWs(); if (e.key === 'Escape') { setShowAddWs(false); setNewWsName(''); } }} />
+          <button className="btn btn-prim btn-sm" onClick={submitAddWs}>Add</button>
+          <button className="btn btn-sec btn-sm" onClick={() => { setShowAddWs(false); setNewWsName(''); }}>Cancel</button>
+        </div>
+      )}
+
+      {/* Inline add button when list is non-empty */}
+      {!showAddWs && cat.workstreams.length > 0 && (
+        <div style={{ padding: '6px 14px 10px' }}>
+          <button className="btn btn-sec btn-sm" onClick={() => setShowAddWs(true)}
+            style={{ fontSize: 10, padding: '3px 9px', color: 'var(--slate)' }}>
+            + Add workstream
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HISTORY VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function HistoryView({ sessions, allAg, allWs, onOpen, onEditDate, onDelete }) {
+  const [expanded,    setExpanded]    = useState(null);
+  const [editingDate, setEditingDate] = useState(null); // session id being edited
+
+  if (sessions.length === 0) {
+    return (
+      <div className="empty">
+        <div className="empty-title">No sessions yet</div>
+        <div className="empty-desc">Past O3s will appear here after you create a session.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">O3 History</div>
+          <div className="page-sub">{sessions.length} session{sessions.length !== 1 ? 's' : ''} recorded</div>
+        </div>
+      </div>
+      {sessions.map(s => {
+        const ag = allAg[s.id] || {};
+        const prepped   = allWs.filter(ws => { const it = ag[ws]; return it && !it.na && it.questions?.trim(); }).length;
+        const discussed = allWs.filter(ws => ag[ws]?.status === 'done').length;
+        const isExp = expanded === s.id;
+        const topics = allWs.filter(ws => { const it = ag[ws]; return it && !it.na && it.questions?.trim(); });
+
+        return (
+          <div key={s.id}>
+            <div className="hist-item" onClick={() => editingDate !== s.id && setExpanded(isExp ? null : s.id)}>
+              <div className="hist-date" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {editingDate === s.id ? (
+                  <input type="date" value={s.date} autoFocus
+                    onClick={e => e.stopPropagation()}
+                    onChange={e => onEditDate(s.id, e.target.value)}
+                    onBlur={() => setEditingDate(null)}
+                    style={{ fontSize: 13, fontWeight: 700, background: 'transparent',
+                      border: '1px solid var(--indigo)', borderRadius: 4, padding: '2px 6px',
+                      color: 'var(--navy)', fontFamily: 'var(--font)' }} />
+                ) : (
+                  <>
+                    {fmtDate(s.date)}
+                    <span title="Edit date"
+                      onClick={e => { e.stopPropagation(); setEditingDate(s.id); }}
+                      style={{ cursor: 'pointer', opacity: 0.35, fontSize: 11, lineHeight: 1 }}>✎</span>
+                  </>
+                )}
+              </div>
+              <div className="hist-stats">
+                <div className="hist-stat"><strong>{prepped}</strong> topics prepped</div>
+                <div className="hist-stat"><strong>{discussed}</strong> discussed</div>
+                {s.label && <div className="hist-stat">{s.label}</div>}
+              </div>
+              <div className="hist-chevron">{isExp ? '▲' : '▼'}</div>
+            </div>
+            {isExp && (
+              <div className="hist-detail">
+                {topics.length === 0 ? (
+                  <div style={{ fontSize: 12, color: 'var(--slate-light)', padding: '8px 0' }}>No topics were prepared for this session.</div>
+                ) : (
+                  topics.map(ws => {
+                    const it = ag[ws];
+                    return (
+                      <div key={ws} className="hist-ws-item">
+                        <div className="hist-ws-name">
+                          {ws}
+                          {it.status === 'done'   && <span className="badge badge-done" style={{ fontSize: 9 }}>✓</span>}
+                          {it.status === 'tabled' && <span className="badge badge-tabled" style={{ fontSize: 9 }}>⤵</span>}
+                        </div>
+                        {it.questions    && <div className="hist-ws-text"><em>{it.itemType === 'decide' ? 'Decision question' : 'Agenda'}:</em> {it.questions}</div>}
+                        {it.decisionMade && <div className="hist-ws-text" style={{ marginTop: 3, color: 'var(--amber-text)', fontWeight: 600 }}>✓ Decided: {it.decisionMade}</div>}
+                        {it.notes      && <div className="hist-ws-text" style={{ marginTop: 3 }}><em>Notes:</em> {it.notes}</div>}
+                        {it.kevinNext  && <div className="hist-ws-next hist-ws-k">→ Kevin: {it.kevinNext}</div>}
+                        {it.sophieNext && <div className="hist-ws-next hist-ws-s">→ Sophie: {it.sophieNext}</div>}
+                      </div>
+                    );
+                  })
+                )}
+                <div style={{ display: 'flex', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                  <button className="btn btn-sec btn-sm" onClick={() => onOpen(s.id)}>
+                    Open session ↗
+                  </button>
+                  <button className="btn btn-sm" onClick={() => {
+                    if (window.confirm(`Delete "${s.label || fmtDate(s.date)}"? This cannot be undone.`)) {
+                      setExpanded(null);
+                      onDelete(s.id);
+                    }
+                  }} style={{
+                    background: 'transparent', border: '1px solid var(--red)',
+                    color: 'var(--red-text)', borderRadius: 6, fontSize: 11,
+                    padding: '4px 10px', cursor: 'pointer', fontFamily: 'var(--font)'
+                  }}>
+                    Delete record
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SKILLS VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function SkillsView({ skills, onUpdate }) {
+  const phase     = skills.phase     || 1;
+  const ratings   = skills.ratings   || {};
+  const modes     = skills.modes     || {};
+  const modeNotes = skills.modeNotes || {};
+
+  const setPhase      = (p)       => onUpdate({ phase: p });
+  const setRating     = (sid, v)  => onUpdate({ ratings:   { ...ratings,   [sid]: v } });
+  const toggleMode    = (mid)     => onUpdate({ modes:     { ...modes,     [mid]: !modes[mid] } });
+  const setModeNote   = (mid, v)  => onUpdate({ modeNotes: { ...modeNotes, [mid]: v } });
+  const setSophieNotes = (v)      => onUpdate({ sophieNotes: v });
+
+  const curPhase   = PHASES.find(p => p.id === phase) || PHASES[0];
+  const doneModesN = Object.values(modes).filter(Boolean).length;
+  const ratedVals  = Object.values(ratings).filter(v => v > 0);
+  const avgRating  = ratedVals.length
+    ? (ratedVals.reduce((s, v) => s + v, 0) / ratedVals.length).toFixed(1)
+    : '—';
+
+  return (
+    <div>
+      {/* ── Header ── */}
+      <div className="page-header">
+        <div>
+          <div className="page-title">Skill Development</div>
+          <div className="page-sub">Shane Skikne framework · Kevin × Sophie growth tracker</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'var(--slate)', fontWeight: 600 }}>
+            Avg {avgRating} / 5
+          </span>
+          <span style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+            textTransform: 'uppercase', padding: '4px 10px', borderRadius: 20,
+            background: 'var(--indigo-bg)', color: 'var(--indigo-text)',
+            border: '1px solid rgba(105,221,255,0.3)'
+          }}>
+            Phase {phase}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Phase Tracker ── */}
+      <div className="section-label" style={{ marginBottom: 8 }}>Current Phase</div>
+      <div className="phase-track">
+        {PHASES.map(p => (
+          <div
+            key={p.id}
+            className={`phase-step${p.id === phase ? ' active' : p.id < phase ? ' done' : ''}`}
+            onClick={() => setPhase(p.id)}
+          >
+            <div className="phase-num">
+              {p.id < phase ? '✓ ' : ''}Phase {p.id}
+            </div>
+            <div className="phase-name">{p.name}</div>
+            <div className="phase-dates">{p.dates}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Phase Focus Callout ── */}
+      <div style={{
+        background: 'var(--indigo-bg)', border: '1px solid rgba(105,221,255,0.3)',
+        borderRadius: 'var(--radius)', padding: '10px 14px', marginBottom: 20,
+        fontSize: 12, color: 'var(--navy)', lineHeight: 1.5
+      }}>
+        <span style={{ fontWeight: 700, color: 'var(--indigo)', marginRight: 6 }}>
+          Phase {curPhase.id} focus →
+        </span>
+        {curPhase.focus}
+      </div>
+
+      {/* ── Build Modes ── */}
+      <div className="section-label" style={{ marginBottom: 8 }}>
+        Build Modes
+        <span style={{
+          fontWeight: 400, textTransform: 'none', letterSpacing: 0,
+          color: 'var(--slate)', marginLeft: 8
+        }}>
+          {doneModesN} of {BUILD_MODES.length} practiced
+        </span>
+      </div>
+      <div className="build-mode-grid">
+        {BUILD_MODES.map(m => {
+          const checked = !!modes[m.id];
+          return (
+            <div key={m.id} className={`build-mode-card${checked ? ' done' : ''}`}>
+              <div
+                className={`mode-check${checked ? ' checked' : ''}`}
+                onClick={() => toggleMode(m.id)}
+              >
+                {checked && (
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="1.5"
+                      strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="mode-label">{m.label}</div>
+                <div className="mode-desc">{m.desc}</div>
+                {checked && (
+                  <textarea
+                    className="mode-note-input"
+                    rows={2}
+                    placeholder="Context — when did you use this mode?"
+                    value={modeNotes[m.id] || ''}
+                    onChange={e => setModeNote(m.id, e.target.value)}
+                  />
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Skill Ratings ── */}
+      <div className="section-label" style={{ marginBottom: 12 }}>Skill Ratings</div>
+      {SKILL_DOMAINS.map(domain => (
+        <div key={domain.id} className="skill-domain">
+          <div className="domain-head">
+            <div className="domain-label">{domain.label}</div>
+          </div>
+          <div className="skill-list">
+            {domain.skills.map(skill => {
+              const rating = ratings[skill.id] || 0;
+              return (
+                <div key={skill.id} className="skill-row">
+                  <div className="skill-label">{skill.label}</div>
+                  <div className="skill-dots">
+                    {[1, 2, 3, 4, 5].map(dot => (
+                      <div
+                        key={dot}
+                        className={`skill-dot${dot <= rating ? ' filled' : ''}`}
+                        onClick={() => setRating(skill.id, dot === rating ? 0 : dot)}
+                        title={dot === rating ? 'Click to clear' : `Level ${dot}`}
+                      />
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--slate-light)', width: 14, textAlign: 'right' }}>
+                    {rating || ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {/* ── Sophie's Coaching Notes ── */}
+      <div className="section-label" style={{ marginBottom: 8 }}>Sophie's Coaching Notes</div>
+      <div className="coaching-box">
+        <div className="coaching-label">For Sophie — add observations, nudges, or sprint priorities here</div>
+        <textarea
+          style={{
+            width: '100%', minHeight: 100, border: '1px solid var(--border)',
+            borderRadius: 6, padding: '8px 10px', fontSize: 12,
+            fontFamily: 'var(--font)', color: 'var(--navy)',
+            background: 'var(--gray-50)', resize: 'vertical', boxSizing: 'border-box'
+          }}
+          placeholder="e.g. Kevin is strong on agentic workflow design but needs reps with MCP integration. Next sprint: Build to Reveal mode with Illuminate data..."
+          value={skills.sophieNotes || ''}
+          onChange={e => setSophieNotes(e.target.value)}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function ActionsView({ actions, categories, onToggle, onAdd, onEdit, onDelete }) {
+  const [filter, setFilter] = useState('open');
+  const [owner,  setOwner]  = useState('all');
+  const [showAdd, setShowAdd] = useState(false);
+  const [text, setText]       = useState('');
+  // ── Inline edit state ────────────────────────────────────────
+  const [editId,    setEditId]    = useState(null);
+  const [editText,  setEditText]  = useState('');
+  const [editOwner, setEditOwner] = useState('Kevin');
+  const [editDue,   setEditDue]   = useState('');
+  const startEdit = (a) => { setEditId(a.id); setEditText(a.text); setEditOwner(a.owner || 'Kevin'); setEditDue(a.due || ''); };
+  const submitEdit = () => { if (editText.trim()) { onEdit(editId, { text: editText.trim(), owner: editOwner, due: editDue }); } setEditId(null); };
+  const [newOwner, setNewOwner] = useState('Kevin');
+  const [ws, setWs]           = useState('');
+  const [due, setDue]         = useState('');
+
+  const open = actions.filter(a => a.status === 'open').length;
+  const done = actions.filter(a => a.status === 'done').length;
+
+  const filtered = actions.filter(a => {
+    const statusOk = filter === 'all' || a.status === filter;
+    const ownerOk  = owner  === 'all' || a.owner  === owner;
+    return statusOk && ownerOk;
+  });
+
+  const submit = () => {
+    if (text.trim()) { onAdd(ws || 'General', text.trim(), newOwner, due); setText(''); setDue(''); setShowAdd(false); }
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">Action Items</div>
+          <div className="page-sub">{open} open · {done} done</div>
+        </div>
+        <button className="btn btn-prim" onClick={() => setShowAdd(s => !s)}>+ Add</button>
+      </div>
+
+      {showAdd && (
+        <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 14, marginBottom: 16 }}>
+          <div className="field-label" style={{ marginBottom: 6 }}>New Action Item</div>
+          <textarea className="ws-textarea" rows={2} placeholder="What needs to happen?" autoFocus
+            value={text} onChange={e => setText(e.target.value)} style={{ marginBottom: 8 }} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            <select className="mini-select" value={newOwner} onChange={e => setNewOwner(e.target.value)}>
+              <option>Kevin</option><option>Sophie</option><option>Both</option>
+            </select>
+            <select className="mini-select" value={ws} onChange={e => setWs(e.target.value)} style={{ flex: 1 }}>
+              <option value="">— Workstream —</option>
+              {categories.map(c => (
+                <optgroup key={c.id} label={c.name}>
+                  {c.workstreams.map(w => <option key={w}>{w}</option>)}
+                </optgroup>
+              ))}
+            </select>
+            <input type="date" className="mini-select" value={due} onChange={e => setDue(e.target.value)} />
+            <button className="btn btn-prim btn-sm" onClick={submit}>Save</button>
+            <button className="btn btn-sec btn-sm" onClick={() => setShowAdd(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+        <div className="filter-row" style={{ margin: 0 }}>
+          {[{ id: 'open', label: `Open (${open})` }, { id: 'done', label: `Done (${done})` }, { id: 'all', label: 'All' }].map(f => (
+            <button key={f.id} className={`filter-pill ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>{f.label}</button>
+          ))}
+        </div>
+        <div className="filter-row" style={{ margin: 0 }}>
+          {['all','Kevin','Sophie','Both'].map(o => (
+            <button key={o} className={`filter-pill ${owner === o ? 'active' : ''}`} onClick={() => setOwner(o)}>
+              {o === 'all' ? 'All owners' : o}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="empty">
+          <div className="empty-title">{filter === 'open' ? 'All caught up!' : 'Nothing to show'}</div>
+          <div className="empty-desc">{filter === 'open' ? 'No open action items.' : 'Try changing the filter.'}</div>
+        </div>
+      ) : (
+        <div className="actions-table">
+          {filtered.map((a) => (
+            <div key={a.id} className="action-row">
+              <div className={`action-check ${a.status === 'done' ? 'checked' : ''}`} onClick={() => onToggle(a.id)}>
+                {a.status === 'done' && <span style={{ color: 'var(--navy)', fontSize: 9, fontWeight: 700 }}>✓</span>}
+              </div>
+              {editId === a.id ? (
+                /* ── inline edit form ── */
+                <div style={{ flex: 1 }}>
+                  <input className="ws-input" value={editText} autoFocus
+                    style={{ fontSize: 12, marginBottom: 6, width: '100%' }}
+                    onChange={e => setEditText(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') submitEdit(); if (e.key === 'Escape') setEditId(null); }} />
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <select className="mini-select" value={editOwner} onChange={e => setEditOwner(e.target.value)}>
+                      <option value="Kevin">Kevin</option>
+                      <option value="Sophie">Sophie</option>
+                      <option value="Both">Both</option>
+                    </select>
+                    <input type="date" className="mini-select" value={editDue}
+                      onChange={e => setEditDue(e.target.value)} style={{ flex: 1 }} />
+                    <button className="btn btn-prim btn-sm" onClick={submitEdit}>Save</button>
+                    <button className="btn btn-sec btn-sm" onClick={() => setEditId(null)}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                /* ── normal display ── */
+                <div style={{ flex: 1 }}>
+                  <div className={`action-text ${a.status === 'done' ? 'struck' : ''}`}>{a.text}</div>
+                  <div className="action-meta">
+                    <span className={`owner-tag ${a.owner === 'Kevin' ? 'owner-k' : a.owner === 'Sophie' ? 'owner-s' : 'owner-b'}`}>{a.owner}</span>
+                    {a.ws  && <span className="action-ws">· {a.ws}</span>}
+                    {a.due && <span className="action-due">· Due {fmtDate(a.due)}</span>}
+                  </div>
+                </div>
+              )}
+              {editId !== a.id && (
+                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                  <span title="Edit" onClick={() => startEdit(a)}
+                    style={{ cursor: 'pointer', fontSize: 12, color: 'var(--slate-light)', padding: '2px 4px',
+                      borderRadius: 4, lineHeight: 1 }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--indigo-text)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--slate-light)'}>✎</span>
+                  <span title="Delete" onClick={() => { if (window.confirm('Delete this action item?')) onDelete(a.id); }}
+                    style={{ cursor: 'pointer', fontSize: 12, color: 'var(--slate-light)', padding: '2px 4px',
+                      borderRadius: 4, lineHeight: 1 }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--red-text)'}
+                    onMouseLeave={e => e.currentTarget.style.color = 'var(--slate-light)'}>×</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEW SESSION MODAL
+// ═══════════════════════════════════════════════════════════════
+
+function NewSessionModal({ onClose, onCreate }) {
+  const [date, setDate]   = useState(nextTue());
+  const [label, setLabel] = useState('');
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="modal-title">New O3 Session</div>
+          <div className="modal-sub">Create a session to begin preparing your agenda</div>
+        </div>
+        <div className="modal-body">
+          <div className="f-group">
+            <label className="f-label">O3 Date</label>
+            <input type="date" className="f-input" value={date} onChange={e => setDate(e.target.value)} />
+          </div>
+          <div className="f-group">
+            <label className="f-label">Label (optional)</label>
+            <input className="f-input" placeholder="e.g. Pre-MOY planning, Q3 check-in..."
+              value={label} onChange={e => setLabel(e.target.value)} />
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn btn-sec" onClick={onClose}>Cancel</button>
+          <button className="btn btn-prim" onClick={() => onCreate(date, label)}>Create Session</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS MODAL
+// ═══════════════════════════════════════════════════════════════
+
+function SettingsModal({ settings, onSave, onClose, onExport, onImport }) {
+  const [sheetUrl,   setSheetUrl]   = useState(settings.sheetUrl || '');
+  const [importJson, setImportJson] = useState('');
+  const [exportDone, setExportDone] = useState(false);
+
+  const handleExport = () => {
+    onExport().then(() => {
+      setExportDone(true);
+      setTimeout(() => setExportDone(false), 3000);
+    }).catch(() => {});
+  };
+
+  const handleImport = () => {
+    if (!importJson.trim()) return;
+    if (window.confirm('This will overwrite ALL local data and push to the server. Continue?')) {
+      onImport(importJson);
+      setImportJson('');
+      onClose();
+    }
+  };
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="modal-title">Settings</div>
+          <div className="modal-sub">Live sync &amp; backup options</div>
+        </div>
+        <div className="modal-body">
+
+          {/* ── Live Sync Info ── */}
+          <div style={{ background: 'var(--blue-bg)', border: '1px solid rgba(150,205,255,0.35)', borderRadius: 'var(--radius)', padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 4, color: 'var(--blue-text)' }}>🔄 Live Sync Active</div>
+            <div style={{ fontSize: 10, color: 'var(--slate)', lineHeight: 1.55 }}>
+              Data syncs automatically to Google Sheets every time you make changes, and polls for updates every 30 seconds.
+              Both Kevin and Sophie can edit from any device — desktop, iOS, or Android.
+              The sync status dot in the header shows the current connection state.
+            </div>
+          </div>
+
+          {/* ── Backup Export / Import ── */}
+          <div style={{ background: 'var(--gray-50)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, marginBottom: 4 }}>📦 Backup Export / Import</div>
+            <div style={{ fontSize: 10, color: 'var(--slate)', marginBottom: 10, lineHeight: 1.55 }}>
+              Export a JSON snapshot for backup, or import data to override both local and server data.
+            </div>
+            <button className="btn btn-sec" style={{ width: '100%', marginBottom: 8, fontWeight: 600 }} onClick={handleExport}>
+              {exportDone ? '✓ Copied to clipboard!' : '📤 Export all data to clipboard'}
+            </button>
+            <label className="f-label" style={{ marginBottom: 4 }}>Import data (paste exported JSON below)</label>
+            <textarea className="f-input" rows={3}
+              placeholder='Paste JSON from "Export all data" here…'
+              value={importJson} onChange={e => setImportJson(e.target.value)}
+              style={{ fontFamily: 'monospace', fontSize: 10, resize: 'vertical' }} />
+            <button className="btn btn-sec" style={{ marginTop: 6, width: '100%' }}
+              disabled={!importJson.trim()}
+              onClick={handleImport}>
+              📥 Import &amp; replace all data
+            </button>
+          </div>
+
+          <div className="f-group">
+            <label className="f-label">Google Sheet URL <span style={{ fontWeight: 400, color: 'var(--slate-light)' }}>(for the header link)</span></label>
+            <input className="f-input" placeholder="https://docs.google.com/spreadsheets/d/.../edit"
+              value={sheetUrl} onChange={e => setSheetUrl(e.target.value)} />
+            <div style={{ fontSize: 10, color: 'var(--slate-light)', marginTop: 4 }}>
+              Paste your Sheet URL to show a "Sheets" shortcut in the header
+            </div>
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn btn-sec" onClick={onClose}>Cancel</button>
+          <button className="btn btn-prim" onClick={() => { onSave({ ...settings, sheetUrl }); onClose(); }}>Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
