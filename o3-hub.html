@@ -280,6 +280,16 @@
     .tab-manage:hover { color: var(--blue-text); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
     .tab-manage.active { color: var(--blue-text); border-bottom-color: var(--blue); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
 
+    /* ── Section: Quarterly (moved position 2 — KIPP Sky Blue) ── */
+    .tab-quarterly { font-size: 11.5px; }
+    .tab-quarterly:hover { color: var(--blue-text); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
+    .tab-quarterly.active { color: var(--blue-text); border-bottom-color: var(--blue); background: rgba(91,184,206,0.08); border-radius: 4px 4px 0 0; }
+
+    /* ── Section: Performance Eval — KIPP Orange ── */
+    .tab-eval { font-size: 11.5px; }
+    .tab-eval:hover { color: var(--amber-text); background: rgba(245,160,32,0.08); border-radius: 4px 4px 0 0; }
+    .tab-eval.active { color: var(--amber-text); border-bottom-color: var(--amber); background: rgba(245,160,32,0.08); border-radius: 4px 4px 0 0; }
+
     /* ── Mobile label helpers ── */
     .label-short { display: none; }
     .label-full  { display: inline; }
@@ -319,8 +329,8 @@
         font-size: 11.5px;
       }
 
-      /* Row 2: Strategy tabs — equal thirds */
-      .tab-goals, .tab-skills, .tab-manage {
+      /* Row 2: Strategy tabs — equal share */
+      .tab-goals, .tab-quarterly, .tab-skills, .tab-eval, .tab-manage {
         order: 2;
         flex: 1;
         justify-content: center;
@@ -329,9 +339,11 @@
         border-top: 1px solid var(--border);
         border-radius: 0;
       }
-      .tab-goals  { font-size: 11.5px; }
-      .tab-skills { font-size: 11.5px; }
-      .tab-manage { font-size: 11px; }
+      .tab-goals     { font-size: 11px; }
+      .tab-quarterly { font-size: 11px; }
+      .tab-skills    { font-size: 11px; }
+      .tab-eval      { font-size: 11px; }
+      .tab-manage    { font-size: 11px; }
 
       /* Show short label for long tab names */
       .label-short { display: inline; }
@@ -1295,6 +1307,139 @@
     .ext-resources-row .fb-desc { font-size: 10px; color: var(--slate); margin-top: 1px; }
     .fb-partners { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
     .fb-partner { padding: 3px 10px; border-radius: 100px; background: var(--white); color: var(--slate); font-size: 9px; font-weight: 600; white-space: nowrap; border: 1px solid var(--border); }
+
+    /* ─── QUARTERLY VIEW ─────────────────────────────────────── */
+    .qv-timeline {
+      display: flex; gap: 8px; align-items: stretch;
+      margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .qv-chip {
+      flex: 1; min-width: 100px;
+      border: 2px solid transparent; border-radius: var(--radius-lg);
+      padding: 10px 14px; cursor: pointer; transition: all var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .qv-chip-past    { background: var(--gray-50); border-color: var(--border); }
+    .qv-chip-current { background: linear-gradient(135deg,#E5F5FA 0%,#d4eff7 100%); border-color: #5BB8CE; box-shadow: 0 0 0 3px rgba(91,184,206,0.18); }
+    .qv-chip-planning { background: var(--amber-bg); border-color: var(--amber); border-style: dashed; }
+    .qv-chip-past.selected    { background: var(--gray-100); border-color: var(--slate); }
+    .qv-chip-current.selected { box-shadow: 0 0 0 4px rgba(91,184,206,0.3); }
+    .qv-chip-planning.selected { box-shadow: 0 0 0 3px rgba(245,160,32,0.25); }
+    .qv-chip:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .qv-chip-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+    .qv-chip-past .qv-chip-label    { color: var(--slate); }
+    .qv-chip-current .qv-chip-label { color: #1A5A6A; }
+    .qv-chip-planning .qv-chip-label { color: var(--amber-text); }
+    .qv-chip-period { font-size: 10px; color: var(--slate-light); margin-bottom: 4px; }
+    .qv-chip-title  { font-size: 11px; font-weight: 600; color: var(--navy); }
+    .qv-chip-badge  { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 100px; }
+    .qv-chip-past .qv-chip-badge    { background: var(--gray-200); color: var(--slate); }
+    .qv-chip-current .qv-chip-badge { background: #5BB8CE; color: white; }
+    .qv-chip-planning .qv-chip-badge { background: var(--amber); color: white; }
+
+    .qv-content { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+    .qv-content-current { border-color: #5BB8CE; border-width: 2px; box-shadow: 0 0 0 3px rgba(91,184,206,0.12); }
+    .qv-content-planning { border-color: var(--amber); border-width: 1px; border-style: dashed; background: var(--amber-bg); }
+    .qv-content-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .qv-content-q { font-size: 28px; font-weight: 900; color: var(--navy); letter-spacing: -1px; }
+    .qv-content-meta { flex: 1; }
+    .qv-content-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .qv-content-period { font-size: 11px; color: var(--slate); margin-top: 1px; }
+    .qv-status-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 100px; }
+    .qv-status-past     { background: var(--gray-100); color: var(--slate); }
+    .qv-status-current  { background: #5BB8CE; color: white; }
+    .qv-status-planning { background: var(--amber); color: white; }
+
+    .qv-section { margin-bottom: 14px; }
+    .qv-section-head { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gray-100); }
+    .qv-items { display: flex; flex-direction: column; gap: 6px; }
+    .qv-item { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--navy); line-height: 1.45; }
+    .qv-item-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .qv-item-dot-done    { background: #5BB8CE; }
+    .qv-item-dot-active  { background: var(--kipp-orange); }
+    .qv-item-dot-plan    { background: var(--amber); }
+    .qv-item-sub { font-size: 10px; color: var(--slate); margin-top: 1px; }
+
+    .qv-manage-link { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--slate); cursor: pointer; margin-top: 8px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--gray-50); }
+    .qv-manage-link:hover { background: var(--gray-100); }
+
+    /* ─── PERFORMANCE EVAL VIEW ──────────────────────────────── */
+    .ev-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .ev-tab {
+      padding: 10px 20px; font-size: 12px; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      color: var(--slate); transition: all var(--transition); white-space: nowrap;
+    }
+    .ev-tab:hover { color: var(--navy); background: var(--gray-50); }
+    .ev-tab.active { color: var(--navy); border-bottom-color: var(--amber); font-weight: 600; }
+    .ev-tab-status { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 100px; }
+    .ev-status-complete { background: #5BB8CE; color: white; }
+    .ev-status-partial  { background: var(--amber); color: white; }
+    .ev-status-pending  { background: var(--gray-200); color: var(--slate); }
+
+    .ev-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 14px; }
+    .ev-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+    .ev-card-title { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .ev-card-sub { font-size: 10px; color: var(--slate); margin-top: 2px; }
+    .ev-section-label { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--slate); margin: 14px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--gray-100); }
+    .ev-goal-row { display: grid; grid-template-columns: 1fr 1.5fr 1.5fr; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--gray-50); font-size: 11px; }
+    @media (max-width: 680px) { .ev-goal-row { grid-template-columns: 1fr; } }
+    .ev-goal-label { font-weight: 600; color: var(--navy); }
+    .ev-goal-self { color: var(--navy); line-height: 1.45; }
+    .ev-goal-mgr { color: #1A5A6A; line-height: 1.45; font-style: italic; }
+    .ev-goal-mgr-pending { color: var(--slate-light); font-style: italic; font-size: 10px; }
+    .ev-narrative-grid { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 10px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--gray-50); font-size: 11px; }
+    @media (max-width: 800px) { .ev-narrative-grid { grid-template-columns: 1fr; } }
+    .ev-narrative-prompt { font-weight: 600; color: var(--slate); font-size: 10px; line-height: 1.4; }
+    .ev-narrative-self { color: var(--navy); line-height: 1.55; }
+    .ev-narrative-mgr  { color: #1A5A6A; line-height: 1.55; font-style: italic; }
+    .ev-col-head { font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .ev-col-head-self { color: var(--navy); }
+    .ev-col-head-mgr  { color: #1A5A6A; }
+    .ev-status-banner { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius); margin-bottom: 14px; font-size: 11px; }
+    .ev-banner-complete { background: #E5F5FA; border: 1px solid #5BB8CE; color: #1A5A6A; }
+    .ev-banner-partial  { background: var(--amber-bg); border: 1px solid var(--amber); color: var(--amber-text); }
+    .ev-banner-pending  { background: var(--gray-50); border: 1px solid var(--border); color: var(--slate); }
+    .ev-goal-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 100px; font-size: 9px; font-weight: 700; }
+    .ev-chip-met  { background: #E5F5FA; color: #1A5A6A; }
+    .ev-chip-miss { background: var(--red-bg); color: var(--red-text); }
+    .ev-chip-na   { background: var(--gray-100); color: var(--slate); }
+    .ev-empty-template { background: var(--gray-50); border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+    .ev-empty-title { font-size: 14px; font-weight: 700; color: var(--slate); margin-bottom: 6px; }
+    .ev-empty-sub { font-size: 12px; color: var(--slate-light); line-height: 1.5; }
+    .ev-template-row { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; }
+    .ev-template-label { font-size: 10px; font-weight: 700; color: var(--slate); margin-bottom: 4px; }
+    .ev-template-placeholder { height: 36px; background: var(--gray-100); border-radius: 4px; }
+
+    /* ── Inline editable textareas — eval + quarterly ── */
+    .ev-textarea {
+      width: 100%; border: 1px solid transparent; border-radius: 4px;
+      padding: 4px 6px; margin: -4px -6px; /* optical alignment with surrounding text */
+      font-size: 11px; font-family: var(--font); color: var(--navy);
+      resize: vertical; background: transparent; line-height: 1.5;
+      min-height: 52px; transition: border-color 0.15s, background 0.15s;
+      box-sizing: content-box;
+      field-sizing: content; /* Chrome 123+ — auto-expands to content height */
+    }
+    .ev-textarea:focus { outline: none; border-color: rgba(21,32,88,0.25); background: var(--gray-50); border-radius: 4px; }
+    .ev-textarea.mgr { color: #1A5A6A; font-style: italic; }
+    .ev-textarea.mgr:focus { border-color: rgba(91,184,206,0.4); background: var(--blue-bg); }
+    .ev-textarea.mgr::placeholder { color: rgba(91,184,206,0.7); font-style: italic; }
+    .ev-textarea::placeholder { color: var(--slate-light); }
+
+    /* Quarterly view inline edit */
+    .qv-edit-input {
+      width: 100%; border: 1px solid transparent; border-radius: 4px;
+      padding: 3px 5px; margin: -3px -5px;
+      font-size: 12px; font-family: var(--font); color: var(--navy);
+      background: transparent; resize: none; line-height: 1.45;
+      transition: border-color 0.15s, background 0.15s; box-sizing: content-box;
+    }
+    .qv-edit-input:focus { outline: none; border-color: rgba(21,32,88,0.25); background: var(--gray-50); border-radius: 4px; }
+    .qv-edit-sub {
+      font-size: 10px; color: var(--slate); margin-top: 3px; display: block; min-height: 20px;
+    }
+    .qv-edit-sub::placeholder { color: var(--gray-200); }
   </style>
 </head>
 <body>
@@ -2460,7 +2605,7 @@ function App() {
     }
   };
 
-  const noSession = !session && view !== 'history' && view !== 'actions' && view !== 'manage' && view !== 'skills';
+  const noSession = !session && view !== 'history' && view !== 'actions' && view !== 'manage' && view !== 'skills' && view !== 'quarterly' && view !== 'eval';
 
   const updSkills = (patch) => {
     setD(d => ({ ...d, skills: { ...d.skills, ...patch } }));
@@ -2526,7 +2671,16 @@ function App() {
 
         <div className="tab-sep" />
 
-        {/* ── 2. O3 Group ──────────────────────────────────── */}
+        {/* ── 2. Quarterly Priorities (moved left) ─────────── */}
+        <div className={`tab tab-quarterly ${view === 'quarterly' ? 'active' : ''}`}
+             onClick={() => setView('quarterly')}>
+          <span className="label-full">Quarterly Priorities</span>
+          <span className="label-short">Quarters</span>
+        </div>
+
+        <div className="tab-sep" />
+
+        {/* ── 3. O3 Group ──────────────────────────────────── */}
         <div className="tab-group-o3">
           <span className="tab-group-badge">O3</span>
           {[
@@ -2545,7 +2699,7 @@ function App() {
 
         <div className="tab-sep" />
 
-        {/* ── 3. Skills & Growth ───────────────────────────── */}
+        {/* ── 4. Skills & Growth ───────────────────────────── */}
         <div className={`tab tab-skills ${view === 'skills' ? 'active' : ''}`}
              onClick={() => setView('skills')}>
           Skills &amp; Growth
@@ -2553,11 +2707,11 @@ function App() {
 
         <div className="tab-sep" />
 
-        {/* ── 4. Quarterly Priorities & Initiatives ────────── */}
-        <div className={`tab tab-manage ${view === 'manage' ? 'active' : ''}`}
-             onClick={() => setView('manage')}>
-          <span className="label-full">Quarterly Priorities &amp; Initiatives</span>
-          <span className="label-short">Priorities</span>
+        {/* ── 5. Performance Eval ──────────────────────────── */}
+        <div className={`tab tab-eval ${view === 'eval' ? 'active' : ''}`}
+             onClick={() => setView('eval')}>
+          <span className="label-full">Performance Eval</span>
+          <span className="label-short">Eval</span>
         </div>
 
       </nav>
@@ -2565,6 +2719,10 @@ function App() {
       <main className="main" style={view === 'goals' ? { maxWidth: 1300 } : {}}>
         {view === 'goals' ? (
           <GoalsDashboardView />
+        ) : view === 'quarterly' ? (
+          <QuarterlyView onManageWorkstreams={() => setView('manage')} />
+        ) : view === 'eval' ? (
+          <PerformanceEvalView />
         ) : noSession ? (
           <NoSession onNew={() => setShowNew(true)} />
         ) : view === 'prepare' ? (
@@ -3288,6 +3446,512 @@ function RunCard({ ws, color, item, onUpdate, onAddAction }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// QUARTERLY PRIORITIES VIEW
+// ═══════════════════════════════════════════════════════════════
+
+const QUARTERS = [
+  {
+    id: 'q1', label: 'Q1', period: 'Jul – Sep 2025', status: 'past',
+    title: 'Foundation & Launch',
+    summary: 'Pilot portfolio launched · BOY eval complete · $725K secured',
+    sections: [
+      {
+        head: 'Key Deliverables',
+        items: [
+          { text: 'Launched 2025-26 AI pilot portfolio', sub: 'EnlightenAI, CourseMojo, Khan Academy, Amira, Goblins, OKO Labs' },
+          { text: 'ChatGPT Enterprise custom tools deployed', sub: 'KIPP Forward essays, AP feedback workflows, school psych reporting' },
+          { text: 'BOY performance evaluation completed', sub: 'Sep 22–Oct 3, 2025 · Self & Manager (Sophie) · All 3 top goals: Met' },
+          { text: 'Year 1 fundraising exceeded: $725K secured', sub: 'Covered FY25 innovation costs + seeded FY26 pilots' },
+          { text: 'Built AI literacy + Gemini rollout for HS staff' },
+        ]
+      },
+      {
+        head: 'Partnerships & External',
+        items: [
+          { text: 'OpenAI, Learning Commons (CZI), Masterborn, ID8 Innovation' },
+          { text: 'Charter School Growth Fund, Gates Foundation — pitch foundation built' },
+          { text: 'University of Washington, MIT Blueprint Labs — research partnerships scoped' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'q2', label: 'Q2', period: 'Oct – Dec 2025', status: 'past',
+    title: 'Research & Momentum',
+    summary: 'MOY pilot analysis · AP Prep Engine research · ChatGPT EDU',
+    sections: [
+      {
+        head: 'Key Deliverables',
+        items: [
+          { text: 'MOY pilot portfolio analysis completed', sub: 'Scale / continue / caution / stop framework; structured around treatment/control' },
+          { text: 'AP Prep Engine user research surfaced core finding', sub: 'APs spend ~18 hrs/week on prep+data vs ~12 on coaching; Prep Engine targets 5–8.5 hrs/week back' },
+          { text: 'ChatGPT EDU launch partnership with OpenAI', sub: 'One of first K-12 networks to deploy enterprise-grade AI at scale' },
+          { text: '2030 Student AI Competencies framework built', sub: 'Phased rollout concept for KIPP NJ/MIA graduates' },
+          { text: 'MOY performance evaluation self-reflection completed', sub: 'Meeting: Dec 8–19, 2025 · Manager notes pending' },
+          { text: 'KIPP Miami Technical HS opportunity identified', sub: 'Career pathways, Apple Education partnership, Fall 2026 opening' },
+        ]
+      },
+      {
+        head: 'Product & Partnerships',
+        items: [
+          { text: 'Learning Commons (CZI) collaboration deepened', sub: 'Knowledge graph infrastructure; standards-aligned foundation for prototyping' },
+          { text: 'Masterborn scope renegotiated', sub: 'Engineering capacity for product dev infrastructure' },
+          { text: 'KIPP Forward co-design in motion', sub: 'Kyla: "We\'d love to use this tool with our juniors"' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'q3', label: 'Q3', period: 'Jan – Mar 2026', status: 'current',
+    title: 'Scale & Consult',
+    summary: 'KF Consulting · Claude Code enablement · Learning Commons prototyping',
+    sections: [
+      {
+        head: 'Primary Focus',
+        items: [
+          { text: 'KIPP Foundation consulting — Phase A', sub: 'Network-wide survey + interviews; MOY Research Report due Mar–Apr 2026' },
+          { text: 'Claude Code enablement at scale', sub: 'Building internal frameworks: use cases, guardrails, training, impact measures; Ryan Hill leading adoption signal' },
+          { text: 'Learning Commons prototyping', sub: 'Rapid proof-of-concept prototypes to pilot with APs and regional leaders' },
+        ]
+      },
+      {
+        head: 'Active Workstreams',
+        items: [
+          { text: 'EOY pilot analysis preparation', sub: 'Lightweight cadence: student outcomes + implementation quality + ROI assumptions' },
+          { text: 'KIPP Miami Technical HS development', sub: 'Career pathways, MGT implementation support, Apple Education partnership' },
+          { text: 'Operating cadence build', sub: 'Weekly tracker; hand off / deprioritize lower-leverage workstreams' },
+          { text: 'Squared Away + Drew onboarding', sub: 'Extending capacity to protect deep-work time for product dev + strategy' },
+        ]
+      },
+      {
+        head: 'Growth Commitments (from MOY eval)',
+        items: [
+          { text: '"Go slow to go fast" — build simple systems that protect quality' },
+          { text: 'Deliberate operating cadence: standards → checkpoints → QA → measurement early' },
+          { text: 'Ruthless prioritization + delegation: fewer initiatives, clearer ownership' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'q4', label: 'Q4', period: 'Apr – Jun 2026', status: 'planning',
+    title: 'Deliver & Plan',
+    summary: 'KF Phase A delivery · EOY eval · Fundraising proposals · 2030 plan',
+    sections: [
+      {
+        head: 'Planned Deliverables',
+        items: [
+          { text: 'KF Foundation Phase A delivery', sub: 'MOY Research Report published Mar–Apr; Phase B scoping (combined strategic framework Jun–Aug)' },
+          { text: 'EOY performance evaluation', sub: 'Self due May 15, 2026 · Manager review meeting May 25–Jun 5, 2026' },
+          { text: 'EOY pilot review and analysis', sub: 'Full portfolio evaluation with scale/stop decisions for 2026-27' },
+        ]
+      },
+      {
+        head: 'Strategy & Fundraising',
+        items: [
+          { text: 'Fundraising proposals to national funders', sub: 'AP Prep Engine, data/tech infrastructure, KIPP Miami HS, Math student work analysis' },
+          { text: '2030 AI Innovation Plan integration', sub: 'Finalize with DTI/C³; transition from pilots to durable innovation engine' },
+          { text: 'Learning Commons proof-of-concept validation', sub: 'Demonstrate real pull from APs and regional leaders to fuel fundraising' },
+        ]
+      }
+    ]
+  }
+];
+
+function QuarterlyView({ onManageWorkstreams }) {
+  const [focused, setFocused] = useState('q3');
+  // Editable quarters — localStorage-backed, seeded from hardcoded QUARTERS
+  const [quarters, setQuarters] = useState(() => LS.get('qv_quarters') || QUARTERS);
+
+  const updateItem = (qid, si, ii, field, value) => {
+    setQuarters(prev => {
+      const next = prev.map(qt => {
+        if (qt.id !== qid) return qt;
+        const sections = qt.sections.map((sec, s) => {
+          if (s !== si) return sec;
+          const items = sec.items.map((it, i) => i !== ii ? it : { ...it, [field]: value });
+          return { ...sec, items };
+        });
+        return { ...qt, sections };
+      });
+      LS.set('qv_quarters', next);
+      return next;
+    });
+  };
+
+  const updateSummary = (qid, value) => {
+    setQuarters(prev => {
+      const next = prev.map(qt => qt.id !== qid ? qt : { ...qt, summary: value });
+      LS.set('qv_quarters', next);
+      return next;
+    });
+  };
+
+  const q = quarters.find(x => x.id === focused);
+  const dotClass = q ? `qv-item-dot-${q.status === 'past' ? 'done' : q.status === 'current' ? 'active' : 'plan'}` : '';
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">Quarterly Priorities &amp; Initiatives</div>
+          <div className="page-sub">SY 2025–26 · Q1 Jul–Sep · Q2 Oct–Dec · Q3 Jan–Mar (current) · Q4 Apr–Jun</div>
+        </div>
+        <span className="qv-manage-link" onClick={onManageWorkstreams}>⚙ Workstreams</span>
+      </div>
+
+      {/* ── Timeline — labels removed, just Q + period + status ── */}
+      <div className="qv-timeline">
+        {quarters.map(qtr => (
+          <div
+            key={qtr.id}
+            className={`qv-chip qv-chip-${qtr.status}${focused === qtr.id ? ' selected' : ''}`}
+            onClick={() => setFocused(qtr.id)}
+          >
+            <span className="qv-chip-badge">{qtr.status === 'past' ? '✓ Done' : qtr.status === 'current' ? '● Now' : '◷ Next'}</span>
+            <div className="qv-chip-label">{qtr.label}</div>
+            <div className="qv-chip-period">{qtr.period}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Detail card ── */}
+      {q && (
+        <div className={`qv-content qv-content-${q.status}`}>
+          <div className="qv-content-header">
+            <div className="qv-content-q">{q.label}</div>
+            <div className="qv-content-meta">
+              {/* Summary is editable inline */}
+              <textarea
+                className="qv-edit-input"
+                style={{ fontSize: 11, color: 'var(--slate)', minHeight: 20 }}
+                value={q.summary}
+                onChange={e => updateSummary(q.id, e.target.value)}
+                placeholder="Quarter summary…"
+                rows={1}
+              />
+              <div className="qv-content-period">{q.period}</div>
+            </div>
+            <span className={`qv-status-pill qv-status-${q.status}`}>
+              {q.status === 'past' ? '✓ Completed' : q.status === 'current' ? '● Current Quarter' : '◷ Planning'}
+            </span>
+          </div>
+
+          {q.sections.map((sec, si) => (
+            <div className="qv-section" key={si}>
+              <div className="qv-section-head">{sec.head}</div>
+              <div className="qv-items">
+                {sec.items.map((item, ii) => (
+                  <div className="qv-item" key={ii} style={{ alignItems: 'flex-start' }}>
+                    <div className={`qv-item-dot ${dotClass}`} style={{ marginTop: 8, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <textarea
+                        className="qv-edit-input"
+                        value={item.text}
+                        onChange={e => updateItem(q.id, si, ii, 'text', e.target.value)}
+                        rows={2}
+                        placeholder="Priority or deliverable…"
+                      />
+                      <textarea
+                        className="qv-edit-input qv-edit-sub"
+                        value={item.sub || ''}
+                        onChange={e => updateItem(q.id, si, ii, 'sub', e.target.value)}
+                        rows={1}
+                        placeholder="Add detail…"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// PERFORMANCE EVALUATION VIEW
+// ═══════════════════════════════════════════════════════════════
+
+function PerformanceEvalView() {
+  const [tab, setTab] = useState('boy');
+  // Flat edits object keyed by "period_section_rowIndex_field"
+  // Seeds from localStorage; falls back to hardcoded text per field
+  const [edits, setEdits] = useState(() => LS.get('eval_edits') || {});
+  const getVal = (key, fallback = '') => edits[key] !== undefined ? edits[key] : fallback;
+  const setVal = (key, value) => setEdits(prev => {
+    const next = { ...prev, [key]: value };
+    LS.set('eval_edits', next);
+    return next;
+  });
+
+  const tabs = [
+    { id: 'boy', label: 'BOY', sublabel: '2024-25 EOY + 2025-26 Setup', status: 'complete', statusLabel: 'Complete' },
+    { id: 'moy', label: 'MOY', sublabel: '2025-26 Mid-Year', status: 'partial', statusLabel: 'Self ✓ · Mgr Pending' },
+    { id: 'eoy', label: 'EOY', sublabel: '2025-26 End-of-Year', status: 'pending', statusLabel: 'Not Started' },
+  ];
+
+  return (
+    <div>
+      <div className="page-header">
+        <div>
+          <div className="page-title">Performance Evaluation</div>
+          <div className="page-sub">SY 2025–26 · BOY (Sep 2025) · MOY (Dec 2025) · EOY (Jun 2026)</div>
+        </div>
+      </div>
+
+      {/* ── Eval tabs ── */}
+      <div className="ev-tabs">
+        {tabs.map(t => (
+          <div key={t.id} className={`ev-tab${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+            <strong>{t.label}</strong> &nbsp;{t.sublabel}
+            <span className={`ev-tab-status ev-status-${t.status}`}>{t.statusLabel}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ── BOY ── */}
+      {tab === 'boy' && (
+        <div>
+          <div className="ev-status-banner ev-banner-complete">
+            ✓ <strong>Complete</strong> — Review meeting: Sep 22–Oct 3, 2025 · Both self-reflection and manager notes finalized.
+          </div>
+
+          {/* Top Goals */}
+          <div className="ev-card">
+            <div className="ev-card-head">
+              <div><div className="ev-card-title">Top Goals — 2024-25</div><div className="ev-card-sub">Reviewed at BOY 2025-26 meeting</div></div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1.5fr 1.5fr', gap:8, marginBottom:8 }}>
+              <div className="ev-col-head ev-col-head-self">Goal</div>
+              <div className="ev-col-head ev-col-head-self">Kevin — Self Reflection</div>
+              <div className="ev-col-head ev-col-head-mgr">Sophie — Manager Notes</div>
+            </div>
+            {[
+              {
+                goal: 'AI pilots running across framework, with scale identified / deprioritized',
+                met: 'met',
+                self: 'Launched ChatGPT Enterprise (custom tools for KIPP Forward essays, AP feedback, school psych), EnlightenAI, CourseMojo, AI literacy + Gemini for HS. Clear scale paths set (EnlightenAI expansion, CourseMojo Miami 6–8).',
+                mgr: 'Strong first year of execution. Launched several pilots and started getting AI into the water. Ramped up fast and made inroads in several areas in a year.',
+              },
+              {
+                goal: 'Innovation idea engine established',
+                met: 'met',
+                self: 'Built strong relationships with ed-tech / big tech / researchers / funders. Created a visible, managed backlog for future scoping. Pilot evaluation framework established.',
+                mgr: 'Built relationships with numerous external partners — bringing ideas and resources into the organization and strategically connecting internal needs and external opportunities. "What is the pilot evaluation framework?"',
+              },
+              {
+                goal: 'Fundraising Year 1 target exceeded; Year 2 in place',
+                met: 'met',
+                self: 'Exceeded Year 1 goal by securing $725K to cover FY25 innovation costs and seed FY26 pilots. Began reframing work as disciplined AI R&D function — shifting funders from supporting one-off projects to investing in an innovation lab.',
+                mgr: 'Very successful in fundraising ($725K!), all the more impressive given it was first year fundraising and the first year of the function.',
+              },
+            ].map((row, i) => (
+              <div className="ev-goal-row" key={i}>
+                <div>
+                  <div className="ev-goal-label">{row.goal}</div>
+                  <span className="ev-goal-chip ev-chip-met">✓ Met</span>
+                </div>
+                <textarea className="ev-textarea"
+                  value={getVal(`boy_goal_${i}_self`, row.self)}
+                  onChange={e => setVal(`boy_goal_${i}_self`, e.target.value)}
+                  placeholder="Kevin's self-reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`boy_goal_${i}_mgr`, row.mgr)}
+                  onChange={e => setVal(`boy_goal_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+          </div>
+
+          {/* Narrative */}
+          <div className="ev-card">
+            <div className="ev-card-head"><div><div className="ev-card-title">Narrative</div></div></div>
+            <div style={{ display:'grid', gridTemplateColumns:'180px 1fr 1fr', gap:8, marginBottom:8 }}>
+              <div />
+              <div className="ev-col-head ev-col-head-self">Kevin — Self</div>
+              <div className="ev-col-head ev-col-head-mgr">Sophie — Manager</div>
+            </div>
+            {[
+              {
+                prompt: 'Greatest accomplishments / contributions?',
+                self: 'Built an innovation flywheel: combined vision + grit with executional range (research, strategy, operations, product scoping, vendor management, fundraising). Delivered credible pilots that solved real problems. Secured $725K and partnerships. Strengthened KIPP\'s external posture with big tech, ed-tech, research partners.',
+                mgr: 'Strong first year building a new function. Launched multiple credible AI pilots with several stakeholders, built external partnerships, secured $725K. Demonstrated initiative, resourcefulness, and effort — starting to show the community that AI can generate tangible solutions (e.g., Miami AP coaching GPT).',
+              },
+              {
+                prompt: 'Biggest misses?',
+                self: 'Did not proactively invest enough to build a stronger, earlier partnership with Sarba — slowed alignment on aspects of the AI strategy. Budgeted ~$20K on video production in Camden that wasn\'t usable. Prioritization/PM discipline contributed.',
+                mgr: 'AP Worktime project had a slow start — deprioritized for several weeks, PM and execution not as tight as they could have been. Multiple rounds of redrafting before landing where needed. "Your reflection that this was your first time leading a project of this complexity was helpful to hear."',
+              },
+              {
+                prompt: 'Areas of growth for this year?',
+                self: 'Ruthless prioritization & execution discipline — protect highest-leverage work, reduce context-switching, deliver on time. Org strategy alignment & trust-building — deepen proactive partnership with Sarba and Sha.',
+                mgr: 'Ruthless prioritization and execution discipline — building self-management systems, protecting focus, consistently delivering on time without needing managerial follow-up. Discernment and communication — giving colleagues only what they most need to know, with a clear purpose and ask.',
+              },
+            ].map((row, i) => (
+              <div className="ev-narrative-grid" key={i}>
+                <div className="ev-narrative-prompt">{row.prompt}</div>
+                <textarea className="ev-textarea"
+                  value={getVal(`boy_narr_${i}_self`, row.self)}
+                  onChange={e => setVal(`boy_narr_${i}_self`, e.target.value)}
+                  placeholder="Kevin's self reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`boy_narr_${i}_mgr`, row.mgr)}
+                  onChange={e => setVal(`boy_narr_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+          </div>
+
+          {/* 2025-26 Goals set */}
+          <div className="ev-card">
+            <div className="ev-card-title" style={{marginBottom:10}}>Top Goals Set for 2025-26</div>
+            <div className="qv-items">
+              {[
+                { text: 'Impact Score grows 10%+ on average per quarter', sub: 'Impact Score = student outcomes ÷ staff hours' },
+                { text: 'Enhance student proficiency in Math & ELA through pilots' },
+                { text: 'Improve College Matriculation & Career Launch outcomes' },
+                { text: 'Increase Employee Efficiency & Impact' },
+                { text: 'Integrate AI & Innovation into 2030 Plan' },
+              ].map((item, i) => (
+                <div className="qv-item" key={i}>
+                  <div className="qv-item-dot qv-item-dot-done" />
+                  <div><div>{item.text}</div>{item.sub && <div className="qv-item-sub">{item.sub}</div>}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{marginTop:12, padding:'10px 12px', background:'var(--gray-50)', borderRadius:'var(--radius)', fontSize:11, color:'var(--slate)'}}>
+              <strong>Meta-Goal:</strong> Position as leading candidate for Chief AI, R&amp;D, and Innovation Officer at KIPP Team &amp; Family — by delivering measurable Impact Score outcomes, establishing durable innovation systems, and building trusted cross-functional partnerships.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MOY ── */}
+      {tab === 'moy' && (
+        <div>
+          <div className="ev-status-banner ev-banner-partial">
+            ⏳ <strong>Self-reflection complete.</strong> Manager notes not yet received. Review meeting: Dec 8–19, 2025.
+          </div>
+
+          <div className="ev-card">
+            <div className="ev-card-head">
+              <div><div className="ev-card-title">Top Goals — 2025-26 (Mid-Year Progress)</div><div className="ev-card-sub">Self-reflection only · Manager column pending</div></div>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1.5fr', gap:8, marginBottom:8 }}>
+              <div className="ev-col-head ev-col-head-self">Goal</div>
+              <div className="ev-col-head ev-col-head-self">Kevin — MOY Self Reflection</div>
+              <div className="ev-col-head ev-col-head-mgr">Sophie — Manager Notes</div>
+            </div>
+            {[
+              {
+                goal: 'Improve student outcomes and increase staff efficiency through targeted AI initiatives (4 strategy areas)',
+                self: 'On track against the one goal, with clear progress across all four strategy areas. Where I\'ve been most stretched is the systems/operating model required to move from "pilot and learn" to a durable innovation engine, given I\'m still operating as a team of one and have been navigating meaningful personal stress.\n\n1) ELA & Math: AI pilot portfolio + MOY evaluation increasingly structured around treatment/control comparisons; clearer scale/continue/caution/stop recommendations.\n2) College Matriculation: KIPP Forward co-design in motion — Kyla: "We\'d love to use this tool later this spring with our juniors."\n3) Employee Efficiency: AP Prep Engine research surfaced 18 hrs/week prep vs 12 hrs coaching; Prep Engine targets 5–8.5 hrs/week back. ChatGPT EDU launched.\n4) 2030 Plan: AI/innovation integrated into longer-term direction. Student Competencies built. KIPP Miami HS partnership. Fundable portfolio for 4 initiatives.',
+                mgr: null,
+              },
+            ].map((row, i) => (
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1.5fr', gap:10, paddingBottom:10, borderBottom:'1px solid var(--gray-50)', fontSize:11 }}>
+                <div><div className="ev-goal-label">{row.goal}</div></div>
+                <textarea className="ev-textarea"
+                  value={getVal(`moy_goal_${i}_self`, row.self)}
+                  onChange={e => setVal(`moy_goal_${i}_self`, e.target.value)}
+                  placeholder="Kevin's self-reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`moy_goal_${i}_mgr`, '')}
+                  onChange={e => setVal(`moy_goal_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+          </div>
+
+          <div className="ev-card">
+            <div className="ev-card-head"><div><div className="ev-card-title">Narrative — Self</div><div className="ev-card-sub">Manager narrative pending</div></div></div>
+            {[
+              {
+                prompt: 'Greatest accomplishments so far this year?',
+                self: 'Building momentum and turning it into clearer structure: a stronger pilot portfolio, a clearer measurement story, and collaboration leading to a more clear "innovation engine" vision for 2030 plan.\n\nBuilt and matured a portfolio of AI pilots tied to outcomes + decision-making (MOY analysis is an important step). Advanced AP Prep Engine from "pain point" to evidence-grounded product direction. Shifted innovation from projects to infrastructure inside the 2030 / DTI arc. Built fundable portfolio with clear pitch narratives for national funders across 4 distinct initiatives.',
+              },
+              {
+                prompt: '1–2 areas of growth to focus on now?',
+                self: '1) "Go slow to go fast": build simple systems that protect quality and prevent overextension. Sophie\'s Caliper feedback resonated — core risk is speed without enough deliberate information-gathering, communication, and process/QA.\n\n2) Shift from "pilot leadership" to "innovation engine leadership": a repeatable operating model for intake → prioritization → pilot design → adoption support → measurement → scale/sunset decisions.\n\nTwo behaviors committed to: Deliberate operating cadence (standards → checkpoints → QA → measurement early) and Ruthless prioritization + delegation (fewer initiatives, clearer ownership, protect deep-work time).',
+              },
+            ].map((row, i) => (
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'200px 1fr 1fr', gap:10, marginBottom:10, paddingBottom:10, borderBottom:'1px solid var(--gray-50)', fontSize:11 }}>
+                <div className="ev-narrative-prompt">{row.prompt}</div>
+                <textarea className="ev-textarea"
+                  value={getVal(`moy_narr_${i}_self`, row.self)}
+                  onChange={e => setVal(`moy_narr_${i}_self`, e.target.value)}
+                  placeholder="Kevin's self-reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`moy_narr_${i}_mgr`, '')}
+                  onChange={e => setVal(`moy_narr_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── EOY ── */}
+      {tab === 'eoy' && (
+        <div>
+          <div className="ev-status-banner ev-banner-pending">
+            📋 <strong>Not yet started.</strong> Self-reflection due: <strong>May 15, 2026</strong> · Review meeting: <strong>May 25–Jun 5, 2026</strong>
+          </div>
+
+          <div>
+            <div className="ev-section-label">Top Goals — EOY Review</div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1.5fr', gap:8, marginBottom:8 }}>
+              <div className="ev-col-head ev-col-head-self">Goal</div>
+              <div className="ev-col-head ev-col-head-self">Kevin — EOY Self Reflection</div>
+              <div className="ev-col-head ev-col-head-mgr">Sophie — Manager Notes</div>
+            </div>
+            {['Top Goal 1','Top Goal 2','Top Goal 3','Top Goal 4','Top Goal 5'].map((g, i) => (
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr 2fr 1.5fr', gap:10, paddingBottom:10, marginBottom:10, borderBottom:'1px solid var(--gray-50)', fontSize:11 }}>
+                <textarea className="ev-textarea"
+                  value={getVal(`eoy_goal_${i}_goal`, '')}
+                  onChange={e => setVal(`eoy_goal_${i}_goal`, e.target.value)}
+                  placeholder={`${g} — describe the goal…`} />
+                <textarea className="ev-textarea"
+                  value={getVal(`eoy_goal_${i}_self`, '')}
+                  onChange={e => setVal(`eoy_goal_${i}_self`, e.target.value)}
+                  placeholder="Kevin's EOY self-reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`eoy_goal_${i}_mgr`, '')}
+                  onChange={e => setVal(`eoy_goal_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+
+            <div className="ev-section-label" style={{marginTop:16}}>Narrative — EOY</div>
+            {[
+              'What are your greatest accomplishments / contributions to your team/organization this year? What contributed to these accomplishments?',
+              'What are 1–2 areas of growth to focus on for next year?',
+            ].map((prompt, i) => (
+              <div key={i} style={{ display:'grid', gridTemplateColumns:'200px 1fr 1fr', gap:10, marginBottom:10, paddingBottom:10, borderBottom:'1px solid var(--gray-50)', fontSize:11 }}>
+                <div className="ev-narrative-prompt">{prompt}</div>
+                <textarea className="ev-textarea"
+                  value={getVal(`eoy_narr_${i}_self`, '')}
+                  onChange={e => setVal(`eoy_narr_${i}_self`, e.target.value)}
+                  placeholder="Kevin's self-reflection…" />
+                <textarea className="ev-textarea mgr"
+                  value={getVal(`eoy_narr_${i}_mgr`, '')}
+                  onChange={e => setVal(`eoy_narr_${i}_mgr`, e.target.value)}
+                  placeholder="Sophie's manager notes…" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════════════
 // MANAGE VIEW — add / rename / delete workstreams & categories
 // ═══════════════════════════════════════════════════════════════
 
@@ -3503,10 +4167,19 @@ function HistoryView({ sessions, allAg, allWs, onOpen, onEditDate, onDelete }) {
       </div>
       {sessions.map(s => {
         const ag = allAg[s.id] || {};
-        const prepped   = allWs.filter(ws => { const it = ag[ws]; return it && !it.na && it.questions?.trim(); }).length;
+        const isPrepped = (it) => {
+          if (!it) return false;
+          const t = getItemType(it);
+          if (t === 'na') return false;
+          if (t === 'fyi') return !!it.updateText?.trim();
+          if (t === 'blocked') return !!(it.blockerText?.trim() || it.questions?.trim());
+          if (t === 'discuss' || t === 'decide') return !!it.questions?.trim();
+          return false;
+        };
+        const prepped   = allWs.filter(ws => isPrepped(ag[ws])).length;
         const discussed = allWs.filter(ws => ag[ws]?.status === 'done').length;
         const isExp = expanded === s.id;
-        const topics = allWs.filter(ws => { const it = ag[ws]; return it && !it.na && it.questions?.trim(); });
+        const topics = allWs.filter(ws => isPrepped(ag[ws]));
 
         return (
           <div key={s.id}>
@@ -3550,7 +4223,9 @@ function HistoryView({ sessions, allAg, allWs, onOpen, onEditDate, onDelete }) {
                           {it.status === 'done'   && <span className="badge badge-done" style={{ fontSize: 9 }}>✓</span>}
                           {it.status === 'tabled' && <span className="badge badge-tabled" style={{ fontSize: 9 }}>⤵</span>}
                         </div>
-                        {it.questions    && <div className="hist-ws-text"><em>{it.itemType === 'decide' ? 'Decision question' : 'Agenda'}:</em> {it.questions}</div>}
+                        {it.itemType === 'fyi'  && it.updateText  && <div className="hist-ws-text"><em>FYI:</em> {it.updateText}</div>}
+                        {it.itemType !== 'fyi'  && it.questions   && <div className="hist-ws-text"><em>{it.itemType === 'decide' ? 'Decision question' : it.itemType === 'blocked' ? 'Needs from Sophie' : 'Agenda'}:</em> {it.questions}</div>}
+                        {it.itemType === 'blocked' && it.blockerText && <div className="hist-ws-text"><em>Blocked:</em> {it.blockerText}</div>}
                         {it.decisionMade && <div className="hist-ws-text" style={{ marginTop: 3, color: 'var(--amber-text)', fontWeight: 600 }}>✓ Decided: {it.decisionMade}</div>}
                         {it.notes      && <div className="hist-ws-text" style={{ marginTop: 3 }}><em>Notes:</em> {it.notes}</div>}
                         {it.kevinNext  && <div className="hist-ws-next hist-ws-k">→ Kevin: {it.kevinNext}</div>}
