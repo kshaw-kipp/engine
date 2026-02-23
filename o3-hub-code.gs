@@ -54,8 +54,10 @@ function doGet(e) {
     else if (action === 'getAllAgenda') result = getAllAgenda();
     else if (action === 'getActions')   result = getActions();
     else if (action === 'getCategories')result = getCategories();
-    else if (action === 'getSkills')    result = getSkills();
-    else                                result = { error: 'Unknown action: ' + action };
+    else if (action === 'getSkills')      result = getSkills();
+    else if (action === 'getQuarterlies') result = getJsonBlob('Quarterlies');
+    else if (action === 'getEvalEdits')   result = getJsonBlob('EvalEdits');
+    else                                  result = { error: 'Unknown action: ' + action };
   } catch (err) {
     result = { error: err.message };
   }
@@ -82,6 +84,8 @@ function doPost(e) {
     else if (p.action === 'deleteAction')      result = deleteAction(p.id);
     else if (p.action === 'syncCategories')    result = syncCategories(p.categories);
     else if (p.action === 'syncSkills')        result = syncSkills(p.skills);
+    else if (p.action === 'syncQuarterlies')   result = setJsonBlob('Quarterlies', p.quarters);
+    else if (p.action === 'syncEvalEdits')     result = setJsonBlob('EvalEdits',   p.edits);
     else if (p.action === 'syncAll')           result = syncAll(p.sessions, p.agenda, p.actions, p.categories, p.skills);
     else                                       result = { error: 'Unknown action: ' + p.action };
   } catch (err) {
@@ -143,8 +147,18 @@ function initSheets() {
     skills.setColumnWidths(1, 2, [140, 600]);
   }
 
+  ['Quarterlies', 'EvalEdits'].forEach(name => {
+    if (!ss.getSheetByName(name)) {
+      const sh = ss.insertSheet(name);
+      sh.appendRow(['key', 'value']);
+      sh.getRange(1, 1, 1, 2).setFontWeight('bold').setBackground('#1E293B').setFontColor('white');
+      sh.setFrozenRows(1);
+      sh.setColumnWidths(1, 2, [140, 600]);
+    }
+  });
+
   SpreadsheetApp.flush();
-  Logger.log('✅ Sheets ready: Sessions, Agenda, Actions, Categories, Skills');
+  Logger.log('✅ Sheets ready: Sessions, Agenda, Actions, Categories, Skills, Quarterlies, EvalEdits');
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -158,6 +172,8 @@ function getAll() {
     actions:    getActions(),
     categories: getCategories(),
     skills:     getSkills(),
+    quarterlies: getJsonBlob('Quarterlies'),
+    evalEdits:   getJsonBlob('EvalEdits'),
     _ts:        new Date().toISOString()
   };
 }
@@ -503,6 +519,25 @@ function normDate(val) {
   }
   // Already a string — strip any time component and return date part only
   return String(val).split('T')[0].substring(0, 10);
+}
+
+// ──────────────────────────────────────────────────────────────
+// JSON BLOB HELPERS — used for Quarterlies and EvalEdits sheets
+// Each sheet stores exactly one data row: [key, JSON string]
+// ──────────────────────────────────────────────────────────────
+
+function getJsonBlob(sheetName) {
+  const sh = getSheet(sheetName);
+  if (!sh || sh.getLastRow() <= 1) return null;
+  try { return JSON.parse(sh.getRange(2, 2).getValue()); } catch { return null; }
+}
+
+function setJsonBlob(sheetName, data) {
+  let sh = getSheet(sheetName);
+  if (!sh) { initSheets(); sh = getSheet(sheetName); }
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).clearContent();
+  sh.appendRow([sheetName.toLowerCase(), JSON.stringify(data)]);
+  return { ok: true };
 }
 
 function getCategoryForWorkstream(workstream) {

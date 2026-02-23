@@ -2305,12 +2305,14 @@ const fmtTimer = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')
 function App() {
   // ── State: localStorage-first, server-merged ────────────────
   const init = () => ({
-    sessions:   LS.get('o3_sessions')   || [],
-    agenda:     LS.get('o3_agenda')     || {},
-    actions:    LS.get('o3_actions')    || [],
-    settings:   LS.get('o3_settings')   || { sheetUrl: '' },
-    categories: LS.get('o3_categories') || DEFAULT_CATEGORIES,
-    skills:     LS.get('o3_skills')     || DEFAULT_SKILLS
+    sessions:    LS.get('o3_sessions')    || [],
+    agenda:      LS.get('o3_agenda')      || {},
+    actions:     LS.get('o3_actions')     || [],
+    settings:    LS.get('o3_settings')    || { sheetUrl: '' },
+    categories:  LS.get('o3_categories')  || DEFAULT_CATEGORIES,
+    skills:      LS.get('o3_skills')      || DEFAULT_SKILLS,
+    quarterlies: LS.get('qv_quarters_v2') || null,  // null → seed QUARTERS in QuarterlyView
+    evalEdits:   LS.get('eval_edits')     || {},
   });
 
   const [D, setD] = useState(init);
@@ -2333,12 +2335,14 @@ function App() {
 
   // ── Persist to localStorage on every state change ───────────
   useEffect(() => {
-    LS.set('o3_sessions',   D.sessions);
-    LS.set('o3_agenda',     D.agenda);
-    LS.set('o3_actions',    D.actions);
-    LS.set('o3_settings',   D.settings);
-    LS.set('o3_categories', D.categories);
-    LS.set('o3_skills',     D.skills);
+    LS.set('o3_sessions',    D.sessions);
+    LS.set('o3_agenda',      D.agenda);
+    LS.set('o3_actions',     D.actions);
+    LS.set('o3_settings',    D.settings);
+    LS.set('o3_categories',  D.categories);
+    LS.set('o3_skills',      D.skills);
+    LS.set('qv_quarters_v2', D.quarterlies);
+    LS.set('eval_edits',     D.evalEdits);
   }, [D]);
 
   // ── Merge server data (server wins except settings) ─────────
@@ -2349,13 +2353,17 @@ function App() {
     const hasPendingCatWrite = writeQueueRef.current.some(
       item => item.action === 'syncCategories' || item.action === 'syncAll'
     );
+    const hasPendingQVWrite   = writeQueueRef.current.some(item => item.action === 'syncQuarterlies');
+    const hasPendingEvalWrite = writeQueueRef.current.some(item => item.action === 'syncEvalEdits');
     setD(prev => ({
-      sessions:   server.sessions   ?? prev.sessions,
-      agenda:     server.agenda     ?? prev.agenda,
-      actions:    server.actions    ?? prev.actions,
-      settings:   prev.settings, // device-local always
-      categories: hasPendingCatWrite ? prev.categories : (server.categories ?? prev.categories),
-      skills:     server.skills     ?? prev.skills
+      sessions:    server.sessions   ?? prev.sessions,
+      agenda:      server.agenda     ?? prev.agenda,
+      actions:     server.actions    ?? prev.actions,
+      settings:    prev.settings, // device-local always
+      categories:  hasPendingCatWrite  ? prev.categories  : (server.categories  ?? prev.categories),
+      skills:      server.skills      ?? prev.skills,
+      quarterlies: hasPendingQVWrite   ? prev.quarterlies  : (server.quarterlies ?? prev.quarterlies),
+      evalEdits:   hasPendingEvalWrite ? prev.evalEdits    : (server.evalEdits   ?? prev.evalEdits),
     }));
     if (server.sessions?.length) {
       setSid(prev => {
@@ -2613,6 +2621,16 @@ function App() {
     enqueue({ action: 'syncSkills', skills: merged }, { delay: 1000, dedupeKey: 'skills' });
   };
 
+  const updQuarterlies = (quarters) => {
+    setD(d => ({ ...d, quarterlies: quarters }));
+    enqueue({ action: 'syncQuarterlies', quarters }, { delay: 1000, dedupeKey: 'quarterlies' });
+  };
+
+  const updEvalEdits = (edits) => {
+    setD(d => ({ ...d, evalEdits: edits }));
+    enqueue({ action: 'syncEvalEdits', edits }, { delay: 1000, dedupeKey: 'evalEdits' });
+  };
+
   // ── Backup Export / Import ────────────────────────────────────
   const exportState = () => {
     const payload = JSON.stringify({
@@ -2721,6 +2739,8 @@ function App() {
           <GoalsDashboardView />
         ) : view === 'quarterly' ? (
           <QuarterlyView
+            quarterlies={D.quarterlies}
+            onUpdateQuarterlies={updQuarterlies}
             categories={D.categories}
             onAddWorkstream={addWorkstream}
             onRenameWorkstream={renameWorkstream}
@@ -2732,7 +2752,7 @@ function App() {
             onReset={resetCategories}
           />
         ) : view === 'eval' ? (
-          <PerformanceEvalView />
+          <PerformanceEvalView evalEdits={D.evalEdits} onUpdateEvalEdits={updEvalEdits} />
         ) : noSession ? (
           <NoSession onNew={() => setShowNew(true)} />
         ) : view === 'prepare' ? (
@@ -3513,34 +3533,28 @@ const QUARTERS = [
   }
 ];
 
-function QuarterlyView({ categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
+function QuarterlyView({ quarterlies, onUpdateQuarterlies, categories, onAddWorkstream, onRenameWorkstream, onDeleteWorkstream,
                          onAddCategory, onRenameCategory, onRecolorCategory, onDeleteCategory, onReset }) {
   const [focused, setFocused] = useState('q3');
-  // Editable quarters — localStorage-backed, seeded from hardcoded QUARTERS
-  const [quarters, setQuarters] = useState(() => LS.get('qv_quarters_v2') || QUARTERS);
+  // Use server-synced quarters from App state; fall back to seed data if never set
+  const quarters = quarterlies || QUARTERS;
 
   const updateItem = (qid, si, ii, field, value) => {
-    setQuarters(prev => {
-      const next = prev.map(qt => {
-        if (qt.id !== qid) return qt;
-        const sections = qt.sections.map((sec, s) => {
-          if (s !== si) return sec;
-          const items = sec.items.map((it, i) => i !== ii ? it : { ...it, [field]: value });
-          return { ...sec, items };
-        });
-        return { ...qt, sections };
+    const next = quarters.map(qt => {
+      if (qt.id !== qid) return qt;
+      const sections = qt.sections.map((sec, s) => {
+        if (s !== si) return sec;
+        const items = sec.items.map((it, i) => i !== ii ? it : { ...it, [field]: value });
+        return { ...sec, items };
       });
-      LS.set('qv_quarters_v2', next);
-      return next;
+      return { ...qt, sections };
     });
+    onUpdateQuarterlies(next);
   };
 
   const updateSummary = (qid, value) => {
-    setQuarters(prev => {
-      const next = prev.map(qt => qt.id !== qid ? qt : { ...qt, summary: value });
-      LS.set('qv_quarters_v2', next);
-      return next;
-    });
+    const next = quarters.map(qt => qt.id !== qid ? qt : { ...qt, summary: value });
+    onUpdateQuarterlies(next);
   };
 
   const q = quarters.find(x => x.id === focused);
@@ -3647,17 +3661,15 @@ function QuarterlyView({ categories, onAddWorkstream, onRenameWorkstream, onDele
 // PERFORMANCE EVALUATION VIEW
 // ═══════════════════════════════════════════════════════════════
 
-function PerformanceEvalView() {
+function PerformanceEvalView({ evalEdits, onUpdateEvalEdits }) {
   const [tab, setTab] = useState('boy');
-  // Flat edits object keyed by "period_section_rowIndex_field"
-  // Seeds from localStorage; falls back to hardcoded text per field
-  const [edits, setEdits] = useState(() => LS.get('eval_edits') || {});
+  // edits object is now managed by App and synced to GAS — no local useState needed
+  const edits = evalEdits || {};
   const getVal = (key, fallback = '') => edits[key] !== undefined ? edits[key] : fallback;
-  const setVal = (key, value) => setEdits(prev => {
-    const next = { ...prev, [key]: value };
-    LS.set('eval_edits', next);
-    return next;
-  });
+  const setVal = (key, value) => {
+    const next = { ...edits, [key]: value };
+    onUpdateEvalEdits(next);
+  };
 
   const tabs = [
     { id: 'boy', label: 'BOY', sublabel: '2024-25 EOY + 2025-26 Setup', status: 'complete', statusLabel: 'Complete' },
