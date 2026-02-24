@@ -1225,7 +1225,7 @@
     .vision-strip-label { align-self: center; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-text); white-space: nowrap; padding-right: 4px; }
 
     /* Alignment grid */
-    .alignment-grid { display: grid; grid-template-columns: 200px 255px 1fr; gap: 14px; margin-bottom: 24px; align-items: start; }
+    .alignment-grid { display: grid; grid-template-columns: 200px 1fr; gap: 14px; margin-bottom: 24px; align-items: start; }
     @media (max-width: 900px) { .alignment-grid { grid-template-columns: 1fr; } }
     .alignment-col-head { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px 8px 0 0; margin-bottom: 8px; }
     .col-num { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; }
@@ -1234,8 +1234,7 @@
     .col-l1 .col-num { background: var(--kipp-blue); color: #0D2460; }
     .col-l2 .alignment-col-head { background: rgba(245,160,32,0.10); color: #7A4200; }
     .col-l2 .col-num { background: var(--amber); color: var(--navy); }
-    .col-l3 .alignment-col-head { background: rgba(21,32,88,0.07); color: var(--navy); }
-    .col-l3 .col-num { background: var(--navy); color: #fff; }
+
 
     /* Pillar cards */
     .pillar-card { background: var(--white); border: 1px solid var(--border); border-left: 3px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; }
@@ -1964,7 +1963,7 @@ function GoalsDashboardView() {
       {/* ── THREE-COLUMN ALIGNMENT MAP ── */}
       <div className="gd-section-header">
         <span className="gd-section-title">Goal Alignment Map</span>
-        <span className="gd-section-sub">2030 Vision → SY25-26 Team Priorities → Kevin's Initiatives</span>
+        <span className="gd-section-sub">2030 Vision → SY25-26 Team Priorities</span>
       </div>
 
       <div className="alignment-grid">
@@ -2030,18 +2029,7 @@ function GoalsDashboardView() {
           })}
         </div>
 
-        {/* COLUMN 3: Kevin's Initiatives */}
-        <div className="col-l3">
-          <div className="alignment-col-head">
-            <div className="col-num">3</div>
-            <div><div className="col-title-gd">Kevin's Initiatives</div></div>
-          </div>
-          <div className="initiative-cards-grid">
-            {initiatives.map(g => (
-              <InitiativeCard key={g.id} goal={g} onSave={saveInitiative} />
-            ))}
-          </div>
-        </div>
+
       </div>
 
       {/* ── AI PILOT PORTFOLIO ── */}
